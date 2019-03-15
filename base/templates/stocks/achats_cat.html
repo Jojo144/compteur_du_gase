@@ -1,0 +1,47 @@
+{% include "stocks/achats.html" %} 
+
+Cat : {{ cat }} <br>
+
+{% if products %}
+<form action="{% url 'stocks:achats_cat' member.pk cat.pk %}" method="post">
+{% csrf_token %}
+<input type="submit" value="Dans panier">
+{{ form.as_p }}
+<!-- <table> -->
+<!--   <tr> -->
+<!--     <th>Produit</th> -->
+<!--     <th>Prix au kg</th> -->
+<!--     <th>Quantité</th> -->
+<!--   </tr> -->
+<!-- {% for p in products %} -->
+<!--   <tr> -->
+<!--     <td>{{ p.name }}</td> -->
+<!--     <td>{{ p.price }}</td> -->
+<!--     <td><input type="number" name="qte_{{ cat.pk }}_{{ p.pk }}"> </td> -->
+<!--   </tr> -->
+<!-- {% endfor %} -->
+<!-- </table>  -->
+</form>
+{% else %}
+  Pas de produit de cette catégorie.
+{% endif %}
+
+{% if basket %}
+<table>
+  <tr>
+    <th>Produit</th>
+    <th>Quantité</th>
+    <!-- <th>Prix</th> -->
+  </tr>
+{% for p, q in basket.items %}
+  <tr>
+    <td>{{ p }}</td>
+    <td>{{ q }}</td>
+    <!-- <td>{{ p.price }}</td> -->
+  </tr>
+{% endfor %}
+</table> 
+{% else %}
+  Panier vide.
+{% endif %}
+<a href="{% url 'stocks:end_achats' member.pk %}">Payer</a>

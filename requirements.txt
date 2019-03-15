@@ -1,0 +1,3 @@
+django
+django_tables2
+django_filters

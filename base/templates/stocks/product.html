@@ -1,0 +1,8 @@
+{% include 'stocks/menu.html' %}
+{% include "stocks/messages.html" %} 
+
+<form action="" method="post">
+{% csrf_token %}
+<input type="submit" value="Go">
+{{ form.as_p }}
+</form>

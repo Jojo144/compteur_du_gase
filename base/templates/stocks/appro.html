@@ -1,0 +1,19 @@
+{% include 'stocks/menu.html' %}
+{% include "stocks/messages.html" %} 
+
+<br>
+<br>
+
+Fournisseur : {{ provider }}
+
+<br>
+
+{% if pdts %}
+<form action="{% url 'stocks:appro' provider.pk %}" method="post">
+{% csrf_token %}
+<input type="submit" value="Go">
+{{ form.as_p }}
+</form>
+{% else %}
+  Pas de produit pour ce fournisseur.
+{% endif %}
