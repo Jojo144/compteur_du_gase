@@ -1,5 +1,5 @@
-{% include "stocks/menu.html" %} 
-{% include "stocks/messages.html" %} 
+{% include "base/menu.html" %} 
+{% include "base/messages.html" %} 
 {% load bootstrap3 %}
 {% load render_table from django_tables2 %}
 
@@ -11,7 +11,7 @@
   <body>
 <br>
 <br>
-<a href="{% url 'stocks:create_product' %}">Créer un nouveau produit</a>
+<a href="{% url 'base:create_product' %}">Créer un nouveau produit</a>
 <br>
 <br>
 

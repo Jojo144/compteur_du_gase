@@ -1,9 +1,9 @@
-{% include "stocks/achats.html" %} 
+{% include "base/achats.html" %} 
 
 Cat : {{ cat }} <br>
 
 {% if products %}
-<form action="{% url 'stocks:achats_cat' member.pk cat.pk %}" method="post">
+<form action="{% url 'base:achats_cat' member.pk cat.pk %}" method="post">
 {% csrf_token %}
 <input type="submit" value="Dans panier">
 {{ form.as_p }}
@@ -44,4 +44,4 @@ Cat : {{ cat }} <br>
 {% else %}
   Panier vide.
 {% endif %}
-<a href="{% url 'stocks:end_achats' member.pk %}">Payer</a>
+<a href="{% url 'base:end_achats' member.pk %}">Payer</a>

@@ -18,10 +18,10 @@ from .utils import *
 ### index
 
 def index(request):
-    return render(request, 'stocks/index.html')
+    return render(request, 'base/index.html')
 
 def gestion(request):
-    return render(request, 'stocks/gestion.html')
+    return render(request, 'base/gestion.html')
 
 
 ### achats
@@ -33,13 +33,13 @@ def pre_achats(request):
             return HttpResponseRedirect(reverse('stocks:achats', args=(request.POST['member'],)))
     else:
         form = HouseholdForm()
-    return render(request, 'stocks/pre_achats.html', {'form': form})
+    return render(request, 'base/pre_achats.html', {'form': form})
 
 def achats(request, member_id):
     context = {'member': Household.objects.get(pk=member_id),
                'cats': Category.objects.all(),
     }
-    return render(request, 'stocks/achats.html', context)
+    return render(request, 'base/achats.html', context)
 
 
 def achats_cat(request, member_id, cat_id):
@@ -59,7 +59,7 @@ def achats_cat(request, member_id, cat_id):
                'form': ProductList(pdts),
                'basket': basket}
     request.session['basket'] = basket
-    return render(request, 'stocks/achats_cat.html', context)
+    return render(request, 'base/achats_cat.html', context)
 
 
 def end_achats(request, member_id):
@@ -89,7 +89,7 @@ def pre_compte(request):
             return HttpResponseRedirect(reverse('stocks:compte', args=(request.POST['member'],)))
     else:
         form = HouseholdForm()
-    return render(request, 'stocks/pre_compte.html', {'form': form})
+    return render(request, 'base/pre_compte.html', {'form': form})
 
 def compte(request, member_id):
     member = Household.objects.get(pk=member_id)
@@ -109,7 +109,7 @@ def compte(request, member_id):
                # 'pdts': prod.get_products(),
                'form': form,
     }
-    return render(request, 'stocks/compte.html', context)
+    return render(request, 'base/compte.html', context)
 
 
 ### produits
@@ -123,7 +123,7 @@ def create_product(request):
             return HttpResponseRedirect(reverse('stocks:products'))
     else:
         form = ProductForm()
-    return render(request, 'stocks/product.html', {'form': form})
+    return render(request, 'base/product.html', {'form': form})
 
 def detail_product(request, product_id):
     pdt = Product.objects.get(pk=product_id)
@@ -135,7 +135,7 @@ def detail_product(request, product_id):
             return HttpResponseRedirect(reverse('stocks:products'))
     else:
         form = ProductForm(instance=pdt)
-    return render(request, 'stocks/product.html', {'form': form})
+    return render(request, 'base/product.html', {'form': form})
 
 
 class ProductTable(tables.Table):
@@ -180,7 +180,7 @@ def products(request):
     f = ProductFilter(request.GET, queryset=Product.objects.order_by('name'))
     table = ProductTable(f.qs)
     tables.RequestConfig(request).configure(table)
-    return render(request, 'stocks/products.html', {'table': table, 'filter': f})
+    return render(request, 'base/products.html', {'table': table, 'filter': f})
 
 
 ### appro
@@ -192,7 +192,7 @@ def pre_appro(request):
             return HttpResponseRedirect(reverse('stocks:appro', args=(request.POST['provider'],)))
     else:
         form = ProviderForm()
-    return render(request, 'stocks/pre_appro.html', {'form': form})
+    return render(request, 'base/pre_appro.html', {'form': form})
 
 def appro(request, provider_id):
     prod = Provider.objects.get(pk=provider_id)
@@ -214,7 +214,7 @@ def appro(request, provider_id):
                'pdts': prod.get_products(),
                'form': form,
     }
-    return render(request, 'stocks/appro.html', context)
+    return render(request, 'base/appro.html', context)
 
 
 
@@ -250,7 +250,7 @@ def members(request):
     f = MemberFilter(request.GET, queryset=Member.objects.order_by('name'))
     table = MemberTable(f.qs)
     tables.RequestConfig(request).configure(table)
-    return render(request, 'stocks/members.html', {'table': table, 'filter': f})
+    return render(request, 'base/members.html', {'table': table, 'filter': f})
 
 
 def detail_member(request, member_id):
@@ -263,7 +263,7 @@ def detail_member(request, member_id):
             return HttpResponseRedirect(reverse('stocks:members'))
     else:
         form = MemberForm(instance=member)
-    return render(request, 'stocks/member.html', {'form': form})
+    return render(request, 'base/member.html', {'form': form})
 
 
 ## inventaire
@@ -286,7 +286,7 @@ def inventory(request):
             return HttpResponseRedirect(reverse('stocks:gestion'))
     else:
         form = ProductList(pdts, request.POST)
-    return render(request, 'stocks/inventory.html', {'form': form})
+    return render(request, 'base/inventory.html', {'form': form})
 
 ### stats
 from jchart import Chart
@@ -306,4 +306,4 @@ class LineChart(Chart):
 
 def stats(request, product_id):
     pdt = Product.objects.get(pk=product_id)
-    return render(request, 'stocks/stats.html', {'pdt': pdt, 'chart': LineChart(),})
+    return render(request, 'base/stats.html', {'pdt': pdt, 'chart': LineChart(),})

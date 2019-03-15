@@ -1,0 +1,11 @@
+{% include "base/menu.html" %} 
+{% include "base/messages.html" %} 
+<br>
+<br>
+<h1>Choisissez votre nom :</h1>
+
+<form action="{% url 'base:pre_achats' %}" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit">
+</form>

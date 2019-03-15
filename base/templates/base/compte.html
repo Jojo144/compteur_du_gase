@@ -1,5 +1,5 @@
-{% include 'stocks/menu.html' %}
-{% include "stocks/messages.html" %} 
+{% include 'base/menu.html' %}
+{% include "base/messages.html" %} 
 
 <br>
 <br>
@@ -9,7 +9,7 @@ Membre : {{ member }}
 Solde : {{ member.account }}
 <br>
 
-<form action="{% url 'stocks:compte' member.pk %}" method="post">
+<form action="{% url 'base:compte' member.pk %}" method="post">
 {% csrf_token %}
 <input type="submit" value="Go">
 {{ form.as_p }}

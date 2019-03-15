@@ -1,5 +1,5 @@
-{% include 'stocks/menu.html' %}
-{% include "stocks/messages.html" %} 
+{% include 'base/menu.html' %}
+{% include "base/messages.html" %} 
 
 <br>
 <br>
@@ -9,7 +9,7 @@ Fournisseur : {{ provider }}
 <br>
 
 {% if pdts %}
-<form action="{% url 'stocks:appro' provider.pk %}" method="post">
+<form action="{% url 'base:appro' provider.pk %}" method="post">
 {% csrf_token %}
 <input type="submit" value="Go">
 {{ form.as_p }}

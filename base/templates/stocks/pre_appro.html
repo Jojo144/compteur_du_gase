@@ -1,8 +1,0 @@
-{% include 'stocks/menu.html' %}
-{% include "stocks/messages.html" %} 
-
-<form action="{% url 'stocks:pre_appro' %}" method="post">
-    {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit">
-</form>

@@ -1,0 +1,11 @@
+{% include "base/menu.html" %} 
+{% include "base/messages.html" %} 
+
+<br>
+<br>
+
+<form action="{% url 'base:inventory' %}" method="post">
+{% csrf_token %}
+<input type="submit" value="Goo">
+{{ form.as_p }}
+</form>

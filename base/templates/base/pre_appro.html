@@ -1,0 +1,8 @@
+{% include 'base/menu.html' %}
+{% include "base/messages.html" %} 
+
+<form action="{% url 'base:pre_appro' %}" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit">
+</form>

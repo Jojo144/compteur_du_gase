@@ -1,7 +1,7 @@
-{% include "stocks/messages.html" %} 
+{% include "base/messages.html" %} 
 |
 {% for cat in cats %}
-<a href="{% url 'stocks:achats_cat' member.pk cat.pk %}">{{ cat.name }}</a>
+<a href="{% url 'base:achats_cat' member.pk cat.pk %}">{{ cat.name }}</a>
    |
 {% endfor %}
 <br>
