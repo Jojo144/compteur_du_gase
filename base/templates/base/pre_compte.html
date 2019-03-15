@@ -1,8 +1,11 @@
-{% include 'base/menu.html' %}
-{% include "base/messages.html" %} 
+{% extends "base/base.html" %}
+
+{% block content %}
 
 <form action="{% url 'base:pre_compte' %}" method="post">
     {% csrf_token %}
     {{ form }}
     <input type="submit" value="Submit">
 </form>
+Yo!
+{% endblock content %}

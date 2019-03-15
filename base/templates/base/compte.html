@@ -1,5 +1,6 @@
-{% include 'base/menu.html' %}
-{% include "base/messages.html" %} 
+{% extends "base/base.html" %}
+
+{% block content %}
 
 <br>
 <br>
@@ -14,3 +15,5 @@ Solde : {{ member.account }}
 <input type="submit" value="Go">
 {{ form.as_p }}
 </form>
+
+{% endblock content %}

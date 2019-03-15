@@ -30,7 +30,7 @@ def pre_achats(request):
     if request.method == 'POST':
         form = HouseholdForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect(reverse('stocks:achats', args=(request.POST['member'],)))
+            return HttpResponseRedirect(reverse('base:achats', args=(request.POST['member'],)))
     else:
         form = HouseholdForm()
     return render(request, 'base/pre_achats.html', {'form': form})
@@ -77,7 +77,7 @@ def end_achats(request, member_id):
         pdt.save()
     messages.success(request, 'Votre compte a été débité de ' + str(s) + ' €.')
     del request.session['basket']
-    return HttpResponseRedirect(reverse('stocks:index'))
+    return HttpResponseRedirect(reverse('base:index'))
 
 
 ### compte
@@ -86,7 +86,7 @@ def pre_compte(request):
     if request.method == 'POST':
         form = HouseholdForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect(reverse('stocks:compte', args=(request.POST['member'],)))
+            return HttpResponseRedirect(reverse('base:compte', args=(request.POST['member'],)))
     else:
         form = HouseholdForm()
     return render(request, 'base/pre_compte.html', {'form': form})
@@ -102,7 +102,7 @@ def compte(request, member_id):
             member.account += q
             member.save()
             messages.success(request, 'Appro Compte ok!')
-            return HttpResponseRedirect(reverse('stocks:index'))
+            return HttpResponseRedirect(reverse('base:index'))
     else:
         form = ApproCompteForm()
     context = {'member': member,
@@ -120,7 +120,7 @@ def create_product(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Produit créé !')
-            return HttpResponseRedirect(reverse('stocks:products'))
+            return HttpResponseRedirect(reverse('base:products'))
     else:
         form = ProductForm()
     return render(request, 'base/product.html', {'form': form})
@@ -132,7 +132,7 @@ def detail_product(request, product_id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Produit mis à jour !')
-            return HttpResponseRedirect(reverse('stocks:products'))
+            return HttpResponseRedirect(reverse('base:products'))
     else:
         form = ProductForm(instance=pdt)
     return render(request, 'base/product.html', {'form': form})
@@ -140,7 +140,7 @@ def detail_product(request, product_id):
 
 class ProductTable(tables.Table):
     link = tables.Column(verbose_name='', empty_values=(),
-                         linkify=('stocks:detail_product',[tables.A('pk')]))
+                         linkify=('base:detail_product',[tables.A('pk')]))
 
     def render_link(self, value):
         return "Détails"
@@ -189,7 +189,7 @@ def pre_appro(request):
     if request.method == 'POST':
         form = ProviderForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect(reverse('stocks:appro', args=(request.POST['provider'],)))
+            return HttpResponseRedirect(reverse('base:appro', args=(request.POST['provider'],)))
     else:
         form = ProviderForm()
     return render(request, 'base/pre_appro.html', {'form': form})
@@ -207,7 +207,7 @@ def appro(request, provider_id):
                     pdt.stock += q
                     pdt.save()
             messages.success(request, 'Appro ok!')
-            return HttpResponseRedirect(reverse('stocks:index'))
+            return HttpResponseRedirect(reverse('base:index'))
     else:
         form = ApproForm(prod)
     context = {'provider': prod,
@@ -225,10 +225,10 @@ def appro(request, provider_id):
 class MemberTable(tables.Table):
     # foyer = tables.Column(verbose_name='Foyer', empty_values=(),
     #                       accessor=tables.A('pk'),
-    #                       linkify=('stocks:detail_produit',[tables.A('pk')]))
+    #                       linkify=('base:detail_produit',[tables.A('pk')]))
 
     link = tables.Column(verbose_name='', empty_values=(),
-                         linkify=('stocks:detail_member',[tables.A('pk')]))
+                         linkify=('base:detail_member',[tables.A('pk')]))
 
     def render_link(self, value):
         return 'Détails'
@@ -260,7 +260,7 @@ def detail_member(request, member_id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Membre mis à jour !')
-            return HttpResponseRedirect(reverse('stocks:members'))
+            return HttpResponseRedirect(reverse('base:members'))
     else:
         form = MemberForm(instance=member)
     return render(request, 'base/member.html', {'form': form})
@@ -283,7 +283,7 @@ def inventory(request):
                         pdt.stock = q
                         pdt.save()
             messages.success(request, 'Stock mis à jour !')
-            return HttpResponseRedirect(reverse('stocks:gestion'))
+            return HttpResponseRedirect(reverse('base:gestion'))
     else:
         form = ProductList(pdts, request.POST)
     return render(request, 'base/inventory.html', {'form': form})

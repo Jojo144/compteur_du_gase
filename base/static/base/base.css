@@ -1,0 +1,35 @@
+
+.message {
+    padding: 0.5em;
+    text-align: center;
+    margin: 1em 0;
+}
+
+.message.success {
+    color: #FFFFFF;
+    background-color: #20BA44;
+}
+
+.message.warning {
+    color: #620;
+    background-color: #FFAE00;
+    font-style: normal;
+    border-radius: 0;
+}
+
+.message.error {
+    color: #B90202;
+    background-color: #FFBABA;
+}
+
+
+.eat-up {
+    margin-top: -1.5em;
+}
+.message.success:before {
+    content: "✔ ";
+}
+
+.message.error:before {
+    content: "✘ ";
+}
