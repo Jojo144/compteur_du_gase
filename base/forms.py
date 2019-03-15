@@ -3,15 +3,15 @@ from django import forms
 from .models import *
 
 class HouseholdForm(forms.Form):
-    member = forms.ModelChoiceField(label='Qui qui ?',
-                                    queryset=Household.objects.all())
+    household = forms.ModelChoiceField(label='Sélectionnez votre compte : ',
+                                       queryset=Household.objects.all())
 
 class ProviderForm(forms.Form):
     provider = forms.ModelChoiceField(label='Qui qui ?',
                                       queryset=Provider.objects.all())
 
 class ApproCompteForm(forms.Form):
-    amount = forms.DecimalField(label='Combien de thune ?', decimal_places=2)
+    amount = forms.DecimalField(label="Combien d'argent avez-vous virez sur le compte du GASE ?", decimal_places=2)
 
 class ApproForm(forms.Form):
     def __init__(self, prod, *args, **kwargs):

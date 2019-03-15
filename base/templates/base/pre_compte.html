@@ -1,11 +1,10 @@
 {% extends "base/base.html" %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-
 <form action="{% url 'base:pre_compte' %}" method="post">
     {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit">
+    {{ form | crispy }}
+    <input type="submit" value="Valider">
 </form>
-Yo!
 {% endblock content %}

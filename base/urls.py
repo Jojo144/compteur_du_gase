@@ -19,7 +19,7 @@ urlpatterns = [
     path('appro', views.pre_appro, name='pre_appro'),
     path('appro/<int:provider_id>', views.appro, name='appro'),
     path('compte', views.pre_compte, name='pre_compte'),
-    path('compte/<int:member_id>', views.compte, name='compte'),
+    path('compte/<int:household_id>', views.compte, name='compte'),
     path('inventaire', views.inventory, name='inventory'),
     path('stats/<int:product_id>', views.stats, name='stats'),
 ]

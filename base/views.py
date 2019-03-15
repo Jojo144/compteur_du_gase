@@ -86,27 +86,26 @@ def pre_compte(request):
     if request.method == 'POST':
         form = HouseholdForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect(reverse('base:compte', args=(request.POST['member'],)))
+            return HttpResponseRedirect(reverse('base:compte', args=(request.POST['household'],)))
     else:
         form = HouseholdForm()
     return render(request, 'base/pre_compte.html', {'form': form})
 
-def compte(request, member_id):
-    member = Household.objects.get(pk=member_id)
+def compte(request, household_id):
+    household = Household.objects.get(pk=household_id)
     if request.method == 'POST':
         form = ApproCompteForm(request.POST)
         if form.is_valid():
             q = form.cleaned_data['amount']
-            op = ApproCompteOp(member=member, amount=q)
+            op = ApproCompteOp(member=household, amount=q)
             op.save()
-            member.account += q
-            member.save()
+            household.account += q
+            household.save()
             messages.success(request, 'Appro Compte ok!')
             return HttpResponseRedirect(reverse('base:index'))
     else:
         form = ApproCompteForm()
-    context = {'member': member,
-               # 'pdts': prod.get_products(),
+    context = {'household': household,
                'form': form,
     }
     return render(request, 'base/compte.html', context)

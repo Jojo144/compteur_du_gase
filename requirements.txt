@@ -2,3 +2,4 @@ django
 django_tables2
 django_filters
 django-jchart
+django-crispy-forms

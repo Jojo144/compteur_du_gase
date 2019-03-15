@@ -1,19 +1,27 @@
 {% extends "base/base.html" %}
+{% load crispy_forms_tags %}
 
 {% block content %}
+<div class="row justify-content-center">
+  <h5>Foyer :</h5> &nbsp;{{ household }}
+</div>
 
-<br>
-<br>
+<div class="row justify-content-center">
+  <h5>Solde actuel :</h5> &nbsp;{{ household.account }} €
+</div>
 
-Membre : {{ member }}
-<br>
-Solde : {{ member.account }}
-<br>
+<div class="row justify-content-center">
+  <form action="{% url 'base:compte' household.pk %}" method="post">
+    {% csrf_token %}
+    {{ form | crispy }}
+    <input type="submit" value="Approvisionner">
+  </form>
+</div>
 
-<form action="{% url 'base:compte' member.pk %}" method="post">
-{% csrf_token %}
-<input type="submit" value="Go">
-{{ form.as_p }}
-</form>
+<div class="row justify-content-center">
+  <span class="fas fa-heart"></span>&nbsp;
+  Merci d'approvisionner votre compte &nbsp;<strong>après</strong>&nbsp; avoir réalisé le virement (ou alors de ne vraiment pas oublier !).
+</div>
+
 
 {% endblock content %}
