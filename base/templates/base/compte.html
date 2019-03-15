@@ -14,13 +14,15 @@
   <form action="{% url 'base:compte' household.pk %}" method="post">
     {% csrf_token %}
     {{ form | crispy }}
-    <input type="submit" value="Approvisionner">
+    <div class="text-right">
+      <input class="btn btn-info" type="submit" value="Approvisionner">
+      <a class="btn btn-light" href="{% url 'base:products' %}">Annuler</a>
+    </div>
   </form>
 </div>
 
 <div class="row justify-content-center">
-  <span class="fas fa-heart"></span>&nbsp;
-  Merci d'approvisionner votre compte &nbsp;<strong>après</strong>&nbsp; avoir réalisé le virement (ou alors de ne vraiment pas oublier !).
+  <h3>♥</h3>&nbsp;&nbsp; Merci d'approvisionner votre compte &nbsp;<strong>après</strong>&nbsp; avoir réalisé le virement (ou alors de ne vraiment pas oublier !).
 </div>
 
 

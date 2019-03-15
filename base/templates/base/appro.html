@@ -1,19 +1,15 @@
-{% include 'base/menu.html' %}
-{% include "base/messages.html" %} 
+{% extends 'base/base.html' %}
+{% load crispy_forms_tags %}
 
-<br>
-<br>
+{% block content %}
+<h3 class="display-5">Fournisseur : {{ provider }}</h3>
 
-Fournisseur : {{ provider }}
-
-<br>
-
-{% if pdts %}
-<form action="{% url 'base:appro' provider.pk %}" method="post">
-{% csrf_token %}
-<input type="submit" value="Go">
-{{ form.as_p }}
+<form action="" method="post">
+  {% csrf_token %}
+  {{ form | crispy }}
+  <div class="text-right">
+    <input class="btn btn-info" type="submit" value="Approvisionner">
+    <a class="btn btn-light" href="{% url 'base:pre_appro' %}">Annuler</a>
+  </div>
 </form>
-{% else %}
-  Pas de produit pour ce fournisseur.
-{% endif %}
+{% endblock content %}

@@ -33,3 +33,22 @@
 .message.error:before {
     content: "✘ ";
 }
+
+
+
+
+
+#vue-table {
+  margin: 2em 0;
+  
+  a {
+    font-weight: bold;
+    text-decoration: none;  
+    
+    &.active {
+      font-weight: bold;
+      color: black;
+      text-decoration: underline;
+    }
+  }
+}

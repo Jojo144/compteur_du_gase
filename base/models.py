@@ -50,7 +50,7 @@ class Member(models.Model):
     name = models.CharField(max_length=200)
     email = models.EmailField(blank=True, null=True)
     tel = models.CharField(max_length=200, blank=True)
-    foyer = models.ForeignKey(Household, verbose_name="Foyer", on_delete=models.CASCADE)
+    household = models.ForeignKey(Household, verbose_name="Foyer", on_delete=models.CASCADE)
     # @property
     # def foyer(self):
     #     return Household.objects.filter(persons=self)
@@ -70,7 +70,7 @@ class Product(models.Model):
     pwyw = models.BooleanField("Prix libre", default=False) # PWYW = Pay what you want
     vrac = models.BooleanField("Vrac")
     visible = models.BooleanField("Visible", default=True, null=False)
-    comment = models.TextField("Comentaire", blank=True)
+    comment = models.TextField("Commentaire", blank=True)
     referent = models.ForeignKey(Member, blank=True, null=True, verbose_name="Référent", on_delete=models.CASCADE) # todo : many to many
     stock = models.DecimalField("Stock", default=0, max_digits=15, decimal_places=3)
     

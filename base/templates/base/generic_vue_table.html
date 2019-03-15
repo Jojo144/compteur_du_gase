@@ -1,18 +1,7 @@
-{% extends "base/base.html" %} 
-
-{% block content %}
-<div class="row justify-content-center">
-  <a class="btn btn-info" href="{% url 'base:create_product' %}">Créer un nouveau produit</a>
-</div>
-
-<div class="row justify-content-center">
-  Les stocks sont en kilogramme ou en litre (pour les produits en vrac) ou en unité (pour les produits à l'unité).
-</div>
-
 <div id="vue-table">
 
-  <form>
-      <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
+  <form id="filter">
+    <input type="text" v-model="search" class="form-control" />
   </form>
 
   <table class="table table-striped">
@@ -20,9 +9,8 @@
       <tr>
         <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
 	  [[ _.capitalize(column) ]]
-	  [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
+	  <!-- <span class="arrow" :class="sortKey > 0 ? 'asc' : 'dsc'"></span> -->
         </th>
-        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -30,7 +18,6 @@
         <td v-for="column in columns">
 	  [[ x[column] ]]
 	</td>
-        <td><a :href="'produit/' + x.id">⌬ Détails</a></td>
       </tr>
     </tbody>
   </table>  
@@ -42,7 +29,7 @@
       delimiters: ['[[', ']]'],
       el: '#vue-table',
       data: {
-	  sortKey: 'nom',
+	  sortKey: 'name',
 	  search: '',
 	  reverse: false,
 	  columns: {{ columns | safe }},
@@ -80,4 +67,3 @@
       }
   })
 </script>
-{% endblock %}

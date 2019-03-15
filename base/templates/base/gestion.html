@@ -1,8 +1,6 @@
-{% include "base/menu.html" %} 
-{% include "base/messages.html" %} 
+{% extends 'base/base.html' %}
 
-<br>
-<br>
+{% block content %}
 
 Créer un compte :
 <br>
@@ -35,3 +33,4 @@ Ecarts
 Valeur du stock et des comptes
 <br>
 <br>
+{% endblock content %}

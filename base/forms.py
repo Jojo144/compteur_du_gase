@@ -7,7 +7,7 @@ class HouseholdForm(forms.Form):
                                        queryset=Household.objects.all())
 
 class ProviderForm(forms.Form):
-    provider = forms.ModelChoiceField(label='Qui qui ?',
+    provider = forms.ModelChoiceField(label='Sélectionnez un fournisseur : ',
                                       queryset=Provider.objects.all())
 
 class ApproCompteForm(forms.Form):

@@ -1,3 +1,4 @@
+import json
 from collections import defaultdict
 
 from django.shortcuts import render
@@ -101,7 +102,7 @@ def compte(request, household_id):
             op.save()
             household.account += q
             household.save()
-            messages.success(request, 'Appro Compte ok!')
+            messages.success(request, 'Approvisionnement du compte effectué')
             return HttpResponseRedirect(reverse('base:index'))
     else:
         form = ApproCompteForm()
@@ -136,50 +137,14 @@ def detail_product(request, product_id):
         form = ProductForm(instance=pdt)
     return render(request, 'base/product.html', {'form': form})
 
-
-class ProductTable(tables.Table):
-    link = tables.Column(verbose_name='', empty_values=(),
-                         linkify=('base:detail_product',[tables.A('pk')]))
-
-    def render_link(self, value):
-        return "Détails"
-
-    def render_price(self, value):
-        return "%s €" % value
-
-    def render_stock(self, value):
-        if value >= 100:
-            return '{0:.0f}'.format(value)
-        if value >= 10:
-            return '{0:.1f}'.format(value).rstrip('0').rstrip('.')
-        if value >= 1:
-            return '{0:.2f}'.format(value).rstrip('0').rstrip('.')
-        else:
-            return '{0:.3f}'.format(value)
-
-    class Meta:
-        model = Product
-        fields = ['name', 'category', 'provider', 'price', 'pwyw', 'vrac', 'stock']
-        # template_name = 'django_tables2/bootstrap.html'
-
-
-class MyBooleanFilter(django_filters.Filter):
-    field_class = forms.BooleanField
-
-
-class ProductFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(label='Filtrer le nom', lookup_expr='icontains')
-    visible = MyBooleanFilter(label="N'afficher que les visibles", lookup_expr='lt', initial=True, exclude=True)
-    class Meta:
-        model = Product
-        fields = ['name', 'visible']
-
-
 def products(request):
-    f = ProductFilter(request.GET, queryset=Product.objects.order_by('name'))
-    table = ProductTable(f.qs)
-    tables.RequestConfig(request).configure(table)
-    return render(request, 'base/products.html', {'table': table, 'filter': f})
+    columns = ['nom', 'catégorie', 'fournisseur', 'prix', 'prix libre', 'vrac', 'stock']
+    pdts = [{"id": p.id, "nom": p.name, "catégorie": str(p.category), "fournisseur": str(p.provider),
+             "prix": '{} €'.format(p.price), "prix libre": p.pwyw, "vrac": p.vrac, "stock": round_stock(p.stock)}
+            for p in Product.objects.all()]
+    columns = json.dumps(columns)
+    pdts = json.dumps(pdts)
+    return render(request, 'base/products.html', {'columns': columns, 'pdts': pdts})
 
 
 ### appro
@@ -205,7 +170,7 @@ def appro(request, provider_id):
                     op.save()
                     pdt.stock += q
                     pdt.save()
-            messages.success(request, 'Appro ok!')
+            messages.success(request, 'Approvisionnement effectué')
             return HttpResponseRedirect(reverse('base:index'))
     else:
         form = ApproForm(prod)
@@ -217,39 +182,15 @@ def appro(request, provider_id):
 
 
 
-
-
 ### membres
 
-class MemberTable(tables.Table):
-    # foyer = tables.Column(verbose_name='Foyer', empty_values=(),
-    #                       accessor=tables.A('pk'),
-    #                       linkify=('base:detail_produit',[tables.A('pk')]))
-
-    link = tables.Column(verbose_name='', empty_values=(),
-                         linkify=('base:detail_member',[tables.A('pk')]))
-
-    def render_link(self, value):
-        return 'Détails'
-
-    class Meta:
-        model = Member
-        fields = ['name', 'foyer', 'email', 'tel']
-        # template_name = 'django_tables2/bootstrap.html'
-
-
-class MemberFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(label='Filtrer le nom', lookup_expr='icontains')
-    class Meta:
-        model = Member
-        fields = ['name']
-
-
 def members(request):
-    f = MemberFilter(request.GET, queryset=Member.objects.order_by('name'))
-    table = MemberTable(f.qs)
-    tables.RequestConfig(request).configure(table)
-    return render(request, 'base/members.html', {'table': table, 'filter': f})
+    columns = ['nom', 'foyer', 'email', 'bigophone']
+    members = [{"id": p.id, "nom": p.name, "foyer": str(p.household), "email": p.email, "bigophone": p.tel}
+               for p in Member.objects.all()]
+    columns = json.dumps(columns)
+    members = json.dumps(members)
+    return render(request, 'base/members.html', {'columns': columns, 'members': members})
 
 
 def detail_member(request, member_id):

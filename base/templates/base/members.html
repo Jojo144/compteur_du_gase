@@ -1,25 +1,79 @@
-{% include "base/menu.html" %} 
-{% include "base/messages.html" %} 
-{% load bootstrap3 %}
-{% load render_table from django_tables2 %}
+{% extends "base/base.html" %} 
 
-<!doctype html>
-<html>
-  <head>
-    <title>List of persons</title>
-  </head>
-  <body>
+{% block content %}
+<div class="row justify-content-center">
+Bla bla
+</div>
 
-<br>
-<br>
+<div id="vue-table">
 
-<form action="" method="get" class="form form-inline">
-  {% bootstrap_form filter.form layout='inline' %}
-  {% bootstrap_button 'Filtrer' %}
-</form>
-<br>
-{% render_table table 'django_tables2/bootstrap.html' %}
+  <form>
+      <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
+  </form>
 
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
+	  [[ _.capitalize(column) ]]
+	  [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
+        </th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="x in filter()">
+        <td v-for="column in columns">
+	  [[ x[column] ]]
+	</td>
+        <td><a :href="'membre/' + x.id">⌬ Détails</a></td>
+      </tr>
+    </tbody>
+  </table>  
 
-  </body>
-</html>
+</div>
+
+<script>
+  new Vue({
+      delimiters: ['[[', ']]'],
+      el: '#vue-table',
+      data: {
+	  sortKey: 'nom',
+	  search: '',
+	  reverse: false,
+	  columns: {{ columns | safe }},
+	  
+	  raw_data: {{ members | safe }}
+      },
+
+      computed: {
+	  orderedData: function () {
+	      var data = _.orderBy(this.raw_data, this.sortKey);
+	      if (this.reverse) {
+		  return _.reverse(data)
+	      } else {
+		  return data
+	      }
+	  }
+      },
+
+      methods: {
+	  sortBy: function(sortKey) {
+	      this.reverse = (this.sortKey == sortKey) ? ! this.reverse : false;
+	      this.sortKey = sortKey
+	  },
+
+	  filter: function () {
+	      var filterKey = this.search.toLowerCase();
+	      var data = this.orderedData;
+	      data = data.filter(function (row) {
+		  return Object.keys(row).some(function (key) {
+		      return String(row[key]).toLowerCase().indexOf(filterKey) > -1
+		  })
+              });
+	      return data
+	  }
+      }
+  })
+</script>
+{% endblock %}

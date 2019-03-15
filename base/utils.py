@@ -11,3 +11,15 @@ def default_value(v, default):
         return default
     else:
         return v
+
+def round_stock(value):
+    if value >= 100:
+        return '{0:.0f}'.format(value)
+    if value >= 10:
+        return '{0:.1f}'.format(value).rstrip('0').rstrip('.')
+    if value >= 1:
+        return '{0:.2f}'.format(value).rstrip('0').rstrip('.')
+    if value == 0:
+        return '0'
+    else:
+        return '{0:.3f}'.format(value)

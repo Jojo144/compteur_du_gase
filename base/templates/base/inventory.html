@@ -1,11 +1,13 @@
-{% include "base/menu.html" %} 
-{% include "base/messages.html" %} 
+{% extends 'base/base.html' %}
+{% load crispy_forms_tags %}
 
-<br>
-<br>
-
-<form action="{% url 'base:inventory' %}" method="post">
-{% csrf_token %}
-<input type="submit" value="Goo">
-{{ form.as_p }}
+{% block content %}
+<form action="" method="post">
+  {% csrf_token %}
+  {{ form | crispy }}
+  <div class="text-right">
+    <input class="btn btn-info" type="submit" value="Mettre les stocks à jour">
+    <a class="btn btn-light" href="{% url 'base:gestion' %}">Annuler</a>
+  </div>
 </form>
+{% endblock content %}
