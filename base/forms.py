@@ -15,13 +15,13 @@ class ApproCompteForm(forms.Form):
 
 class ApproForm(forms.Form):
     def __init__(self, prod, *args, **kwargs):
-        super(ApproForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         for p in prod.get_products():
             self.fields[str(p.pk)] = forms.DecimalField(label=p.name, required=False)
 
 class ProductList(forms.Form):
     def __init__(self, pdts, *args, **kwargs):
-        super(ProductList, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         for p in pdts:
             self.fields[str(p.pk)] = forms.DecimalField(label=p.name, required=False)
 

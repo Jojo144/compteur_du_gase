@@ -1,11 +1,13 @@
-{% include "base/menu.html" %} 
-{% include "base/messages.html" %} 
-<br>
-<br>
-<h1>Choisissez votre nom :</h1>
+{% extends 'base/base.html' %}
+{% load crispy_forms_tags %}
 
-<form action="{% url 'base:pre_achats' %}" method="post">
-    {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit">
+{% block content %}
+<form action="" method="post">
+  {% csrf_token %}
+  {{ form | crispy }}
+  <div class="text-right">
+    <input class="btn btn-info" type="submit" value="C'est parti">
+    <a class="btn btn-light" href="{% url 'base:index' %}">Annuler</a>
+  </div>
 </form>
+{% endblock content %}

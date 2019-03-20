@@ -1,14 +1,137 @@
-{% include "base/messages.html" %} 
-|
-{% for cat in cats %}
-<a href="{% url 'base:achats_cat' member.pk cat.pk %}">{{ cat.name }}</a>
-   |
-{% endfor %}
-<br>
-<br>
+{% extends 'base/base.html' %}
+{% load crispy_forms_tags %}
 
-Nom : {{ member.name }} <br>
-Solde : {{ member.account }}
+{% block navbar %}
+{% endblock navbar %}
 
-<br>
-<br>
+
+{% block content %}
+<div id="vue-table">
+
+<div class="row justify-content-center bg-primary">
+  <button @click="category=''" class="btn btn-info">Toutes</button>
+  {% for cat in cats %}
+  <button @click="category='{{ cat.pk }}'" class="btn btn-info">{{ cat.name }}</button>
+  {% endfor %}
+</div>
+
+
+<div class="row justify-content-center bg-dark">
+  Nom : {{ household.name }} <br>
+  Solde : {{ household.account }}
+</div>
+
+<div class="row">
+
+  <div class="col col-6 bg-warning">
+
+    <form>
+      <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
+    </form>
+
+    <table class="table table-striped">
+      <thead>
+	<tr>
+          <th>Nom</th>
+          <th>Prix au kilo</th>
+          <th>Quantité</th>
+	</tr>
+      </thead>
+      <tbody>
+	<tr v-for="(pdt, id) in filter()">
+          <td>[[ pdt.name ]]</td>
+          <td>[[ pdt.price ]]</td>
+          <td>
+	    <input type="number" class="numberinput form-control" @keyup.enter="inBasket" :id="'input_pdt_' + id">	    
+	  </td>
+	</tr>
+      </tbody>
+    </table>  
+    <div class="text-right">
+      <button class="btn btn-primary" @click="inBasket" >Dans panier !</button>
+    </div>
+  </div>
+
+  <div class="col col-6 bg-info">
+    <form action="" method="post">
+    {% csrf_token %}
+    <table class="table table-striped">
+      <thead>
+	<tr>
+          <th>Nom</th>
+          <th>Quantité</th>
+          <th>Prix</th>
+	</tr>
+      </thead>
+      <tbody>
+	<tr v-for="(qtity, id) in basket">
+          <td>[[ pdts[id].name ]]</td>
+          <td>[[ qtity ]]</td>
+          <td>[[ pdts[id].price * qtity ]]</td>
+	  <input type="hidden" :value="qtity" :name="'basket_' + id" :id="'basket_' + id">
+	</tr>
+      </tbody>
+    </table>
+    <div class="row">
+      <div class="col">
+	<strong>Montant total : [[ totalAmount() ]] €</strong>
+      </div>
+      <div class="col bg-primary text-right">
+	<input class="btn btn-info" type="submit" value="Payer">
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+  function removeAccents(str) {
+      return str.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+  }
+
+  new Vue({
+      delimiters: ['[[', ']]'],
+      el: '#vue-table',
+      data: {
+	  search: '',
+	  category: '',
+	  pdts: {{ pdts | safe }},
+	  basket: {}
+      },
+
+      methods: {
+	  filter: function () {
+	      var filterKey = removeAccents(this.search.toLowerCase());
+	      var category = this.category;
+	      return _.pickBy(this.pdts, (function (row) {
+		  var b = (category.length == 0) || (row.category == category)
+		  return b && removeAccents(String(row.name).toLowerCase()).includes(filterKey)
+		  }))
+	  },
+	  inBasket: function () {
+	      var filtered = this.filter()
+	      for (var id in filtered) {
+		  for (var pdt in filtered[id]) {
+		      var input = document.getElementById("input_pdt_" + id);
+		      if (input.value) {
+			  if (input.value != 0) {
+			      var before = (this.basket[id]) ? (this.basket[id]) : 0
+			      Vue.set(this.basket, id, before + Number(input.value))
+			  }
+			  input.value = ''
+		      }
+		  }
+	      }
+	  },
+	  totalAmount: function() {
+	      var s = 0
+	      for (var id in this.basket) {
+		  s += this.pdts[id].price * this.basket[id]
+	      }
+	      return s
+	  }
+      }
+  })
+</script>
+{% endblock content %}

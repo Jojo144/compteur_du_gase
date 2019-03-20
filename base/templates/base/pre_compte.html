@@ -5,6 +5,9 @@
 <form action="{% url 'base:pre_compte' %}" method="post">
     {% csrf_token %}
     {{ form | crispy }}
-    <input type="submit" value="Valider">
+  <div class="text-right">
+    <input class="btn btn-info" type="submit" value="Valider">
+    <a class="btn btn-light" href="{% url 'base:index' %}">Annuler</a>
+  </div>
 </form>
 {% endblock content %}

@@ -23,6 +23,7 @@
 	  [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
         </th>
         <th></th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -31,6 +32,7 @@
 	  [[ x[column] ]]
 	</td>
         <td><a :href="'produit/' + x.id">⌬ Détails</a></td>
+        <td><a :href="'stats/' + x.id"><!-- 統計 --> 📈 Stats</a></td>
       </tr>
     </tbody>
   </table>  

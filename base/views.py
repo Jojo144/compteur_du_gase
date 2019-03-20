@@ -1,10 +1,13 @@
+import smtplib, ssl
 import json
+import decimal
 from collections import defaultdict
 
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
+from django.core.mail import send_mail
 
 import django_tables2 as tables
 import django_filters
@@ -31,54 +34,42 @@ def pre_achats(request):
     if request.method == 'POST':
         form = HouseholdForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect(reverse('base:achats', args=(request.POST['member'],)))
+            return HttpResponseRedirect(reverse('base:achats', args=(request.POST['household'],)))
     else:
         form = HouseholdForm()
     return render(request, 'base/pre_achats.html', {'form': form})
 
-def achats(request, member_id):
-    context = {'member': Household.objects.get(pk=member_id),
-               'cats': Category.objects.all(),
-    }
-    return render(request, 'base/achats.html', context)
-
-
-def achats_cat(request, member_id, cat_id):
-    cat = Category.objects.get(pk=cat_id)
-    pdts = cat.get_products()
-    basket = request.session.get('basket', {})
+def achats(request, household_id):
+    household = Household.objects.get(pk=household_id)
     if request.method == 'POST':
-        form = ProductList(pdts, request.POST)
-        if form.is_valid():
-            for p, q in form.cleaned_data.items():
-                if q:
-                    incr_key(basket, p, q)
-    context = {'member': Household.objects.get(pk=member_id),
-               'cats': Category.objects.all(),
-               'cat': cat,
-               'products': pdts,
-               'form': ProductList(pdts),
-               'basket': basket}
-    request.session['basket'] = basket
-    return render(request, 'base/achats_cat.html', context)
-
-
-def end_achats(request, member_id):
-    basket = request.session['basket']
-    member = Household.objects.get(pk=member_id)
-    s = 0
-    for p, q in basket.items():
-        pdt = Product.objects.get(pk=p)
-        op = AchatOp(product=pdt, member=member, quantity=-q)
-        op.save()
-        s += op.price
-        member.account -= op.price
-        member.save()
-        pdt.stock -= q
-        pdt.save()
-    messages.success(request, 'Votre compte a été débité de ' + str(s) + ' €.')
-    del request.session['basket']
-    return HttpResponseRedirect(reverse('base:index'))
+        s = 0
+        msg = "Voici votre ticket de caisse :\n"
+        for p, q in request.POST.items():
+            if p.startswith('basket_'):
+                pdt = Product.objects.get(pk=int(p[7:]))
+                q = decimal.Decimal(q)
+                op = AchatOp(product=pdt, member=household, quantity=-q)
+                op.save()
+                household.account -= op.price
+                household.save()
+                pdt.stock -= q
+                pdt.save()
+                s += op.price
+                msg += "{} ({} € / unité) : {} unité  -> {} €\n".format(pdt.name, pdt.price, q, op.price)
+        msg += "Ce qui nous donne un total de {} €.\n\nCiao!".format(s)
+        mails = household.get_emails_receipt()
+        send_mail('[Compteur de GASE] Ticket de caisse', msg, 'gase.nantest@mailoo.org', mails, fail_silently=False)
+        messages.success(request, 'Votre compte a été débité de ' + str(s) + ' €.')
+        return HttpResponseRedirect(reverse('base:index'))
+    else:
+        pdts = {str(p.id): {"name": p.name, "category": p.category.id,
+                            "price": str(p.price), "pwyw": p.pwyw, "vrac": p.vrac}
+                for p in Product.objects.all()}
+        pdts = json.dumps(pdts)
+        context = {'household': household,
+                   'cats': Category.objects.all(),
+                   'pdts': pdts}
+        return render(request, 'base/achats.html', context)
 
 
 ### compte
@@ -181,7 +172,6 @@ def appro(request, provider_id):
     return render(request, 'base/appro.html', context)
 
 
-
 ### membres
 
 def members(request):
@@ -227,6 +217,7 @@ def inventory(request):
     else:
         form = ProductList(pdts, request.POST)
     return render(request, 'base/inventory.html', {'form': form})
+
 
 ### stats
 from jchart import Chart

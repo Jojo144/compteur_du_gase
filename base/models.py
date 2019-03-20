@@ -33,7 +33,6 @@ class Provider(models.Model):
 # foyer
 class Household(models.Model):
     name = models.CharField("Nom", max_length=200)
-    # persons = models.ManyToManyField(Member)
     address = models.CharField("Adresse", max_length=200, blank=True)
     comment = models.TextField(blank=True)
     account = models.DecimalField(default=0, max_digits=10, decimal_places=2)
@@ -41,6 +40,12 @@ class Household(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_members(self):
+        return Member.objects.filter(household=self.pk)
+
+    def get_emails_receipt(self):
+        return [str(m.email) for m in self.get_members().filter(receipt=True)]
 
     class Meta:
         verbose_name = 'Foyer'
@@ -51,9 +56,9 @@ class Member(models.Model):
     email = models.EmailField(blank=True, null=True)
     tel = models.CharField(max_length=200, blank=True)
     household = models.ForeignKey(Household, verbose_name="Foyer", on_delete=models.CASCADE)
-    # @property
-    # def foyer(self):
-    #     return Household.objects.filter(persons=self)
+    # recevoir le ticket de caisse par mail
+    # receive the receipt by mail
+    receipt = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name

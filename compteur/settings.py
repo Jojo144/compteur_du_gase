@@ -127,3 +127,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+EMAIL_HOST = 'mail.gandi.net'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'bla@ex.fr'
+EMAIL_HOST_PASSWORD = 'mqslkd'
+EMAIL_USE_TLS = True
