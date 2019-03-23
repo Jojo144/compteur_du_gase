@@ -13,4 +13,4 @@ admin.site.register(Member)
 admin.site.register(Household)
 admin.site.register(Product)
 admin.site.register(InventoryOp)
-
+admin.site.register(LocalSettings)

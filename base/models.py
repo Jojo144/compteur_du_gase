@@ -129,3 +129,9 @@ class InventoryOp(Operation):
         return self.product.price * self.quantity # négatif si perte
     def __str__(self):
         return 'Inventaire'
+
+# there should be only one instance of this model
+class LocalSettings(models.Model):
+    class Meta:
+        verbose_name = "Réglages divers"
+    min_account = models.DecimalField("Seuil en dessous duquel on ne peut plus faire d'achat", max_digits=10, decimal_places=2, default=0)

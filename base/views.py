@@ -47,6 +47,10 @@ def pre_achats(request):
     return render(request, 'base/pre_achats.html', {'form': form})
 
 def achats(request, household_id):
+    localsettings = LocalSettings.objects.first()
+    if localsettings is None:
+        localsettings = LocalSettings.objects.create()
+
     household = Household.objects.get(pk=household_id)
     if request.method == 'POST':
         s = 0
@@ -75,6 +79,7 @@ def achats(request, household_id):
         pdts = json.dumps(pdts)
         context = {'household': household,
                    'cats': Category.objects.all(),
+                   'max_amount': household.account - localsettings.min_account,
                    'pdts': pdts}
         return render(request, 'base/achats.html', context)
 
