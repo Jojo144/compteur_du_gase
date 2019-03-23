@@ -246,7 +246,7 @@ def inventory(request):
                 if q:
                     diff = q-pdt.stock
                     if diff != 0: # todo check
-                        op = InventoryOp(product=pdt, quantity=diff)
+                        op = InventoryOp(product=pdt, quantity=diff, price = pdt.price * diff)
                         op.save()
                         pdt.stock = q
                         pdt.save()

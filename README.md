@@ -16,20 +16,22 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 [x] documenter inventaire
 [x] bilan inventaire
 [ ] des belles stats !
-[ ] lien vers l'admin + expliquer comment elle fonctionne
+[x] lien vers l'admin + expliquer comment elle fonctionne
 [ ] désactiver mpd admin ?
 [ ] références non visible (doc) -> filtre dans liste des pdts + non listés dans achat
 [ ] gérer plusieurs unités (L / kg / sachet / bouteille) mais pas les grammmes sinon on va s'y perdre !
 [ ] création / modif foyer + membres (pour l'instant faisable via l'admin)
-[ ] ne pas définir price comme une property dans model des ope
-
+[-] ne pas définir price comme une property dans model des ope
+[ ] bouton "abandonner" sur page achats
 [ ] doc création des catégories dans l'admin
 [ ] achat : "valider formulaire" (erreur quand ce n'est pas un nombre)
 [ ] pouvoir avoir plusieurs référents pour un pdt
 [ ] page appro stock : montrer le prix des références (+ pourquoi pas stock actuel)
-[ ] que se passe-t-il si on supprime un foyer ?
+[x] que se passe-t-il si on supprime un foyer ?
 [ ] pouvoir filtrer dans l'inventaire / plus compact
 [ ] afficher bilan au fur à mesure (ou pour chaque produit) pour inventaire
+[ ] gérer non vrac dans achats
+[ ] envoyer un mail quand appro ?
 
 [ ] Rendre tout joli !
 
@@ -45,3 +47,8 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 [ ] aligner le ♥ avec le milieu de la ligne
 [ ] achat + appro sélection de son compte au clavier
 [ ] gestion du prix libre
+
+
+C'est quoi la diff entre verbose_name et 1er arg ?
+filter(provider= vs filter(provider_=
+null=False, default="" partout ?
