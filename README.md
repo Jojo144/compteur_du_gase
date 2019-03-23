@@ -6,15 +6,13 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 [ ] documenter l'install, l'histoire du logiciel
 [ ] doc backups
 [ ] doc màj
-[ ] dans la liste des références, on devrait pouvoir cliquer sur un fournisseur pour en voir les détails
 [x] liste + création/modif des fournisseurs (dans Gestion)
-[ ] voir adresse du foyer qqpart (soit liste membres soit détail membre)
-[ ] historique des appro compte
+[x] voir adresse du foyer qqpart (soit liste membres soit détail membre)
+[x] historique des appro compte
 [ ] mettre un seuil en dessous duquel on ne peut plus faire d'achats
-[ ] mettre timeout sur l'envoi de mail
-[ ] vérifier l'intégrité de la base (stock pdt = somme des ope, solde membre = somme de ope) et sinon reporter une erreur par mail à l'admin
-[ ] historique des achats
-[ ] afficher valeur du stock (total/par référence/par rayon) (documenter)
+[ ] mettre timeout / try-catch sur l'envoi de mail
+[ ] vérifier l'intégrité de la base (stock pdt = somme des ope, solde membre = somme de ope) et sinon reporter une erreur par mail à l'admin  EXPLICITER LEs INVARIANTS DE LA BASE
+[x] afficher valeur du stock (total/par référence/par rayon) (documenter)
 [ ] documenter inventaire
 [ ] bilan inventaire
 [ ] des belles stats !
@@ -37,5 +35,10 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 [ ] pouvoir avoir plusieurs référents pour un pdt
 [ ] gestion du prix libre
 [ ] page appro stock : montrer le prix des références (+ pourquoi pas stock actuel)
+[ ] que se passe-t-il si on supprime un foyer ?
 
 [ ] Rendre tout joli !
+
+
+[ ] dans la liste des références, on devrait pouvoir cliquer sur un fournisseur pour en voir les détails
+[ ] historique des achats (nécessite une page "foyer")

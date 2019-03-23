@@ -25,7 +25,14 @@ def index(request):
     return render(request, 'base/index.html')
 
 def gestion(request):
-    return render(request, 'base/gestion.html')
+    # todo : use aggregate ?
+    value_stock=sum([p.value() for p in Product.objects.all()])
+    value_accounts=sum([p.account for p in Household.objects.all()])
+    return render(request, 'base/gestion.html',
+                  {'value_stock': '{0:.0f}'.format(value_stock),
+                   'value_accounts': '{0:.0f}'.format(value_accounts),
+                   'diff_values': '{0:.0f}'.format(value_accounts - value_stock),
+                  })
 
 
 ### achats
@@ -48,7 +55,7 @@ def achats(request, household_id):
             if p.startswith('basket_'):
                 pdt = Product.objects.get(pk=int(p[7:]))
                 q = decimal.Decimal(q)
-                op = AchatOp(product=pdt, member=household, quantity=-q)
+                op = AchatOp(product=pdt, household=household, quantity=-q)
                 op.save()
                 household.account -= op.price
                 household.save()
@@ -85,11 +92,12 @@ def pre_compte(request):
 
 def compte(request, household_id):
     household = Household.objects.get(pk=household_id)
+    history = ApproCompteOp.objects.filter(household_id=household_id).order_by('-date')[:5]
     if request.method == 'POST':
         form = ApproCompteForm(request.POST)
         if form.is_valid():
             q = form.cleaned_data['amount']
-            op = ApproCompteOp(member=household, amount=q)
+            op = ApproCompteOp(household=household, amount=q)
             op.save()
             household.account += q
             household.save()
@@ -99,6 +107,7 @@ def compte(request, household_id):
         form = ApproCompteForm()
     context = {'household': household,
                'form': form,
+               'history': history,
     }
     return render(request, 'base/compte.html', context)
 
@@ -125,7 +134,7 @@ def detail_product(request, product_id):
             messages.success(request, 'Produit mis à jour !')
             return HttpResponseRedirect(reverse('base:products'))
     else:
-        form = ProductForm(instance=pdt)
+        form = ProductForm(instance=pdt, initial={'value': pdt.value()})
     return render(request, 'base/product.html', {'form': form})
 
 def products(request):
@@ -192,7 +201,7 @@ def detail_member(request, member_id):
             messages.success(request, 'Membre mis à jour')
             return HttpResponseRedirect(reverse('base:members'))
     else:
-        form = MemberForm(instance=member)
+        form = MemberForm(instance=member, initial={'address': member.household.address})
     return render(request, 'base/member.html', {'form': form})
 
 ### membres

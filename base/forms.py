@@ -29,12 +29,17 @@ class ProductList(forms.Form):
 
 class ProductForm(forms.ModelForm):
     stock = forms.DecimalField(disabled=True, initial=0) # initial=0 pour création nveau pdt
+    value = forms.DecimalField(disabled=True, required=False, decimal_places=2,
+                               label="Valeur du stock (en €)")
 
     class Meta:
         model = Product
         exclude = []
 
 class MemberForm(forms.ModelForm):
+    address = forms.CharField(disabled=True, max_length=200, required=False,
+                              label="Adresse")
+
     class Meta:
         model = Member
         exclude = []

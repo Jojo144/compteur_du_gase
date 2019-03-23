@@ -11,6 +11,15 @@
 </div>
 
 <div class="row justify-content-center">
+  <h5>Historique des 5 derniers virements :</h5>
+</div>
+<div class="row justify-content-center">
+  {% for o in history %}
+  {{ o.date | date:"D d M Y - H \h i" }} : {{ o.amount }} €<br>
+  {% endfor %}
+</div>
+
+<div class="row justify-content-center">
   <form action="{% url 'base:compte' household.pk %}" method="post">
     {% csrf_token %}
     {{ form | crispy }}
@@ -24,6 +33,5 @@
 <div class="row justify-content-center">
   <h3>♥</h3>&nbsp;&nbsp; Merci d'approvisionner votre compte &nbsp;<strong>après</strong>&nbsp; avoir réalisé le virement (ou alors de ne vraiment pas oublier !).
 </div>
-
 
 {% endblock content %}

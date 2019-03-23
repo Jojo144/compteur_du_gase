@@ -34,7 +34,10 @@ Ecarts
 <br>
 <br>
 
-Valeur du stock et des comptes
+Valeur du stock total (références non visibles incluses) : {{ value_stock }} €
 <br>
+Somme des soldes des comptes : {{ value_accounts }} €
 <br>
+Donc il doit y avoir en banque : {{ diff_values }} €
+(si toutes les factures ont été payées et que tous le adhérents ont bien fait leur virement)
 {% endblock content %}

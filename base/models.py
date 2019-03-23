@@ -81,6 +81,9 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    def value(self):
+        return self.price * self.stock
+
     class Meta:
         verbose_name = 'Produit'
 
@@ -95,7 +98,7 @@ class Operation(models.Model):
 
 class AchatOp(Operation):
     product = models.ForeignKey(Product, on_delete=models.CASCADE) #todo: ça va pas
-    member = models.ForeignKey(Household, on_delete=models.CASCADE) #todo: ça va pas
+    household = models.ForeignKey(Household, on_delete=models.CASCADE) #todo: ça va pas
     quantity = models.DecimalField(max_digits=15, decimal_places=3) # négatif
     @property
     def price(self):  # TODO ça va pas le prix d'une référence peut changer !
@@ -113,8 +116,8 @@ class ApproStockOp(Operation):
         return 'Appro'
 
 class ApproCompteOp(Operation):
-    member = models.ForeignKey(Household, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=15, decimal_places=3) # positif
+    household = models.ForeignKey(Household, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=15, decimal_places=2) # positif
     def __str__(self):
         return 'ApproCompte'
 
