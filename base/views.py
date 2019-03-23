@@ -79,7 +79,7 @@ def achats(request, household_id):
     else:
         pdts = {str(p.id): {"name": p.name, "category": p.category.id,
                             "price": str(p.price), "pwyw": p.pwyw, "vrac": p.vrac}
-                for p in Product.objects.all()}
+                for p in Product.objects.filter(visible=True)}
         pdts = json.dumps(pdts)
         context = {'household': household,
                    'cats': Category.objects.all(),
