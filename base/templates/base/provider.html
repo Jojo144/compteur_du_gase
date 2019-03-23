@@ -1,0 +1,13 @@
+{% extends 'base/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<form action="" method="post">
+  {% csrf_token %}
+  {{ form | crispy }}
+  <div class="text-right">
+    <input class="btn btn-info" type="submit" value="Enregister">
+    <a class="btn btn-light" href="{% url 'base:members' %}">Annuler</a>
+  </div>
+</form>
+{% endblock content %}

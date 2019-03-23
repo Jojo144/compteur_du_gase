@@ -32,11 +32,11 @@ def gestion(request):
 
 def pre_achats(request):
     if request.method == 'POST':
-        form = HouseholdForm(request.POST)
+        form = HouseholdList(request.POST)
         if form.is_valid():
             return HttpResponseRedirect(reverse('base:achats', args=(request.POST['household'],)))
     else:
-        form = HouseholdForm()
+        form = HouseholdList()
     return render(request, 'base/pre_achats.html', {'form': form})
 
 def achats(request, household_id):
@@ -76,11 +76,11 @@ def achats(request, household_id):
 
 def pre_compte(request):
     if request.method == 'POST':
-        form = HouseholdForm(request.POST)
+        form = HouseholdList(request.POST)
         if form.is_valid():
             return HttpResponseRedirect(reverse('base:compte', args=(request.POST['household'],)))
     else:
-        form = HouseholdForm()
+        form = HouseholdList()
     return render(request, 'base/pre_compte.html', {'form': form})
 
 def compte(request, household_id):
@@ -142,11 +142,11 @@ def products(request):
 
 def pre_appro(request):
     if request.method == 'POST':
-        form = ProviderForm(request.POST)
+        form = ProviderList(request.POST)
         if form.is_valid():
             return HttpResponseRedirect(reverse('base:appro', args=(request.POST['provider'],)))
     else:
-        form = ProviderForm()
+        form = ProviderList()
     return render(request, 'base/pre_appro.html', {'form': form})
 
 def appro(request, provider_id):
@@ -189,11 +189,35 @@ def detail_member(request, member_id):
         form = MemberForm(request.POST, instance=member)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Membre mis à jour !')
+            messages.success(request, 'Membre mis à jour')
             return HttpResponseRedirect(reverse('base:members'))
     else:
         form = MemberForm(instance=member)
     return render(request, 'base/member.html', {'form': form})
+
+### membres
+
+def providers(request):
+    columns = ['nom', 'contact', 'commentaire']
+    providers = [{"id": p.id, "nom": p.name, "contact": str(p.contact),
+                  "commentaire": p.comment}
+                 for p in Provider.objects.all()]
+    columns = json.dumps(columns)
+    providers = json.dumps(providers)
+    return render(request, 'base/providers.html', {'columns': columns, 'providers': providers})
+
+
+def detail_provider(request, provider_id):
+    provider = Provider.objects.get(pk=provider_id)
+    if request.method == 'POST':
+        form = ProviderForm(request.POST, instance=provider)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Fournisseur mis à jour')
+            return HttpResponseRedirect(reverse('base:providers'))
+    else:
+        form = ProviderForm(instance=provider)
+    return render(request, 'base/provider.html', {'form': form})
 
 
 ## inventaire

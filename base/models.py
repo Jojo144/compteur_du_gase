@@ -3,7 +3,7 @@ from django.db.models import Sum
 from .utils import *
 
 class Category(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, verbose_name="Nom")
 
     def __str__(self):
         return self.name
@@ -16,9 +16,9 @@ class Category(models.Model):
 
 
 class Provider(models.Model):
-    name = models.CharField(max_length=200)
-    contact = models.TextField(blank=True)
-    comment = models.TextField(blank=True)
+    name = models.CharField(max_length=200, verbose_name="Nom")
+    contact = models.TextField(blank=True, verbose_name="Mail / téléphone / adresse du fournisseur")
+    comment = models.TextField(blank=True, verbose_name="Commentaire (quel Gasier a été en contact, historique des échages, ...)")
 
     def __str__(self):
         return self.name
@@ -34,8 +34,8 @@ class Provider(models.Model):
 class Household(models.Model):
     name = models.CharField("Nom", max_length=200)
     address = models.CharField("Adresse", max_length=200, blank=True)
-    comment = models.TextField(blank=True)
-    account = models.DecimalField(default=0, max_digits=10, decimal_places=2)
+    comment = models.TextField(blank=True, verbose_name="Commentaire")
+    account = models.DecimalField(default=0, max_digits=10, decimal_places=2, verbose_name="Solde du compte")
     date = models.DateField(auto_now=True) # date d'inscription
 
     def __str__(self):
@@ -52,13 +52,12 @@ class Household(models.Model):
 
 
 class Member(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, verbose_name="Nom")
     email = models.EmailField(blank=True, null=True)
     tel = models.CharField(max_length=200, blank=True)
     household = models.ForeignKey(Household, verbose_name="Foyer", on_delete=models.CASCADE)
-    # recevoir le ticket de caisse par mail
     # receive the receipt by mail
-    receipt = models.BooleanField(default=True)
+    receipt = models.BooleanField(default=True, verbose_name="Recevoir un ticket de caisse par mail ?")
 
     def __str__(self):
         return self.name
@@ -99,7 +98,7 @@ class AchatOp(Operation):
     member = models.ForeignKey(Household, on_delete=models.CASCADE) #todo: ça va pas
     quantity = models.DecimalField(max_digits=15, decimal_places=3) # négatif
     @property
-    def price(self):
+    def price(self):  # TODO ça va pas le prix d'une référence peut changer !
         return - self.product.price * self.quantity # positif
     def __str__(self):
         return 'Achat {} - {}'.format(self.product, self.quantity)
