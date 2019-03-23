@@ -32,3 +32,9 @@ def round2(value):
 # (pas de chiffre après la virgule)
 def round0(value):
     return '{0:.0f}'.format(value)
+
+def bool_to_utf8(b):
+    if b:
+        return "✔"
+    else:
+        return "✘"

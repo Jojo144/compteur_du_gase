@@ -8,11 +8,20 @@
   <script src="{% static 'base/lodash.js' %}"></script>
   <script src="{% static 'base/vue.js' %}"></script>
   <link rel="stylesheet" href="{% static 'base/bootstrap.css' %}">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="{% static 'base/base.css' %}">
     <title>Le compteur du GASE</title>
 </head>
 <body>
+<script>
+  function removeAccents(str) {
+      return str.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+  }
+  
+  function myContains(str, key) {
+      return removeAccents(String(str).toLowerCase()).includes(removeAccents(String(key).toLowerCase()))
+  }
+</script>
+
 <div class="container" {#style="background-color: #8987b8;"#}>
 
     {% block navbar %}

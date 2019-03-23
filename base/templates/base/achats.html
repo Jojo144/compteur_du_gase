@@ -89,10 +89,6 @@
 </div>
 
 <script>
-  function removeAccents(str) {
-      return str.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
-  }
-
   new Vue({
       delimiters: ['[[', ']]'],
       el: '#vue-table',
@@ -105,13 +101,14 @@
 
       methods: {
 	  filter: function () {
-	      var filterKey = removeAccents(this.search.toLowerCase());
+	      var search = this.search; // important de faire ça sinon this.truc réfère à je sais pas quoi qui est undefined
 	      var category = this.category;
 	      return _.pickBy(this.pdts, (function (row) {
 		  var b = (category.length == 0) || (row.category == category)
-		  return b && removeAccents(String(row.name).toLowerCase()).includes(filterKey)
+		  return b && myContains(row.name, search)
 		  }))
 	  },
+
 	  inBasket: function () {
 	      var filtered = this.filter()
 	      for (var id in filtered) {
@@ -127,6 +124,7 @@
 		  }
 	      }
 	  },
+
 	  totalAmount: function() {
 	      var s = 0
 	      for (var id in this.basket) {

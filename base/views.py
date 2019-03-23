@@ -147,9 +147,9 @@ def detail_product(request, product_id):
     return render(request, 'base/product.html', {'form': form})
 
 def products(request):
-    columns = ['nom', 'catégorie', 'fournisseur', 'prix', 'prix libre', 'vrac', 'stock']
+    columns = ['nom', 'catégorie', 'fournisseur', 'prix', 'prix libre', 'vrac', 'visible', 'stock']
     pdts = [{"id": p.id, "nom": p.name, "catégorie": str(p.category), "fournisseur": str(p.provider),
-             "prix": '{} €'.format(p.price), "prix libre": p.pwyw, "vrac": p.vrac, "stock": round_stock(p.stock)}
+             "prix": '{} €'.format(p.price), "prix libre": bool_to_utf8(p.pwyw), "vrac": bool_to_utf8(p.vrac), "visible": bool_to_utf8(p.visible), "stock": round_stock(p.stock)}
             for p in Product.objects.all()]
     columns = json.dumps(columns)
     pdts = json.dumps(pdts)

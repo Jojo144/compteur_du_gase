@@ -11,6 +11,8 @@
 
 <div id="vue-table">
 
+  <button @click="changeVisible" class="btn btn-info">[[ only_visible ? "Montrer " : "Masquer "]] les non visibles </button>
+
   <form>
       <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
   </form>
@@ -45,10 +47,10 @@
       el: '#vue-table',
       data: {
 	  sortKey: 'nom',
+	  only_visible: true,
 	  search: '',
 	  reverse: false,
 	  columns: {{ columns | safe }},
-	  
 	  raw_data: {{ pdts | safe }}
       },
 
@@ -64,20 +66,22 @@
       },
 
       methods: {
+	  changeVisible: function() {
+	      this.only_visible = !this.only_visible
+	  },
+
 	  sortBy: function(sortKey) {
 	      this.reverse = (this.sortKey == sortKey) ? ! this.reverse : false;
 	      this.sortKey = sortKey
 	  },
 
 	  filter: function () {
-	      var filterKey = this.search.toLowerCase();
-	      var data = this.orderedData;
-	      data = data.filter(function (row) {
-		  return Object.keys(row).some(function (key) {
-		      return String(row[key]).toLowerCase().indexOf(filterKey) > -1
-		  })
-              });
-	      return data
+	      var search = this.search;
+	      var only_visible = this.only_visible;
+	      return _.pickBy(this.orderedData, (function (row) {
+		  var b = (!only_visible) || (row.visible == "✔");
+		  return b && (myContains(row.nom, search) || myContains(row.catégorie, search) || myContains(row.fournisseur, search))
+	      }))
 	  }
       }
   })
