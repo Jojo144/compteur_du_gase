@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models import Sum
 from .utils import *
 
 class Category(models.Model):
@@ -35,7 +34,7 @@ class Household(models.Model):
     name = models.CharField("Nom", max_length=200)
     address = models.CharField("Adresse", max_length=200, blank=True)
     comment = models.TextField(blank=True, verbose_name="Commentaire")
-    account = models.DecimalField(default=0, max_digits=10, decimal_places=2, verbose_name="Solde du compte")
+    account = models.DecimalField(default=0, max_digits=10, decimal_places=2, verbose_name="Solde du compte") # INVARIANT : account should be sum of operations
     date = models.DateField(auto_now=True) # date d'inscription
 
     def __str__(self):
@@ -71,12 +70,12 @@ class Product(models.Model):
     name = models.CharField("Nom", max_length=200)
     provider = models.ForeignKey(Provider, verbose_name="Fournisseur", on_delete=models.CASCADE)
     category = models.ForeignKey(Category, verbose_name="Catégorie", on_delete=models.CASCADE)
-    price = models.DecimalField("Prix", max_digits=10, decimal_places=2) # current price, can vary in the time ...
-    pwyw = models.BooleanField("Prix libre", default=False) # PWYW = Pay what you want
+    price = models.DecimalField("Prix à l'unité (kg/L/...)", max_digits=10, decimal_places=2) # current price, can vary in the time ...
+    pwyw = models.BooleanField("Prix libre", default=False, help_text="Pas encore géré par le logiciel ...") # PWYW = Pay what you want
     vrac = models.BooleanField("Vrac") # todo = unité
-    visible = models.BooleanField("Visible", default=True, null=False)
-    comment = models.TextField("Commentaire", blank=True)
+    visible = models.BooleanField("Visible", default=True, null=False, help_text="Une référence non visible n'apparait pas dans les produits que l'on peut acheter, on l'utilise généralement pour les produits e rupture de stock")
     referent = models.ForeignKey(Member, blank=True, null=True, verbose_name="Référent", on_delete=models.SET_NULL) # todo : many to many
+    comment = models.TextField("Commentaire", blank=True)
     stock = models.DecimalField("Stock", default=0, max_digits=15, decimal_places=3) # INVARIANT : stock should be sum of operations
     
     def __str__(self):
@@ -145,5 +144,7 @@ class InventoryOp(Operation):
 # there should be only one instance of this model
 class LocalSettings(models.Model):
     min_account = models.DecimalField("Seuil en dessous duquel on ne peut plus faire d'achat", max_digits=10, decimal_places=2, default=0)
+    txt_home = models.TextField(blank=True, verbose_name="Texte de la page d'accueil (doit être donnée en code html)", default="<i>Bienvenu au GASE</i>")
+    mail_admin = models.EmailField(blank=True, null=True, verbose_name="Mail de l'admin à qui sont reporté les erreurs du logiciel")
     class Meta:
         verbose_name = "Réglages divers"

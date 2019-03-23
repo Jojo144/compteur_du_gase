@@ -2,6 +2,7 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+Cette page sert à approvisionner les stocks à la réception d'une commande.
 <form action="" method="post">
   {% csrf_token %}
   {{ form | crispy }}

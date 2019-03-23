@@ -18,11 +18,18 @@ from .models import *
 from .forms import *
 from .utils import *
 
+def get_local_settings():
+    localsettings = LocalSettings.objects.first()
+    if localsettings is None:
+        localsettings = LocalSettings.objects.create()
+    return localsettings
+
 
 ### index
 
 def index(request):
-    return render(request, 'base/index.html')
+    txt_home = get_local_settings().txt_home
+    return render(request, 'base/index.html', {'txt_home': txt_home})
 
 def gestion(request):
     # todo : use aggregate ?
@@ -47,10 +54,7 @@ def pre_achats(request):
     return render(request, 'base/pre_achats.html', {'form': form})
 
 def achats(request, household_id):
-    localsettings = LocalSettings.objects.first()
-    if localsettings is None:
-        localsettings = LocalSettings.objects.create()
-
+    localsettings = get_local_settings()
     household = Household.objects.get(pk=household_id)
     if request.method == 'POST':
         s = 0
@@ -164,9 +168,10 @@ def pre_appro(request):
     return render(request, 'base/pre_appro.html', {'form': form})
 
 def appro(request, provider_id):
-    prod = Provider.objects.get(pk=provider_id)
+    prov = Provider.objects.get(pk=provider_id)
+    pdts = prov.get_products()
     if request.method == 'POST':
-        form = ApproForm(prod, request.POST)
+        form = ProductList(pdts, request.POST)
         if form.is_valid():
             for p, q in form.cleaned_data.items():
                 if q:
@@ -178,9 +183,8 @@ def appro(request, provider_id):
             messages.success(request, 'Approvisionnement effectué')
             return HttpResponseRedirect(reverse('base:index'))
     else:
-        form = ApproForm(prod)
-    context = {'provider': prod,
-               'pdts': prod.get_products(),
+        form = ProductList(pdts)
+    context = {'provider': prov,
                'form': form,
     }
     return render(request, 'base/appro.html', context)
@@ -220,6 +224,17 @@ def providers(request):
     providers = json.dumps(providers)
     return render(request, 'base/providers.html', {'columns': columns, 'providers': providers})
 
+
+def create_provider(request):
+    if request.method == 'POST':
+        form = ProviderForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Produit créé !')
+            return HttpResponseRedirect(reverse('base:providers'))
+    else:
+        form = ProviderForm()
+    return render(request, 'base/provider.html', {'form': form})
 
 def detail_provider(request, provider_id):
     provider = Provider.objects.get(pk=provider_id)

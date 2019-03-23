@@ -1,6 +1,7 @@
 from django import forms
 
 from .models import *
+from .utils import *
 
 class HouseholdList(forms.Form):
     household = forms.ModelChoiceField(label='Sélectionnez votre compte : ',
@@ -13,19 +14,13 @@ class ProviderList(forms.Form):
 class ApproCompteForm(forms.Form):
     amount = forms.DecimalField(label="Combien d'argent avez-vous virez sur le compte du GASE ?", decimal_places=2)
 
-# utilisé pour appro stock
-class ApproForm(forms.Form):
-    def __init__(self, prod, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for p in prod.get_products():
-            self.fields[str(p.pk)] = forms.DecimalField(label=p.name, required=False)
-
-# utilisé pour inventaire
+# utilisé pour inventaire ET appro stock
 class ProductList(forms.Form):
     def __init__(self, pdts, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for p in pdts:
-            self.fields[str(p.pk)] = forms.DecimalField(label=p.name, required=False)
+            label = "{} ({} / unité, stock actuel : {} unité)".format(p.name, p.price, round_stock(p.stock))
+            self.fields[str(p.pk)] = forms.DecimalField(label=label, required=False)
 
 class ProductForm(forms.ModelForm):
     stock = forms.DecimalField(disabled=True, initial=0) # initial=0 pour création nveau pdt

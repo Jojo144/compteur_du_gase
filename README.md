@@ -11,7 +11,8 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 [x] historique des appro compte
 [-] mettre un seuil en dessous duquel on ne peut plus faire d'achats (ne reste qu'à valider)
 [ ] mettre timeout / try-catch sur l'envoi de mail
-[ ] vérifier l'intégrité de la base (stock pdt = somme des ope, solde membre = somme de ope) et sinon reporter une erreur par mail à l'admin  EXPLICITER LEs INVARIANTS DE LA BASE
+[x] EXPLICITER LEs INVARIANTS DE LA BASE
+[ ] vérifier l'intégrité de la base (stock pdt = somme des ope, solde membre = somme de ope) et sinon reporter une erreur par mail à l'admin
 [x] afficher valeur du stock (total/par référence/par rayon) (documenter)
 [x] documenter inventaire
 [x] bilan inventaire
@@ -23,15 +24,16 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 [ ] création / modif foyer + membres (pour l'instant faisable via l'admin)
 [-] ne pas définir price comme une property dans model des ope
 [ ] bouton "abandonner" sur page achats
-[ ] doc création des catégories dans l'admin
+[x] doc création des catégories dans l'admin
 [ ] achat : "valider formulaire" (erreur quand ce n'est pas un nombre)
 [ ] pouvoir avoir plusieurs référents pour un pdt
-[ ] page appro stock : montrer le prix des références (+ pourquoi pas stock actuel)
+[x] page appro stock : montrer le prix des références (+ pourquoi pas stock actuel)
 [x] que se passe-t-il si on supprime un foyer ?
 [ ] pouvoir filtrer dans l'inventaire / plus compact
 [ ] afficher bilan au fur à mesure (ou pour chaque produit) pour inventaire
 [ ] gérer non vrac dans achats
 [ ] envoyer un mail quand appro ?
+[ ] mettre des symboles € dans les formulaires avec des thunes
 
 [ ] Rendre tout joli !
 

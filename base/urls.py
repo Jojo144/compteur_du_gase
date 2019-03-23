@@ -16,6 +16,7 @@ urlpatterns = [
     path('membre/<int:member_id>', views.detail_member, name='detail_member'),
     path('fournisseurs', views.providers, name='providers'),
     path('fournisseur/<int:provider_id>', views.detail_provider, name='detail_provider'),
+    path('fournisseur', views.create_provider, name='create_provider'),
     path('appro', views.pre_appro, name='pre_appro'),
     path('appro/<int:provider_id>', views.appro, name='appro'),
     path('compte', views.pre_compte, name='pre_compte'),
