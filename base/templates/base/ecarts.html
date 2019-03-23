@@ -1,0 +1,10 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<h5>Bilan des 10 derniers inventaires (regroupés par jour) :</h5>
+{% for e in ecarts %}
+{{ e.date  | date:"D d M Y"}} : {{ e.result }} € <br>
+{% endfor %}
+
+Si c'est positif c'est que le GASE gagne de l'argent, si c'est négatif ce sont des pertes à se répartir !
+{% endblock content %}

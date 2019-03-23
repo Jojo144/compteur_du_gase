@@ -23,3 +23,11 @@ def round_stock(value):
         return '0'
     else:
         return '{0:.3f}'.format(value)
+
+# utilisé pour afficher des sommes d'argents (2 chiffres après la virgule)
+def round2(value):
+    return '{0:.2f}'.format(value)
+
+# (pas de chiffre après la virgule)
+def round0(value):
+    return '{0:.0f}'.format(value)

@@ -13,12 +13,12 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 [ ] mettre timeout / try-catch sur l'envoi de mail
 [ ] vérifier l'intégrité de la base (stock pdt = somme des ope, solde membre = somme de ope) et sinon reporter une erreur par mail à l'admin  EXPLICITER LEs INVARIANTS DE LA BASE
 [x] afficher valeur du stock (total/par référence/par rayon) (documenter)
-[ ] documenter inventaire
-[ ] bilan inventaire
+[x] documenter inventaire
+[x] bilan inventaire
 [ ] des belles stats !
 [ ] lien vers l'admin + expliquer comment elle fonctionne
 [ ] désactiver mpd admin ?
-[ ] altertes stock au référent (doc)
+[ ] alertes stock au référent (doc)
 [ ] références non visible (doc) -> filtre dans liste des pdts + non listés dans achat
 [ ] gérer plusieurs unités (L / kg / sachet / bouteille) mais pas les grammmes sinon on va s'y perdre !
 [ ] création / modif foyer + membres (pour l'instant faisable via l'admin)
@@ -36,6 +36,8 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 [ ] gestion du prix libre
 [ ] page appro stock : montrer le prix des références (+ pourquoi pas stock actuel)
 [ ] que se passe-t-il si on supprime un foyer ?
+[ ] pouvoir filtrer dans l'inventaire / plus compact
+[ ] afficher bilan au fur à mesure (ou pour chaque produit) pour inventaire
 
 [ ] Rendre tout joli !
 

@@ -21,5 +21,6 @@ urlpatterns = [
     path('compte', views.pre_compte, name='pre_compte'),
     path('compte/<int:household_id>', views.compte, name='compte'),
     path('inventaire', views.inventory, name='inventory'),
+    path('ecarts', views.ecarts, name='ecarts'),
     path('stats/<int:product_id>', views.stats, name='stats'),
 ]

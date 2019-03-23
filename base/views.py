@@ -1,6 +1,6 @@
 import smtplib, ssl
 import json
-import decimal
+import decimal, datetime
 from collections import defaultdict
 
 from django.shortcuts import render
@@ -29,9 +29,9 @@ def gestion(request):
     value_stock=sum([p.value() for p in Product.objects.all()])
     value_accounts=sum([p.account for p in Household.objects.all()])
     return render(request, 'base/gestion.html',
-                  {'value_stock': '{0:.0f}'.format(value_stock),
-                   'value_accounts': '{0:.0f}'.format(value_accounts),
-                   'diff_values': '{0:.0f}'.format(value_accounts - value_stock),
+                  {'value_stock': round0(value_stock),
+                   'value_accounts': round0(value_accounts),
+                   'diff_values': round0(value_accounts - value_stock),
                   })
 
 
@@ -246,10 +246,23 @@ def inventory(request):
                         pdt.stock = q
                         pdt.save()
             messages.success(request, 'Stock mis à jour !')
-            return HttpResponseRedirect(reverse('base:gestion'))
+            return HttpResponseRedirect(reverse('base:ecarts'))
     else:
         form = ProductList(pdts, request.POST)
     return render(request, 'base/inventory.html', {'form': form})
+
+def ecarts(request):
+    ope = InventoryOp.objects.all()
+    for o in list(ope):
+        print(o.date, o.price)
+    dates = {o.date.date() for o in ope} # on regroupe par jour
+    # dates = list(dates).sort(reverse=True) # on garde les 10 derniers FIXME
+    ecarts = [{'date': d,
+               'result': round2(sum([o.price for o in ope.filter(date__date=d)]))}
+              for d in dates]
+    return render(request, 'base/ecarts.html',
+                  {'ecarts': ecarts
+                  })
 
 
 ### stats

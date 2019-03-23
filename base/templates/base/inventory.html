@@ -2,6 +2,11 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+Bienvenu dans l'inventaire !
+<br>
+Pour chaque produit pesé/compté, entrer la quantité correspondante puis cliquer sur "Mettre les stocks à jour". Il est possible de ne compléter que quelques produits si on fait un inventaire partiel (par exemple si l'on ne compte qu'un seul produit).
+<br>
+Ne pas oublier de bien tarer la balance et de faire attention aux unités. Bon courage !
 <form action="" method="post">
   {% csrf_token %}
   {{ form | crispy }}
