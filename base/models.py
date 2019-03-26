@@ -15,9 +15,9 @@ class Category(models.Model):
 
 
 class Provider(models.Model):
-    name = models.CharField(max_length=200, verbose_name="Nom")
-    contact = models.TextField(blank=True, verbose_name="Mail / téléphone / adresse du fournisseur")
-    comment = models.TextField(blank=True, verbose_name="Commentaire (quel Gasier a été en contact, historique des échages, ...)")
+    name = models.CharField(max_length=200, verbose_name="nom")
+    contact = models.TextField(blank=True, verbose_name="mail / téléphone / adresse du fournisseur")
+    comment = models.TextField(blank=True, verbose_name="commentaire (quel Gasier a été en contact, historique des échages, ...)")
 
     def __str__(self):
         return self.name
@@ -31,10 +31,10 @@ class Provider(models.Model):
 
 # foyer
 class Household(models.Model):
-    name = models.CharField("Nom", max_length=200)
-    address = models.CharField("Adresse", max_length=200, blank=True)
-    comment = models.TextField(blank=True, verbose_name="Commentaire")
-    account = models.DecimalField(default=0, max_digits=10, decimal_places=2, verbose_name="Solde du compte") # INVARIANT : account should be sum of operations
+    name = models.CharField(max_length=200, verbose_name="nom")
+    address = models.CharField(max_length=200, blank=True, verbose_name="adresse")
+    comment = models.TextField(blank=True, verbose_name="commentaire")
+    account = models.DecimalField(default=0, max_digits=10, decimal_places=2, verbose_name="solde du compte") # INVARIANT : account should be sum of operations
     date = models.DateField(auto_now=True) # date d'inscription
 
     def __str__(self):
@@ -51,13 +51,13 @@ class Household(models.Model):
 
 
 class Member(models.Model):
-    name = models.CharField(max_length=200, verbose_name="Nom")
-    email = models.EmailField(blank=True, null=True)
-    tel = models.CharField(max_length=200, blank=True)
-    household = models.ForeignKey(Household, verbose_name="Foyer", on_delete=models.CASCADE)
+    name = models.CharField(max_length=200, verbose_name="nom")
+    email = models.EmailField(blank=True, null=True, verbose_name="email")
+    tel = models.CharField(max_length=200, blank=True, verbose_name="numéro de téléphone")
+    household = models.ForeignKey(Household, on_delete=models.CASCADE, verbose_name="foyer")
     # receive the receipt by mail
-    receipt = models.BooleanField(default=True, verbose_name="Recevoir un ticket de caisse par mail ?")
-    stock_alert = models.BooleanField(default=True, verbose_name="Recevoir les alertes stock par mail ? (uniquement pour les référents produit)")
+    receipt = models.BooleanField(default=True, verbose_name="recevoir un ticket de caisse par mail ?")
+    stock_alert = models.BooleanField(default=True, verbose_name="recevoir les alertes stock par mail ? (uniquement pour les référents produit)")
 
     def __str__(self):
         return self.name
@@ -67,21 +67,21 @@ class Member(models.Model):
 
 
 class Product(models.Model):
-    name = models.CharField("Nom", max_length=200)
-    provider = models.ForeignKey(Provider, verbose_name="Fournisseur", on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, verbose_name="Catégorie", on_delete=models.CASCADE)
-    price = models.DecimalField("Prix à l'unité (kg/L/...)", max_digits=10, decimal_places=2) # current price, can vary in the time ...
-    pwyw = models.BooleanField("Prix libre", default=False, help_text="Pas encore géré par le logiciel ...") # PWYW = Pay what you want
+    name = models.CharField(max_length=200, verbose_name="nom")
+    provider = models.ForeignKey(Provider, verbose_name="fournisseur", on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, verbose_name="catégorie", on_delete=models.CASCADE)
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="prix à l'unité (kg/L/...)") # current price, can vary in the time ...
+    pwyw = models.BooleanField(default=False, verbose_name="prix libre", help_text="Pas encore géré par le logiciel ...") # PWYW = Pay what you want
     vrac = models.BooleanField("Vrac") # todo = unité
-    visible = models.BooleanField("Visible", default=True, null=False, help_text="Une référence non visible n'apparait pas dans les produits que l'on peut acheter, on l'utilise généralement pour les produits e rupture de stock")
-    referent = models.ForeignKey(Member, blank=True, null=True, verbose_name="Référent", on_delete=models.SET_NULL) # todo : many to many
-    comment = models.TextField("Commentaire", blank=True)
-    stock = models.DecimalField("Stock", default=0, max_digits=15, decimal_places=3) # INVARIANT : stock should be sum of operations
+    visible = models.BooleanField(default=True, null=False, help_text="Une référence non visible n'apparait pas dans les produits que l'on peut acheter, on l'utilise généralement pour les produits e rupture de stock", verbose_name="vible")
+    referent = models.ForeignKey(Member, blank=True, null=True, verbose_name="référent", on_delete=models.SET_NULL) # todo : many to many
+    comment = models.TextField(blank=True, verbose_name="commentaire")
+    stock = models.DecimalField(default=0, max_digits=15, decimal_places=3, verbose_name="stock") # INVARIANT : stock should be sum of operations
     
     def __str__(self):
         return self.name
 
-    def value(self):
+    def value_stock(self):
         return self.price * self.stock
 
     class Meta:
@@ -101,10 +101,10 @@ class AchatOp(Operation):
     quantity = models.DecimalField(max_digits=15, decimal_places=3) # negative for a regular achat
     price = models.DecimalField(max_digits=15, decimal_places=3) # positive for a regular achat (we record it because pdt.price can vary in the time)
 
-    # constructor computing price
-    def __init__(self, product=product, household=household, quantity=quantity, *args, **kwargs):
+    @classmethod    # constructor computing price
+    def create(cls, product=product, household=household, quantity=quantity):
         price = - product.price * quantity
-        super().__init__(product=product, household=household, quantity=quantity, price=price, *args, **kwargs)
+        return cls(product=product, household=household, quantity=quantity, price=price)
     def __str__(self):
         return 'Achat {} - {}'.format(self.product, self.quantity)
 
@@ -113,12 +113,25 @@ class ApproStockOp(Operation):
     quantity = models.DecimalField(max_digits=15, decimal_places=3) # positif for a regular appro
     price = models.DecimalField(max_digits=15, decimal_places=3) # positive for a regular appro (we record it because pdt.price can vary in the time)
 
-    # constructor computing price
-    def __init__(self, product=product, quantity=quantity, *args, **kwargs):
+    @classmethod    # constructor computing price
+    def create(cls, product=product, quantity=quantity):
         price = product.price * quantity
-        super().__init__(product=product, quantity=quantity, price=price, *args, **kwargs)
+        return cls(product=product, quantity=quantity, price=price)
+
     def __str__(self):
         return 'Appro'
+
+class InventoryOp(Operation):
+    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL) # null if the household was deleted and no longer exists
+    quantity = models.DecimalField(max_digits=15, decimal_places=3) # négatif si perte
+    price = models.DecimalField(max_digits=15, decimal_places=3) # negative if loss (we record it because pdt.price can vary in the time)
+
+    @classmethod    # constructor computing price
+    def create(cls, product=product, quantity=quantity):
+        price = product.price * quantity
+        return cls(product=product, quantity=quantity, price=price)
+    def __str__(self):
+        return 'Inventaire'
 
 class ApproCompteOp(Operation):
     household = models.ForeignKey(Household, null=True, on_delete=models.SET_NULL) # null if the household was deleted and no longer exists
@@ -126,25 +139,11 @@ class ApproCompteOp(Operation):
     def __str__(self):
         return 'ApproCompte'
 
-class InventoryOp(Operation):
-    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL) # null if the household was deleted and no longer exists
-    quantity = models.DecimalField(max_digits=15, decimal_places=3) # négatif si perte
-    price = models.DecimalField(max_digits=15, decimal_places=3) # negative if loss (we record it because pdt.price can vary in the time)
-
-    # FIXME I don't understand this bug! (apparait sur ecart)
-    # # constructor computing price
-    # def __init__(self, product=product, quantity=quantity, *args, **kwargs):
-    #     print("lolololo")
-    #     print(product)
-    #     price = product.price * quantity
-    #     super().__init__(product=product, quantity=quantity, price=price, *args, **kwargs)
-    def __str__(self):
-        return 'Inventaire'
 
 # there should be only one instance of this model
 class LocalSettings(models.Model):
-    min_account = models.DecimalField("Seuil en dessous duquel on ne peut plus faire d'achat", max_digits=10, decimal_places=2, default=0)
-    txt_home = models.TextField(blank=True, verbose_name="Texte de la page d'accueil (doit être donnée en code html)", default="<i>Bienvenu au GASE</i>")
-    mail_admin = models.EmailField(blank=True, null=True, verbose_name="Mail de l'admin à qui sont reporté les erreurs du logiciel")
+    min_account = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="seuil en dessous duquel on ne peut plus faire d'achat")
+    txt_home = models.TextField(blank=True, default="<i>Bienvenu au GASE</i>", verbose_name="texte de la page d'accueil (doit être donnée en code html)")
+    mail_admin = models.EmailField(blank=True, null=True, verbose_name="mail de l'admin à qui sont reporté les erreurs du logiciel")
     class Meta:
         verbose_name = "Réglages divers"

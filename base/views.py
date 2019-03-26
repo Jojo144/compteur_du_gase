@@ -33,7 +33,7 @@ def index(request):
 
 def gestion(request):
     # todo : use aggregate ?
-    value_stock=sum([p.value() for p in Product.objects.all()])
+    value_stock=sum([p.value_stock() for p in Product.objects.all()])
     value_accounts=sum([p.account for p in Household.objects.all()])
     return render(request, 'base/gestion.html',
                   {'value_stock': round0(value_stock),
@@ -63,7 +63,7 @@ def achats(request, household_id):
             if p.startswith('basket_'):
                 pdt = Product.objects.get(pk=int(p[7:]))
                 q = decimal.Decimal(q)
-                op = AchatOp(product=pdt, household=household, quantity=-q)
+                op = AchatOp.create(product=pdt, household=household, quantity=-q)
                 op.save()
                 household.account -= op.price
                 household.save()
@@ -143,7 +143,7 @@ def detail_product(request, product_id):
             messages.success(request, 'Produit mis à jour !')
             return HttpResponseRedirect(reverse('base:products'))
     else:
-        form = ProductForm(instance=pdt, initial={'value': pdt.value()})
+        form = ProductForm(instance=pdt, initial={'value': pdt.value_stock()})
     return render(request, 'base/product.html', {'form': form})
 
 def products(request):
@@ -176,7 +176,7 @@ def appro(request, provider_id):
             for p, q in form.cleaned_data.items():
                 if q:
                     pdt = Product.objects.get(pk=p)
-                    op = ApproStockOp(product=pdt, quantity=q)
+                    op = ApproStockOp.create(product=pdt, quantity=q)
                     op.save()
                     pdt.stock += q
                     pdt.save()
@@ -261,7 +261,7 @@ def inventory(request):
                 if q:
                     diff = q-pdt.stock
                     if diff != 0: # todo check
-                        op = InventoryOp(product=pdt, quantity=diff, price = pdt.price * diff)
+                        op = InventoryOp.create(product=pdt, quantity=diff)
                         op.save()
                         pdt.stock = q
                         pdt.save()
@@ -276,13 +276,11 @@ def ecarts(request):
     for o in list(ope):
         print(o.date, o.price)
     dates = {o.date.date() for o in ope} # on regroupe par jour
-    # dates = list(dates).sort(reverse=True) # on garde les 10 derniers FIXME
+    dates = sorted(dates, reverse=True)[:10] # on garde les 10 derniers
     ecarts = [{'date': d,
                'result': round2(sum([o.price for o in ope.filter(date__date=d)]))}
               for d in dates]
-    return render(request, 'base/ecarts.html',
-                  {'ecarts': ecarts
-                  })
+    return render(request, 'base/ecarts.html', {'ecarts': ecarts})
 
 
 ### stats

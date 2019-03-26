@@ -53,7 +53,7 @@
   </div>
 
   <div class="col col-6 bg-info">
-    <form action="" method="post">
+    <form action="" @submit="validateForm" method="post">
     {% csrf_token %}
     <table class="table table-striped">
       <thead>
@@ -131,6 +131,13 @@
 		  s += this.pdts[id].price * this.basket[id]
 	      }
 	      return s
+	  },
+
+	  validateForm: function(e) {
+	      if (this.totalAmount() >= {{ max_amount }}) {
+		  alert ("Vous n'avez pas assez de sous sur votre compte !");
+		  e.preventDefault()
+	      }
 	  }
       }
   })

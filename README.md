@@ -9,7 +9,7 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 [x] liste + création/modif des fournisseurs (dans Gestion)
 [x] voir adresse du foyer qqpart (soit liste membres soit détail membre)
 [x] historique des appro compte
-[-] mettre un seuil en dessous duquel on ne peut plus faire d'achats (ne reste qu'à valider)
+[x] mettre un seuil en dessous duquel on ne peut plus faire d'achats (ne reste qu'à valider)
 [ ] mettre timeout / try-catch sur l'envoi de mail
 [x] EXPLICITER LEs INVARIANTS DE LA BASE
 [ ] vérifier l'intégrité de la base (stock pdt = somme des ope, solde membre = somme de ope) et sinon reporter une erreur par mail à l'admin
@@ -19,10 +19,10 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 [ ] des belles stats !
 [x] lien vers l'admin + expliquer comment elle fonctionne
 [ ] désactiver mpd admin ?
-[ ] références non visible (doc) -> filtre dans liste des pdts + non listés dans achat
+[x] références non visible (doc) -> filtre dans liste des pdts + non listés dans achat
 [ ] gérer plusieurs unités (L / kg / sachet / bouteille) mais pas les grammmes sinon on va s'y perdre !
 [ ] création / modif foyer + membres (pour l'instant faisable via l'admin)
-[-] ne pas définir price comme une property dans model des ope
+[x] ne pas définir price comme une property dans model des ope
 [ ] bouton "abandonner" sur page achats
 [x] doc création des catégories dans l'admin
 [ ] achat : "valider formulaire" (erreur quand ce n'est pas un nombre + entier quand non vrac)
@@ -33,6 +33,7 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 [ ] afficher bilan au fur à mesure (ou pour chaque produit) pour inventaire
 [ ] envoyer un mail quand appro ?
 [ ] mettre des symboles € dans les formulaires avec des thunes
+[ ] unifier inventoryOp et ApproOp ?
 
 [ ] Rendre tout joli !
 
@@ -50,6 +51,16 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 [ ] gestion du prix libre
 
 
-C'est quoi la diff entre verbose_name et 1er arg ?
-filter(provider= vs filter(provider_=
+filter(provider= vs filter(provider_id=
 null=False, default="" partout ?
+
+sum type
+
+
+import ipdb; ipdb.set_trace()
+l  ---> élargir le contexte
+n  ---> passer à la ligne suivante
+q  ---> quitter sauvagement
+c  ---> continuer l'exécution du programme jusqu'à sa fin
+s  ---> rentre dans la fonction de la ligne en cours
+r  ---> execute un return
