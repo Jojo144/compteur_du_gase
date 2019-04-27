@@ -9,11 +9,6 @@ from django.urls import reverse
 from django.contrib import messages
 from django.core.mail import send_mail
 
-import django_tables2 as tables
-import django_filters
-from django_filters.views import FilterView
-from django_tables2.views import SingleTableMixin
-
 from .models import *
 from .forms import *
 from .utils import *
