@@ -19,14 +19,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'rpp%_-#0$sdu6z#x3p-@1-0gc3_$rscs&walq@b#un&o@!s9h9'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -133,3 +125,13 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'bla@ex.fr'
 EMAIL_HOST_PASSWORD = 'mqslkd'
 EMAIL_USE_TLS = True
+
+
+SECRET_KEY = "blabla"
+DEBUG = True
+ALLOWED_HOSTS = []
+
+try:
+    from .settings_ynh import *
+except ModuleNotFoundError:
+    print('Warning: the file settings_ynh.py was not found, you are in debug mode.')
