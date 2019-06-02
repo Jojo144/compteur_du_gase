@@ -8,10 +8,14 @@
 {% block content %}
 <div id="vue-table">
 
+<div class="row justify-content-left">
+  <a class="btn btn-info" href="{% url 'base:index' %}">Abandonner et revenir à l'accueil</a>
+</div>
+
 <div class="row justify-content-center bg-primary">
-  <button @click="category=''" class="btn btn-info">Toutes</button>
+  <button @click="category=''" class="btn btn-info">Toutes catégories</button>&nbsp;
   {% for cat in cats %}
-  <button @click="category='{{ cat.pk }}'" class="btn btn-info">{{ cat.name }}</button>
+  <button @click="category='{{ cat.pk }}'" class="btn btn-info">{{ cat.name }}</button>&nbsp;
   {% endfor %}
 </div>
 
@@ -61,6 +65,7 @@
           <th>Nom</th>
           <th>Quantité</th>
           <th>Prix</th>
+          <th></th>
 	</tr>
       </thead>
       <tbody>
@@ -68,6 +73,7 @@
           <td>[[ pdts[id].name ]]</td>
           <td>[[ qtity ]]</td>
           <td>[[ pdts[id].price * qtity ]]</td>
+          <td><a @click="removeBasket(id)">Supprimer</a></td>
 	  <input type="hidden" :value="qtity" :name="'basket_' + id" :id="'basket_' + id">
 	</tr>
       </tbody>
@@ -116,6 +122,9 @@
 		      var input = document.getElementById("input_pdt_" + id);
 		      if (input.value) {
 			  if (input.value != 0) {
+			      if (input.value < 0) {
+				  alert("Vous avez rentré une quantité négative. Cela peut être pratique pour rattraper une erreur dans un achat précédent. Mais si vous vous êtes trompé, supprimez la référence de votre panier.");
+			      }
 			      var before = (this.basket[id]) ? (this.basket[id]) : 0
 			      Vue.set(this.basket, id, before + Number(input.value))
 			  }
@@ -125,7 +134,11 @@
 	      }
 	  },
 
-	  totalAmount: function() {
+	  removeBasket: function(id) {
+	      Vue.set(this.basket, id, 0)
+	  },
+
+	  totalAmount: function () {
 	      var s = 0
 	      for (var id in this.basket) {
 		  s += this.pdts[id].price * this.basket[id]

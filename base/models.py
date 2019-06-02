@@ -17,7 +17,7 @@ class Category(models.Model):
 class Provider(models.Model):
     name = models.CharField(max_length=200, verbose_name="nom")
     contact = models.TextField(blank=True, verbose_name="mail / téléphone / adresse du fournisseur")
-    comment = models.TextField(blank=True, verbose_name="commentaire (quel Gasier a été en contact, historique des échages, ...)")
+    comment = models.TextField(blank=True, verbose_name="commentaire (quel Gasier a été en contact, historique des échanges, ...)")
 
     def __str__(self):
         return self.name
@@ -31,10 +31,10 @@ class Provider(models.Model):
 
 # foyer
 class Household(models.Model):
-    name = models.CharField(max_length=200, verbose_name="nom")
-    address = models.CharField(max_length=200, blank=True, verbose_name="adresse")
+    name = models.CharField(max_length=200, help_text="Nom qui apparaitra dans la liste des comptes pour faire ses achats", verbose_name="nom du foyer")
+    address = models.CharField(max_length=200, blank=True, help_text="Pas indispensable mais pratique quand on fait des réunions chez les uns les autres", verbose_name="adresse")
     comment = models.TextField(blank=True, verbose_name="commentaire")
-    account = models.DecimalField(default=0, max_digits=10, decimal_places=2, verbose_name="solde du compte") # INVARIANT : account should be sum of operations
+    account = models.DecimalField(default=0, max_digits=10, decimal_places=2, editable=False, verbose_name="solde du compte") # INVARIANT : account should be sum of operations
     date = models.DateField(auto_now=True) # date d'inscription
 
     def __str__(self):
@@ -54,10 +54,10 @@ class Member(models.Model):
     name = models.CharField(max_length=200, verbose_name="nom")
     email = models.EmailField(blank=True, null=True, verbose_name="email")
     tel = models.CharField(max_length=200, blank=True, verbose_name="numéro de téléphone")
-    household = models.ForeignKey(Household, on_delete=models.CASCADE, verbose_name="foyer")
+    household = models.ForeignKey(Household, related_name="has_household", on_delete=models.CASCADE, verbose_name="foyer")
     # receive the receipt by mail
     receipt = models.BooleanField(default=True, verbose_name="recevoir un ticket de caisse par mail ?")
-    stock_alert = models.BooleanField(default=True, verbose_name="recevoir les alertes stock par mail ? (uniquement pour les référents produit)")
+    stock_alert = models.BooleanField(default=True, verbose_name="recevoir les approvisionnements et les alertes stock par mail ? (uniquement pour les référents produit)")
 
     def __str__(self):
         return self.name
@@ -72,11 +72,11 @@ class Product(models.Model):
     category = models.ForeignKey(Category, verbose_name="catégorie", on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="prix à l'unité (kg/L/...)") # current price, can vary in the time ...
     pwyw = models.BooleanField(default=False, verbose_name="prix libre", help_text="Pas encore géré par le logiciel ...") # PWYW = Pay what you want
-    vrac = models.BooleanField("Vrac") # todo = unité
-    visible = models.BooleanField(default=True, null=False, help_text="Une référence non visible n'apparait pas dans les produits que l'on peut acheter, on l'utilise généralement pour les produits e rupture de stock", verbose_name="vible")
-    referent = models.ForeignKey(Member, blank=True, null=True, verbose_name="référent", on_delete=models.SET_NULL) # todo : many to many
+    vrac = models.BooleanField("Vrac", help_text="Cocher si le produit n'est vendu qu'à l'unité entière (bouteille/sachet/...)") # todo = unité
+    visible = models.BooleanField(default=True, null=False, help_text="Une référence non visible n'apparait pas dans les produits que l'on peut acheter, on l'utilise généralement pour les produits en rupture de stock", verbose_name="vible")
+    referent = models.ForeignKey(Member, blank=True, null=True, help_text="Le référent reçoit un mail à chaque fois qu'un produit est approvisionné ou que le stock devient bas. (Sauf si il a choisi de désactiver cette fonctionnalité dans son profil.) ", verbose_name="référent", on_delete=models.SET_NULL) # todo : many to many
     comment = models.TextField(blank=True, verbose_name="commentaire")
-    stock = models.DecimalField(default=0, max_digits=15, decimal_places=3, verbose_name="stock") # INVARIANT : stock should be sum of operations
+    stock = models.DecimalField(default=0, max_digits=15, decimal_places=3, editable=False, verbose_name="stock") # INVARIANT : stock should be sum of operations
     
     def __str__(self):
         return self.name
@@ -142,7 +142,7 @@ class ApproCompteOp(Operation):
 
 # there should be only one instance of this model
 class LocalSettings(models.Model):
-    min_account = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="seuil en dessous duquel on ne peut plus faire d'achat")
+    min_account = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="seuil en dessous duquel on ne peut plus faire d'achat (en €)")
     txt_home = models.TextField(blank=True, default="<i>Bienvenu au GASE</i>", verbose_name="texte de la page d'accueil (doit être donnée en code html)")
     mail_admin = models.EmailField(blank=True, null=True, verbose_name="mail de l'admin à qui sont reporté les erreurs du logiciel")
     class Meta:

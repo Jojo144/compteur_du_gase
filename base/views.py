@@ -5,9 +5,11 @@ from collections import defaultdict
 
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.core.mail import send_mail
+from django.views.generic.edit import CreateView, UpdateView
+from django.db import transaction
 
 from .models import *
 from .forms import *
@@ -67,9 +69,14 @@ def achats(request, household_id):
                 s += op.price
                 msg += "{} ({} € / unité) : {} unité  -> {} €\n".format(pdt.name, pdt.price, q, op.price)
         msg += "Ce qui nous donne un total de {} €.\n\nCiao!".format(s)
-        mails = household.get_emails_receipt()
-        send_mail('[Compteur de GASE] Ticket de caisse', msg, 'gase.nantest@mailoo.org', mails, fail_silently=False)
         messages.success(request, 'Votre compte a été débité de ' + str(s) + ' €.')
+        mails = household.get_emails_receipt()
+        if mails:
+            try:
+                send_mail('[Compteur de GASE] Ticket de caisse', msg, 'gase.nantest@mailoo.org', mails, fail_silently=False)
+                messages.success(request, 'Le ticket de caisse a été envoyé par mail.')
+            except:
+                messages.error(request, 'Erreur : le ticket de caisse n\'a pas été envoyé par mail.')
         return HttpResponseRedirect(reverse('base:index'))
     else:
         pdts = {str(p.id): {"name": p.name, "category": p.category.id,
@@ -189,26 +196,70 @@ def appro(request, provider_id):
 
 def members(request):
     columns = ['nom', 'foyer', 'email', 'bigophone']
-    members = [{"id": p.id, "nom": p.name, "foyer": str(p.household), "email": p.email, "bigophone": p.tel}
+    members = [{"id": p.id, "nom": p.name, "foyer": str(p.household), "email": p.email, "bigophone": p.tel, "household_id": p.household.id}
                for p in Member.objects.all()]
     columns = json.dumps(columns)
     members = json.dumps(members)
     return render(request, 'base/members.html', {'columns': columns, 'members': members})
 
 
-def detail_member(request, member_id):
-    member = Member.objects.get(pk=member_id)
-    if request.method == 'POST':
-        form = MemberForm(request.POST, instance=member)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Membre mis à jour')
-            return HttpResponseRedirect(reverse('base:members'))
-    else:
-        form = MemberForm(instance=member, initial={'address': member.household.address})
-    return render(request, 'base/member.html', {'form': form})
+class HouseholdCreate(CreateView):
+    model = Household
+    fields = ['name', 'address', 'comment']
+    template_name = 'base/create_household2.html'
+    success_url = reverse_lazy('base:members')
 
-### membres
+    def get_context_data(self, **kwargs):
+        data = super(HouseholdCreate, self).get_context_data(**kwargs)
+        if self.request.POST:
+            data['members'] = MemberFormSet(self.request.POST)
+        else:
+            data['members'] = MemberFormSet()
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        members = context['members']
+        with transaction.atomic():
+            form.instance.created_by = self.request.user
+            if members.is_valid():
+                self.object = form.save()
+                members.instance = self.object
+                members.save()
+            else:
+                return self.form_invalid(form)
+        return super(HouseholdCreate, self).form_valid(form)
+
+
+class HouseholdUpdate(UpdateView):
+    model = Household
+    fields = ['name', 'address', 'comment']
+    template_name = 'base/create_household2.html'
+    success_url = reverse_lazy('base:members')
+
+    def get_context_data(self, **kwargs):
+        data = super(HouseholdUpdate, self).get_context_data(**kwargs)
+        if self.request.POST:
+            data['members'] = MemberFormSet(self.request.POST, instance=self.object)
+        else:
+            data['members'] = MemberFormSet(instance=self.object)
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        members = context['members']
+        with transaction.atomic():
+            form.instance.created_by = self.request.user
+            if members.is_valid():
+                self.object = form.save()
+                members.instance = self.object
+                members.save()
+            else:
+                return self.form_invalid(form)
+        return super(HouseholdUpdate, self).form_valid(form)
+
+
+### providers
 
 def providers(request):
     columns = ['nom', 'contact', 'commentaire']
@@ -218,7 +269,6 @@ def providers(request):
     columns = json.dumps(columns)
     providers = json.dumps(providers)
     return render(request, 'base/providers.html', {'columns': columns, 'providers': providers})
-
 
 def create_provider(request):
     if request.method == 'POST':

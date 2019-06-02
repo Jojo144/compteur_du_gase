@@ -4,6 +4,9 @@
 <div class="row justify-content-center">
 Bla bla
 </div>
+<div class="row justify-content-center">
+  <a class="btn btn-info" href="{% url 'base:create_household' %}">Créer un compte pour un·e nouveau·lle Gasier·ère</a>
+</div>
 
 <div id="vue-table">
 
@@ -26,7 +29,7 @@ Bla bla
         <td v-for="column in columns">
 	  [[ x[column] ]]
 	</td>
-        <td><a :href="'membre/' + x.id">⌬ Détails</a></td>
+        <td><a :href="'membre/' + x.household_id">⌬ Détails</a></td>
       </tr>
     </tbody>
   </table>  

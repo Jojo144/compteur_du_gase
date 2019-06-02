@@ -48,13 +48,12 @@
 
     <div class="row justify-content-center">
       <div class ="col">
+	<script src="{% static 'base/jquery-3.3.1.js' %}"></script>
+	<script src="{% static 'base/bootstrap.bundle.js' %}"></script>
 	{% block content %}{% endblock %}
       </div>
     </div>
 
 </div>
-
-<script src="{% static 'base/jquery-3.3.1.js' %}"></script>
-<script src="{% static 'base/bootstrap.bundle.js' %}"></script>
 </body>
 </html>

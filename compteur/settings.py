@@ -123,7 +123,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'bla@ex.fr'
 EMAIL_HOST_PASSWORD = 'mqslkd'
 EMAIL_USE_TLS = True
-
+EMAIL_TIMEOUT = 2
 
 SECRET_KEY = "blabla"
 DEBUG = True

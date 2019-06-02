@@ -10,7 +10,7 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 - [x] voir adresse du foyer qqpart (soit liste membres soit détail membre)
 - [x] historique des appro compte
 - [x] mettre un seuil en dessous duquel on ne peut plus faire d'achats (ne reste qu'à valider)
-- [ ] mettre timeout / try-catch sur l'envoi de mail
+- [x] mettre timeout / try-catch sur l'envoi de mail
 - [x] EXPLICITER LEs INVARIANTS DE LA BASE
 - [ ] vérifier l'intégrité de la base (stock pdt = somme des ope, solde membre = somme de ope) et sinon reporter une erreur par mail à l'admin
 - [x] afficher valeur du stock (total/par référence/par rayon) (documenter)
@@ -18,7 +18,7 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 - [x] bilan inventaire
 - [ ] des belles stats !
 - [x] lien vers l'admin + expliquer comment elle fonctionne
-- [ ] désactiver mpd admin ?
+- [x] désactiver mpd admin ? -> non ça al'air trop relou
 - [x] références non visible (doc) -> filtre dans liste des pdts + non listés dans achat
 - [ ] gérer plusieurs unités (L / kg / sachet / bouteille) mais pas les grammmes sinon on va s'y perdre !
 - [ ] création / modif foyer + membres (pour l'instant faisable via l'admin)
@@ -30,11 +30,16 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 - [x] page appro stock : montrer le prix des références (+ pourquoi pas stock actuel)
 - [x] que se passe-t-il si on supprime un foyer ?
 - [ ] pouvoir filtrer dans l'inventaire / plus compact
-- [ ] afficher bilan au fur à mesure (ou pour chaque produit) pour inventaire
 - [ ] envoyer un mail quand appro ?
 - [ ] mettre des symboles € dans les formulaires avec des thunes
 - [ ] unifier inventoryOp et ApproOp ?
- 
+Expliquer install
+Documenter admin mail
+check vrac à "dans panier"
+supprimer une référence du panier -> icone
+onclick="return confirm('Voulez-vous abandonner vos achats et revenir à l'acceuil ? (Vous n'avez pas payé)');
+confirm si payer avec panier vide
+
 - [ ] Rendre tout joli !
 
 ## Pour la v2!
@@ -49,7 +54,11 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 - [ ] aligner le ♥ avec le milieu de la ligne
 - [ ] achat + appro sélection de son compte au clavier
 - [ ] gestion du prix libre
-
+- [ ] Afficher le stock et sa valeur pour un produit / une catégorie dans l'interface admin (en readonly)
+- [ ] afficher bilan au fur à mesure (ou pour chaque produit) pour inventaire
+  ajouter help_text pour ticket de caisse et alertes dans page membre
+  mieux formatter formulaire page membre
+  rendre plus calir qu'on peut créer plusieurs membres
 
 filter(provider= vs filter(provider_id=
 null=False, default="" partout ?
@@ -64,3 +73,12 @@ q  ---> quitter sauvagement
 c  ---> continuer l'exécution du programme jusqu'à sa fin
 s  ---> rentre dans la fonction de la ligne en cours
 r  ---> execute un return
+
+
+
+Pour devs :
+provider.html et product.html sont utilisés our la création ET pour le détail
+
+
+Bugs connus :
+pas de message d'erreur quand on cherche à enregistrer un foyer sans membre
