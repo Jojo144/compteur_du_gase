@@ -95,49 +95,36 @@ class Operation(models.Model):
     class Meta:
         verbose_name = 'Opération'
 
-class AchatOp(Operation):
+class ChangeStockOp(Operation):
     product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL) # null if the product was deleted and no longer exists
+    quantity = models.DecimalField(max_digits=15, decimal_places=3) # positif for an appro, negative for a normal buying
+    price = models.DecimalField(max_digits=15, decimal_places=3) # product.price * quantity
+
+    @classmethod    # constructor computing price
+    def create(cls, product=product, quantity=quantity, **kwargs):
+        price = product.price * quantity
+        return cls(product=product, quantity=quantity, price=price, **kwargs)
+    def __str__(self):
+        return 'Op {} - {}'.format(self.product, self.quantity)
+
+class AchatOp(ChangeStockOp):
     household = models.ForeignKey(Household, null=True, on_delete=models.SET_NULL) # null if the household was deleted and no longer exists
-    quantity = models.DecimalField(max_digits=15, decimal_places=3) # negative for a regular achat
-    price = models.DecimalField(max_digits=15, decimal_places=3) # positive for a regular achat (we record it because pdt.price can vary in the time)
-
-    @classmethod    # constructor computing price
-    def create(cls, product=product, household=household, quantity=quantity):
-        price = - product.price * quantity
-        return cls(product=product, household=household, quantity=quantity, price=price)
     def __str__(self):
-        return 'Achat {} - {}'.format(self.product, self.quantity)
+        return 'Achat' + super().__str__()
 
-class ApproStockOp(Operation):
-    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL) # null if the product was deleted and no longer exists
-    quantity = models.DecimalField(max_digits=15, decimal_places=3) # positif for a regular appro
-    price = models.DecimalField(max_digits=15, decimal_places=3) # positive for a regular appro (we record it because pdt.price can vary in the time)
-
-    @classmethod    # constructor computing price
-    def create(cls, product=product, quantity=quantity):
-        price = product.price * quantity
-        return cls(product=product, quantity=quantity, price=price)
-
+class ApproStockOp(ChangeStockOp):
     def __str__(self):
-        return 'Appro'
+        return 'ApproStock' + super().__str__()
 
-class InventoryOp(Operation):
-    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL) # null if the household was deleted and no longer exists
-    quantity = models.DecimalField(max_digits=15, decimal_places=3) # négatif si perte
-    price = models.DecimalField(max_digits=15, decimal_places=3) # negative if loss (we record it because pdt.price can vary in the time)
-
-    @classmethod    # constructor computing price
-    def create(cls, product=product, quantity=quantity):
-        price = product.price * quantity
-        return cls(product=product, quantity=quantity, price=price)
+class InventoryOp(ChangeStockOp):
     def __str__(self):
-        return 'Inventaire'
+        return 'Inventaire' + super().__str__()
 
 class ApproCompteOp(Operation):
     household = models.ForeignKey(Household, null=True, on_delete=models.SET_NULL) # null if the household was deleted and no longer exists
     amount = models.DecimalField(max_digits=15, decimal_places=2) # positif for a regular appro
     def __str__(self):
-        return 'ApproCompte'
+        return 'ApproCompteOp {} - {}'.format(self.household, self.amount)
 
 
 # there should be only one instance of this model

@@ -32,11 +32,11 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 - [ ] pouvoir filtrer dans l'inventaire / plus compact
 - [ ] envoyer un mail quand appro ?
 - [ ] mettre des symboles € dans les formulaires avec des thunes
-- [ ] unifier inventoryOp et ApproOp ?
+- [x] unifier inventoryOp et ApproOp
 Expliquer install
 Documenter admin mail
-check vrac à "dans panier"
-supprimer une référence du panier -> icone
+- [x] check vrac à "dans panier"
+- [x] supprimer une référence du panier -> icone
 onclick="return confirm('Voulez-vous abandonner vos achats et revenir à l'acceuil ? (Vous n'avez pas payé)');
 confirm si payer avec panier vide
 

@@ -73,7 +73,7 @@
           <td>[[ pdts[id].name ]]</td>
           <td>[[ qtity ]]</td>
           <td>[[ pdts[id].price * qtity ]]</td>
-          <td><a @click="removeBasket(id)">Supprimer</a></td>
+          <td><a @click="removeBasket(id)">🗑</a></td>
 	  <input type="hidden" :value="qtity" :name="'basket_' + id" :id="'basket_' + id">
 	</tr>
       </tbody>
@@ -116,26 +116,31 @@
 	  },
 
 	  inBasket: function () {
-	      var filtered = this.filter()
+	      var filtered = this.filter();
 	      for (var id in filtered) {
-		  for (var pdt in filtered[id]) {
-		      var input = document.getElementById("input_pdt_" + id);
-		      if (input.value) {
-			  if (input.value != 0) {
-			      if (input.value < 0) {
-				  alert("Vous avez rentré une quantité négative. Cela peut être pratique pour rattraper une erreur dans un achat précédent. Mais si vous vous êtes trompé, supprimez la référence de votre panier.");
-			      }
-			      var before = (this.basket[id]) ? (this.basket[id]) : 0
-			      Vue.set(this.basket, id, before + Number(input.value))
+		  var input = document.getElementById("input_pdt_" + id);
+		  if (input.value) {
+		      var value = Number(input.value);
+		      if (value == 0) {
+			  input.value = '';
+		      } else {
+			  if (value < 0) {
+			      alert("Vous avez rentré une quantité négative. Cela peut être pratique pour rattraper une erreur dans un achat précédent. Mais si vous vous êtes trompé, supprimez la référence de votre panier.");
 			  }
-			  input.value = ''
+			  if(!this.pdts[id].vrac && !Number.isInteger(value)) {
+			      alert("Veuillez utiliser un nombre entier pour: " + this.pdts[id].name);
+			  } else {
+			      var before = (this.basket[id]) ? (this.basket[id]) : 0;
+			      Vue.set(this.basket, id, before + value);
+			      input.value = '';
+			  }
 		      }
 		  }
 	      }
 	  },
 
 	  removeBasket: function(id) {
-	      Vue.set(this.basket, id, 0)
+	      Vue.delete(this.basket, id)
 	  },
 
 	  totalAmount: function () {

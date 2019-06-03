@@ -62,11 +62,11 @@ def achats(request, household_id):
                 q = decimal.Decimal(q)
                 op = AchatOp.create(product=pdt, household=household, quantity=-q)
                 op.save()
-                household.account -= op.price
+                household.account += op.price
                 household.save()
                 pdt.stock -= q
                 pdt.save()
-                s += op.price
+                s -= op.price
                 msg += "{} ({} € / unité) : {} unité  -> {} €\n".format(pdt.name, pdt.price, q, op.price)
         msg += "Ce qui nous donne un total de {} €.\n\nCiao!".format(s)
         messages.success(request, 'Votre compte a été débité de ' + str(s) + ' €.')
@@ -206,7 +206,7 @@ def members(request):
 class HouseholdCreate(CreateView):
     model = Household
     fields = ['name', 'address', 'comment']
-    template_name = 'base/create_household2.html'
+    template_name = 'base/household.html'
     success_url = reverse_lazy('base:members')
 
     def get_context_data(self, **kwargs):
@@ -234,7 +234,7 @@ class HouseholdCreate(CreateView):
 class HouseholdUpdate(UpdateView):
     model = Household
     fields = ['name', 'address', 'comment']
-    template_name = 'base/create_household2.html'
+    template_name = 'base/household.html'
     success_url = reverse_lazy('base:members')
 
     def get_context_data(self, **kwargs):

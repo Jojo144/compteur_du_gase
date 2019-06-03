@@ -20,3 +20,10 @@ admin.site.register(Member)
 admin.site.register(Household, HouseholdAdmin)
 admin.site.register(Product)
 admin.site.register(LocalSettings)
+
+# for debugging
+admin.site.register(Operation)
+admin.site.register(ChangeStockOp)
+admin.site.register(AchatOp)
+admin.site.register(InventoryOp)
+admin.site.register(ApproCompteOp)
