@@ -97,15 +97,15 @@ class Product(models.Model):
 
 class Operation(models.Model):
     date = models.DateTimeField(auto_now=True)
-    def __str__(self):
-        return 'Opération - %s' % self.date
     class Meta:
-        verbose_name = 'Opération'
+        abstract = True
 
 class ChangeStockOp(Operation):
     product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL) # null if the product was deleted and no longer exists
     quantity = models.DecimalField(max_digits=15, decimal_places=3) # positif for an appro, negative for a normal buying
     price = models.DecimalField(max_digits=15, decimal_places=3) # product.price * quantity
+    class Meta:
+        abstract = True
 
     @classmethod    # constructor computing price
     def create(cls, product=product, quantity=quantity, **kwargs):
