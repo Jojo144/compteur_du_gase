@@ -9,7 +9,7 @@
 <div id="vue-table">
 
 <div class="row justify-content-left">
-  <a class="btn btn-info" href="{% url 'base:index' %}">Abandonner et revenir à l'accueil</a>
+  <a class="btn btn-info" href="{% url 'base:index' %}" onclick="return confirm('Voulez-vous vraiment abandonner vos achats et revenir à l\'acceuil ? (Vous n\'avez pas payé)')">Abandonner et revenir à l'accueil</a>
 </div>
 
 <div class="row justify-content-center bg-primary">
@@ -152,6 +152,10 @@
 	  },
 
 	  validateForm: function(e) {
+	      if (Object.keys(this.basket).length == 0) {
+		  alert ("Votre panier est vide");
+		  e.preventDefault()
+	      }
 	      if (this.totalAmount() >= {{ max_amount }}) {
 		  alert ("Vous n'avez pas assez de sous sur votre compte !");
 		  e.preventDefault()

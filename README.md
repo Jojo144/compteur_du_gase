@@ -23,7 +23,7 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 - [ ] gérer plusieurs unités (L / kg / sachet / bouteille) mais pas les grammmes sinon on va s'y perdre !
 - [x] création / modif foyer + membres (pour l'instant faisable via l'admin)
 - [x] ne pas définir price comme une property dans model des ope
-- [ ] bouton "abandonner" sur page achats
+- [x] bouton "abandonner" sur page achats
 - [x] doc création des catégories dans l'admin
 - [ ] achat : "valider formulaire" (erreur quand ce n'est pas un nombre + entier quand non vrac)
 - [ ] pouvoir avoir plusieurs référents pour un pdt
@@ -37,8 +37,7 @@ Expliquer install
 Documenter admin mail
 - [x] check vrac à "dans panier"
 - [x] supprimer une référence du panier -> icone
-onclick="return confirm('Voulez-vous abandonner vos achats et revenir à l'acceuil ? (Vous n'avez pas payé)');
-confirm si payer avec panier vide
+- [x] confirm si payer avec panier vide
 
 - [ ] Rendre tout joli !
 
