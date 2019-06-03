@@ -14,6 +14,7 @@ from django.db import transaction
 from .models import *
 from .forms import *
 from .utils import *
+# from compteur.settings import DEFAULT_FROM_EMAIL
 
 def get_local_settings():
     localsettings = LocalSettings.objects.first()
@@ -21,6 +22,13 @@ def get_local_settings():
         localsettings = LocalSettings.objects.create()
     return localsettings
 
+def my_send_mail(request, subject, message, recipient_list, success_msg, error_msg):
+    if recipient_list:
+        try:
+            send_mail('[Compteur de GASE] ' + subject, message, DEFAULT_FROM_EMAIL, recipient_list, fail_silently=False)
+            messages.success(request, success_msg)
+        except:
+            messages.error(request, error_msg)
 
 ### index
 
@@ -68,15 +76,16 @@ def achats(request, household_id):
                 pdt.save()
                 s -= op.price
                 msg += "{} ({} € / unité) : {} unité  -> {} €\n".format(pdt.name, pdt.price, q, op.price)
+                if (pdt.stock <= pdt.stock_alert):
+                    ref = pdt.get_email_stock_alert()
+                    if ref:
+                        my_send_mail(request, subject='Alerte de stock', message='Le stock de {} est bas : il reste {} unités'.format(pdt, pdt.stock), recipient_list=ref,
+                                     success_msg='Alerte stock envoyée par mail', error_msg='Erreur : l\'alerte stock n\'a pas été envoyée par mail')
         msg += "Ce qui nous donne un total de {} €.\n\nCiao!".format(s)
         messages.success(request, 'Votre compte a été débité de ' + str(s) + ' €.')
         mails = household.get_emails_receipt()
-        if mails:
-            try:
-                send_mail('[Compteur de GASE] Ticket de caisse', msg, 'gase.nantest@mailoo.org', mails, fail_silently=False)
-                messages.success(request, 'Le ticket de caisse a été envoyé par mail.')
-            except:
-                messages.error(request, 'Erreur : le ticket de caisse n\'a pas été envoyé par mail.')
+        my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,
+                     success_msg='Le ticket de caisse a été envoyé par mail', error_msg='Erreur : le ticket de caisse n\'a pas été envoyé par mail')
         return HttpResponseRedirect(reverse('base:index'))
     else:
         pdts = {str(p.id): {"name": p.name, "category": p.category.id,
@@ -113,6 +122,10 @@ def compte(request, household_id):
             household.account += q
             household.save()
             messages.success(request, 'Approvisionnement du compte effectué')
+            msg = 'Votre compte a été approvisionné de {} €'.format(q)
+            mails = household.get_emails_receipt()
+            my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,
+                         success_msg='Le ticket de caisse a été envoyé par mail', error_msg='Erreur : le ticket de caisse n\'a pas été envoyé par mail')
             return HttpResponseRedirect(reverse('base:index'))
     else:
         form = ApproCompteForm()
@@ -175,6 +188,7 @@ def appro(request, provider_id):
     if request.method == 'POST':
         form = ProductList(pdts, request.POST)
         if form.is_valid():
+            msgs = {}
             for p, q in form.cleaned_data.items():
                 if q:
                     pdt = Product.objects.get(pk=p)
@@ -182,7 +196,14 @@ def appro(request, provider_id):
                     op.save()
                     pdt.stock += q
                     pdt.save()
+                    ref = pdt.get_email_stock_alert()
+                    print(ref)
+                    if ref:
+                        msgs[ref] = msgs.get(ref, '') + '{} a été approvisionné de {} unités\n'.format(pdt, q)
             messages.success(request, 'Approvisionnement effectué')
+            for (key, value) in msgs.items():
+                my_send_mail(request, subject='Approvisionnement', message=value, recipient_list=[key],
+                             success_msg='Mail de confirmation envoyé au référent', error_msg='Erreur : le mail de confirmation n\'a pas été envoyé')
             return HttpResponseRedirect(reverse('base:index'))
     else:
         form = ProductList(pdts)

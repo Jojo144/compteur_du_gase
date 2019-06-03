@@ -82,3 +82,4 @@ provider.html et product.html sont utilisés our la création ET pour le détail
 
 Bugs connus :
 pas de message d'erreur quand on cherche à enregistrer un foyer sans membre
+stock à 0 dans détail produit

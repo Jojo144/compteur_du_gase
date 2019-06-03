@@ -118,12 +118,16 @@ STATIC_URL = '/static/'
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
+# todo
+# "mail de l'admin à qui sont reporté les erreurs du logiciel"
+
 EMAIL_HOST = 'mail.gandi.net'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'bla@ex.fr'
 EMAIL_HOST_PASSWORD = 'mqslkd'
 EMAIL_USE_TLS = True
 EMAIL_TIMEOUT = 2
+DEFAULT_FROM_EMAIL = 'gase.nantest@mailoo.org'
 
 SECRET_KEY = "blabla"
 DEBUG = True

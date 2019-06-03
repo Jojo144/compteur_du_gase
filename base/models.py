@@ -75,6 +75,7 @@ class Product(models.Model):
     vrac = models.BooleanField("Vrac", help_text="Cocher si le produit n'est vendu qu'à l'unité entière (bouteille/sachet/...)") # todo = unité
     visible = models.BooleanField(default=True, null=False, help_text="Une référence non visible n'apparait pas dans les produits que l'on peut acheter, on l'utilise généralement pour les produits en rupture de stock", verbose_name="vible")
     referent = models.ForeignKey(Member, blank=True, null=True, help_text="Le référent reçoit un mail à chaque fois qu'un produit est approvisionné ou que le stock devient bas. (Sauf si il a choisi de désactiver cette fonctionnalité dans son profil.) ", verbose_name="référent", on_delete=models.SET_NULL) # todo : many to many
+    stock_alert = models.DecimalField(max_digits=10, decimal_places=2, null=True, help_text="Laisser vide pour pas d'alerte", verbose_name="Alerte stock")
     comment = models.TextField(blank=True, verbose_name="commentaire")
     stock = models.DecimalField(default=0, max_digits=15, decimal_places=3, editable=False, verbose_name="stock") # INVARIANT : stock should be sum of operations
     
@@ -83,6 +84,12 @@ class Product(models.Model):
 
     def value_stock(self):
         return self.price * self.stock
+
+    def get_email_stock_alert(self):
+        if (self.referent and self.referent.stock_alert and self.referent.email != ''):
+            return str(self.referent.email)
+        else:
+            return None
 
     class Meta:
         verbose_name = 'Produit'
@@ -131,6 +138,5 @@ class ApproCompteOp(Operation):
 class LocalSettings(models.Model):
     min_account = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="seuil en dessous duquel on ne peut plus faire d'achat (en €)")
     txt_home = models.TextField(blank=True, default="<i>Bienvenu au GASE</i>", verbose_name="texte de la page d'accueil (doit être donnée en code html)")
-    mail_admin = models.EmailField(blank=True, null=True, verbose_name="mail de l'admin à qui sont reporté les erreurs du logiciel")
     class Meta:
         verbose_name = "Réglages divers"
