@@ -21,7 +21,7 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 - [x] désactiver mpd admin ? -> non ça al'air trop relou
 - [x] références non visible (doc) -> filtre dans liste des pdts + non listés dans achat
 - [ ] gérer plusieurs unités (L / kg / sachet / bouteille) mais pas les grammmes sinon on va s'y perdre !
-- [ ] création / modif foyer + membres (pour l'instant faisable via l'admin)
+- [x] création / modif foyer + membres (pour l'instant faisable via l'admin)
 - [x] ne pas définir price comme une property dans model des ope
 - [ ] bouton "abandonner" sur page achats
 - [x] doc création des catégories dans l'admin
@@ -30,7 +30,7 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 - [x] page appro stock : montrer le prix des références (+ pourquoi pas stock actuel)
 - [x] que se passe-t-il si on supprime un foyer ?
 - [ ] pouvoir filtrer dans l'inventaire / plus compact
-- [ ] envoyer un mail quand appro ?
+- [x] envoyer un mail quand appro
 - [ ] mettre des symboles € dans les formulaires avec des thunes
 - [x] unifier inventoryOp et ApproOp
 Expliquer install
@@ -56,10 +56,12 @@ confirm si payer avec panier vide
 - [ ] gestion du prix libre
 - [ ] Afficher le stock et sa valeur pour un produit / une catégorie dans l'interface admin (en readonly)
 - [ ] afficher bilan au fur à mesure (ou pour chaque produit) pour inventaire
-  ajouter help_text pour ticket de caisse et alertes dans page membre
-  mieux formatter formulaire page membre
-  rendre plus calir qu'on peut créer plusieurs membres
-
+- [ ] ajouter help_text pour ticket de caisse et alertes dans page membre
+- [ ] mieux formatter formulaire page membre
+- [ ] rendre plus calir qu'on peut créer plusieurs membres
+- [ ] une liste des alertes stock
+- [ ] ne pas envoyer plusieurs fois la même alerte stock
+  
 filter(provider= vs filter(provider_id=
 null=False, default="" partout ?
 

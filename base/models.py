@@ -54,7 +54,7 @@ class Member(models.Model):
     name = models.CharField(max_length=200, verbose_name="nom")
     email = models.EmailField(blank=True, null=True, verbose_name="email")
     tel = models.CharField(max_length=200, blank=True, verbose_name="numéro de téléphone")
-    household = models.ForeignKey(Household, related_name="has_household", on_delete=models.CASCADE, verbose_name="foyer")
+    household = models.ForeignKey(Household, blank=True, null=True, related_name="has_household", on_delete=models.CASCADE, verbose_name="foyer")
     # receive the receipt by mail
     receipt = models.BooleanField(default=True, verbose_name="recevoir un ticket de caisse par mail ?")
     stock_alert = models.BooleanField(default=True, verbose_name="recevoir les approvisionnements et les alertes stock par mail ? (uniquement pour les référents produit)")

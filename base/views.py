@@ -217,7 +217,7 @@ def appro(request, provider_id):
 
 def members(request):
     columns = ['nom', 'foyer', 'email', 'bigophone']
-    members = [{"id": p.id, "nom": p.name, "foyer": str(p.household), "email": p.email, "bigophone": p.tel, "household_id": p.household.id}
+    members = [{"id": p.id, "nom": p.name, "foyer": str(p.household), "email": p.email, "bigophone": p.tel, "household_id": p.household.id if p.household else 0}
                for p in Member.objects.all()]
     columns = json.dumps(columns)
     members = json.dumps(members)
