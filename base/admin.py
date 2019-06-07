@@ -15,6 +15,7 @@ admin.site.unregister(User)
 admin.site.unregister(Group)
 
 admin.site.register(Category)
+admin.site.register(Unit)
 admin.site.register(Provider)
 admin.site.register(Member)
 admin.site.register(Household, HouseholdAdmin)

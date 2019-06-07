@@ -5,10 +5,6 @@
   <a class="btn btn-info" href="{% url 'base:create_product' %}">Créer un nouveau produit</a>
 </div>
 
-<div class="row justify-content-center">
-  Les stocks sont en kilogramme ou en litre (pour les produits en vrac) ou en unité (pour les produits à l'unité).
-</div>
-
 <div id="vue-table">
 
   <button @click="changeVisible" class="btn btn-info">[[ only_visible ? "Montrer " : "Masquer "]] les non visibles </button>

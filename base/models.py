@@ -14,6 +14,17 @@ class Category(models.Model):
         verbose_name = 'Catégorie'
 
 
+class Unit(models.Model):
+    name = models.CharField(max_length=200, verbose_name="Nom")
+    vrac = models.BooleanField(verbose_name="Vrac", help_text="Oui pour kg, L, ... Non pour sachet, bouteille, ...")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Unité'
+
+
 class Provider(models.Model):
     name = models.CharField(max_length=200, verbose_name="nom")
     contact = models.TextField(blank=True, verbose_name="mail / téléphone / adresse du fournisseur")
@@ -70,12 +81,12 @@ class Product(models.Model):
     name = models.CharField(max_length=200, verbose_name="nom")
     provider = models.ForeignKey(Provider, verbose_name="fournisseur", on_delete=models.CASCADE)
     category = models.ForeignKey(Category, verbose_name="catégorie", on_delete=models.CASCADE)
+    unit = models.ForeignKey(Unit, verbose_name="unité", on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="prix à l'unité (kg/L/...)") # current price, can vary in the time ...
     pwyw = models.BooleanField(default=False, verbose_name="prix libre", help_text="Pas encore géré par le logiciel ...") # PWYW = Pay what you want
-    vrac = models.BooleanField("Vrac", help_text="Cocher si le produit n'est vendu qu'à l'unité entière (bouteille/sachet/...)") # todo = unité
-    visible = models.BooleanField(default=True, null=False, help_text="Une référence non visible n'apparait pas dans les produits que l'on peut acheter, on l'utilise généralement pour les produits en rupture de stock", verbose_name="vible")
+    visible = models.BooleanField(default=True, help_text="Une référence non visible n'apparait pas dans les produits que l'on peut acheter, on l'utilise généralement pour les produits en rupture de stock", verbose_name="visible")
     referent = models.ForeignKey(Member, blank=True, null=True, help_text="Le référent reçoit un mail à chaque fois qu'un produit est approvisionné ou que le stock devient bas. (Sauf si il a choisi de désactiver cette fonctionnalité dans son profil.) ", verbose_name="référent", on_delete=models.SET_NULL) # todo : many to many
-    stock_alert = models.DecimalField(max_digits=10, decimal_places=2, null=True, help_text="Laisser vide pour pas d'alerte", verbose_name="Alerte stock")
+    stock_alert = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Laisser vide pour pas d'alerte", verbose_name="Alerte stock")
     comment = models.TextField(blank=True, verbose_name="commentaire")
     stock = models.DecimalField(default=0, max_digits=15, decimal_places=3, editable=False, verbose_name="stock") # INVARIANT : stock should be sum of operations
     

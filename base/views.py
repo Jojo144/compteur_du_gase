@@ -76,7 +76,7 @@ def achats(request, household_id):
                 pdt.save()
                 s -= op.price
                 msg += "{} ({} € / unité) : {} unité  -> {} €\n".format(pdt.name, pdt.price, q, op.price)
-                if (pdt.stock <= pdt.stock_alert):
+                if (pdt.stock_alert and pdt.stock <= pdt.stock_alert):
                     ref = pdt.get_email_stock_alert()
                     if ref:
                         my_send_mail(request, subject='Alerte de stock', message='Le stock de {} est bas : il reste {} unités'.format(pdt, pdt.stock), recipient_list=ref,
@@ -89,7 +89,7 @@ def achats(request, household_id):
         return HttpResponseRedirect(reverse('base:index'))
     else:
         pdts = {str(p.id): {"name": p.name, "category": p.category.id,
-                            "price": str(p.price), "pwyw": p.pwyw, "vrac": p.vrac}
+                            "price": str(p.price), "pwyw": p.pwyw, "vrac": p.unit.vrac}
                 for p in Product.objects.filter(visible=True)}
         pdts = json.dumps(pdts)
         context = {'household': household,
@@ -162,9 +162,9 @@ def detail_product(request, product_id):
     return render(request, 'base/product.html', {'form': form})
 
 def products(request):
-    columns = ['nom', 'catégorie', 'fournisseur', 'prix', 'prix libre', 'vrac', 'visible', 'stock']
+    columns = ['nom', 'catégorie', 'fournisseur', 'prix', 'vrac', 'visible', 'stock']
     pdts = [{"id": p.id, "nom": p.name, "catégorie": str(p.category), "fournisseur": str(p.provider),
-             "prix": '{} €'.format(p.price), "prix libre": bool_to_utf8(p.pwyw), "vrac": bool_to_utf8(p.vrac), "visible": bool_to_utf8(p.visible), "stock": round_stock(p.stock)}
+             "prix": '{} € / {}'.format(p.price, p.unit), "vrac": bool_to_utf8(p.unit.vrac), "visible": bool_to_utf8(p.visible), "stock": round_stock(p.stock)}
             for p in Product.objects.all()]
     columns = json.dumps(columns)
     pdts = json.dumps(pdts)

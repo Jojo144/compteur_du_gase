@@ -20,7 +20,7 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 - [x] lien vers l'admin + expliquer comment elle fonctionne
 - [x] désactiver mpd admin ? -> non ça al'air trop relou
 - [x] références non visible (doc) -> filtre dans liste des pdts + non listés dans achat
-- [ ] gérer plusieurs unités (L / kg / sachet / bouteille) mais pas les grammmes sinon on va s'y perdre !
+- [x] gérer plusieurs unités (L / kg / sachet / bouteille) mais pas les grammmes sinon on va s'y perdre !
 - [x] création / modif foyer + membres (pour l'instant faisable via l'admin)
 - [x] ne pas définir price comme une property dans model des ope
 - [x] bouton "abandonner" sur page achats
@@ -40,6 +40,13 @@ Documenter admin mail
 - [x] confirm si payer avec panier vide
 
 - [ ] Rendre tout joli !
+Abandonner et revenir à l'accueil -> mettre un logo
+Page produits -> non visible interrupteur sur même ligne que filtre
+détail membre/produit -> commentaire bcp plus petit
+messages
+formulaires de sélection de compte -> moins large
+
+
 
 ## Pour la v2!
 - [ ] dans la liste des références, on devrait pouvoir cliquer sur un fournisseur pour en voir les détails

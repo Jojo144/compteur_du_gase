@@ -1,12 +1,15 @@
 {% extends 'base/base.html' %}
 
 {% block content %}
-
-<a href="/admin">Accès à l'interface d'administration</a>
-Cette interface permet de bidouiller tout ce que gère le logiciel, à utiliser avec précaution. En particulier on peut :
+<h4>Interface d'administration</h4>
+<a class="btn btn-info" href="/admin">Accès à l'interface d'administration</a>
+<br> Cette interface permet de bidouiller tout ce que gère le logiciel, à utiliser avec précaution. En particulier on peut :
 <ul>
 <li>
 Créer/modifier les catégories.
+</li>
+<li>
+Créer/modifier les unités.
 </li>
 <li>
 Supprimer un foyer/fournisseur/référence/catégorie. Une fois un objet supprimé on ne peut pas le retrouver, à utiliser avec modération donc. Attention si l'on supprime un fournisseur / une catégorie cela supprimera aussi tous les produits correspondants (le logiciel demande confirmation avant).
@@ -20,30 +23,20 @@ Changer le texte de la page d'accueil (dans "Réglages divers").
 </ul>
 
 
-Créer un compte :
+<h4>Fournisseurs</h4>
+<a class="btn btn-info" href="{% url 'base:providers' %}">Liste des fournisseurs</a>
 <br>
-- via admin
 <br>
-- d'abord foyer
-<br>
-- puis membres
-<br>
+
+<h4>Inventaire</h4>
+<a class="btn btn-info" href="{% url 'base:inventory' %}">Nouvel inventaire</a>
+&nbsp;&nbsp;&nbsp;
+<a class="btn btn-info" href="{% url 'base:ecarts' %}">Bilan des inventaires précédents</a>
 <br>
 <br>
 
 
-<a href="{% url 'base:providers' %}">Liste des fournisseurs</a>
-<br>
-<br>
-
-<a href="{% url 'base:inventory' %}">Inventaire</a>
-<br>
-<br>
-
-<a href="{% url 'base:ecarts' %}">Écarts</a>
-<br>
-<br>
-
+<h4>Valeur du stock et des comptes</h4>
 Valeur du stock total (références non visibles incluses) : {{ value_stock }} €
 <br>
 Somme des soldes des comptes : {{ value_accounts }} €

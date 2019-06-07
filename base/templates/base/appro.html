@@ -2,8 +2,11 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<h3 class="display-5">Fournisseur : {{ provider }}</h3>
+<h4>Approvisionnement du stock</h4>
+Fournisseur : {{ provider }}
 
+<br>
+<br>
 <form action="" method="post">
   {% csrf_token %}
   {{ form | crispy }}
