@@ -207,7 +207,7 @@ def appro(request, provider_id):
             for p, q in form.cleaned_data.items():
                 if q:
                     pdt = Product.objects.get(pk=p)
-                    op = ApproStockOp.create(product=pdt, quantity=q)
+                    op = ChangeStockOp.create_appro_stock(product=pdt, quantity=q)
                     op.save()
                     pdt.stock += q
                     pdt.save()
@@ -342,7 +342,7 @@ def inventory(request):
                 if q:
                     diff = q-pdt.stock
                     if diff != 0: # todo check
-                        op = InventoryOp.create(product=pdt, quantity=diff)
+                        op = ChangeStockOp.create_inventory(product=pdt, quantity=diff)
                         op.save()
                         pdt.stock = q
                         pdt.save()
@@ -353,7 +353,7 @@ def inventory(request):
     return render(request, 'base/inventory.html', {'form': form})
 
 def ecarts(request):
-    ope = InventoryOp.objects.all()
+    ope = ChangeStockOp.objects.filter(label='Inventaire')
     for o in list(ope):
         print(o.date, o.price)
     dates = {o.date.date() for o in ope} # on regroupe par jour
@@ -363,25 +363,9 @@ def ecarts(request):
               for d in dates]
     return render(request, 'base/ecarts.html', {'ecarts': ecarts})
 
-
-### stats
-# from jchart import Chart
-# from jchart.config import Axes, DataSet, rgba
-
-# class LineChart(Chart):
-#     chart_type = 'line'
-#     scales = {
-#         'xAxes': [Axes(type='time', position='bottom')],
-#     }
-#     def get_datasets(self, product_id):
-#         # pdt = Product.objects.get(pk=2)
-#         opes = PurchaseDetail.objects.filter(product=product_id)
-#         data = [{'y': a.quantity, 'x': a.date.isoformat()[:-13],} for a in opes ]
-#         print(data)
-#         return [DataSet(type='line', data=data)]
-
 def stats(request, product_id):
+    # opes = ChangeStockOp.objects.filter(product=product_id, date__date__gt=datetime.date(2018, 1, 1))
     opes = ChangeStockOp.objects.filter(product=product_id)
-    data = [{'stock': str(a.stock), 'date': a.date.isoformat()[:-13],} for a in opes ]
+    data = [{'stock': str(a.stock), 'date': a.date.isoformat()[:-13], 'label': a.label} for a in opes ]
     pdt = Product.objects.get(pk=product_id)
     return render(request, 'base/stats.html', {'pdt': pdt, 'data': data,})

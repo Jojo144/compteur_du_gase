@@ -7,6 +7,12 @@
 {{ data | safe }}
 
 <canvas id="myChart"></canvas>
+<br>
+<br>
+<button id="removeData">Un mois de moins</button>
+<button id="addData">Un mois de plus</button>
+
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
 <script>
   var ctx = document.getElementById('myChart').getContext('2d');
@@ -17,13 +23,13 @@
       data: {
           // labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
           datasets: [{
-              label: 'Stock',
+              label: 'Stock de {{ pdt }}',
               backgroundColor: 'rgb(255, 99, 132)',
               borderColor: 'rgb(255, 99, 132)',
 	      fill: false,
 	      data: [
 		  {% for d in data %}
-		  { x: new Date('{{d.date}}'), y: {{d.stock}}, bl: 'blo' },
+		  { x: new Date('{{d.date}}'), y: {{d.stock}}, label: '{{d.label}}' },
 		  {% endfor %}
 	      ]
           }]
@@ -34,9 +40,7 @@
 	  scales: {
               xAxes: [{
                   type: 'time',
-                  time: {
-                      unit: 'month'
-                  }
+		  time: {min: '2019-06-13T16:33:48'}
               }],
 	      yAxes: [{
 		  scaleLabel: {
@@ -45,16 +49,28 @@
 		  }
 	      }]
 	  },
-          // tooltips: {
-              // callbacks: {
-                  // label: function(tooltipItem, data) {
-		      // console.log(tooltipItem);
-		      // console.log(data.datasets[tooltipItem.datasetIndex]);
-                      // return tooltipItem;
-                  // }
-              // }
-	  // },
+          tooltips: {
+              callbacks: {
+                  label: function(tooltipItem, data) {
+                      return data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].label;
+                  }
+              }
+	  },
       }
+  });
+
+  document.getElementById('addData').addEventListener('click', function() {
+      var date = new Date(chart.options.scales.xAxes[0].time.min);
+      date.setMonth(date.getMonth() - 1);
+      chart.options.scales.xAxes[0].time.min = date;
+      chart.update();
+  });
+
+  document.getElementById('removeData').addEventListener('click', function() {
+      var date = new Date(chart.options.scales.xAxes[0].time.min);
+      date.setMonth(date.getMonth() + 1);
+      chart.options.scales.xAxes[0].time.min = date;
+      chart.update();
   });
 </script>
 {% endblock content %}

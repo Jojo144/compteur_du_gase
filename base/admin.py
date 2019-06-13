@@ -25,6 +25,5 @@ admin.site.register(LocalSettings)
 # for debugging
 admin.site.register(Purchase)
 admin.site.register(PurchaseDetailOp)
-admin.site.register(InventoryOp)
-admin.site.register(ApproStockOp)
+admin.site.register(ChangeStockOp)
 admin.site.register(ApproCompteOp)

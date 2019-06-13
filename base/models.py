@@ -115,21 +115,22 @@ class ChangeStockOp(Operation):
     product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL) # null if the product was deleted and no longer exists
     quantity = models.DecimalField(max_digits=15, decimal_places=3) # positif for an appro, negative for a normal buying
     price = models.DecimalField(max_digits=15, decimal_places=3) # product.price * quantity
-    stock = models.DecimalField(max_digits=15, decimal_places=3) # stock before the operation
+    stock = models.DecimalField(max_digits=15, decimal_places=3) # stock after the operation
     label = models.CharField(max_length=20)
-    class Meta:
-        abstract = True
 
     @classmethod    # constructor computing price
     def create(cls, product=product, quantity=quantity, **kwargs):
         price = product.price * quantity
-        return cls(product=product, quantity=quantity, price=price, stock=product.stock, **kwargs)
+        newstock = product.stock + quantity
+        return cls(product=product, quantity=quantity, price=price, stock=newstock, **kwargs)
 
+    @classmethod
     def create_appro_stock(cls, **kwargs):
-        cls.create(label='ApproStock', **kwargs)
+        return cls.create(label='ApproStock', **kwargs)
 
+    @classmethod
     def create_inventory(cls, **kwargs):
-        cls.create(label='Inventaire', **kwargs)
+        return cls.create(label='Inventaire', **kwargs)
 
     def __str__(self):
         return '{} : {} - {}'.format(self.label, self.product, self.quantity)
@@ -139,19 +140,9 @@ class Purchase(Operation):
 
 class PurchaseDetailOp(ChangeStockOp):
     purchase = models.ForeignKey(Purchase, null=False, on_delete=models.CASCADE)
-
     @classmethod
-    def create(cls, *args, **kwargs):
-        super().create(label='Achat', *arsg, **kwargs)
-
-class ApproStockOp(ChangeStockOp):
-    @classmethod
-    def create(cls, *args, **kwargs):
-        super().create(label='ApproStock', *arsg, **kwargs)
-
-class InventoryOp(ChangeStockOp):
-    def __str__(self):
-        return 'Inventaire' + super().__str__()
+    def create(cls, **kwargs):
+        return super().create(label='Achat', **kwargs)
 
 class ApproCompteOp(Operation):
     household = models.ForeignKey(Household, null=True, on_delete=models.SET_NULL) # null if the household was deleted and no longer exists
