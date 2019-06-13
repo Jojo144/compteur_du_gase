@@ -1,10 +1,13 @@
 {% extends 'base/base.html' %}
 
-{% block content %}
-<h2>Statistiques pour : {{ pdt }}</h2>
+{% load static %}
+{% load my_tags %}
 
-<br>
-{{ data | safe }}
+{% block content %}
+<h4>Statistiques pour : {{ pdt }}</h4>
+Fournisseur : {{ pdt.provider }}<br>
+Stock actuel : {{ pdt.stock | round_stock }} {{ pdt.unit }}<br>
+Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
 
 <canvas id="myChart"></canvas>
 <br>
@@ -12,16 +15,18 @@
 <button id="removeData">Un mois de moins</button>
 <button id="addData">Un mois de plus</button>
 
+<script src="{% static 'base/moment-with-locales.js' %}"></script>
+<script src="{% static 'base/Chart.js' %}"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
 <script>
+  moment.locale('fr');
   var ctx = document.getElementById('myChart').getContext('2d');
-  var timeFormat = 'MM/DD/YYYY HH:mm';
+  var init_date = new Date();
+  init_date.setFullYear(init_date.getFullYear() - 1);
   var chart = new Chart(ctx, {
       type: 'line',
 
       data: {
-          // labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
           datasets: [{
               label: 'Stock de {{ pdt }}',
               backgroundColor: 'rgb(255, 99, 132)',
@@ -40,12 +45,12 @@
 	  scales: {
               xAxes: [{
                   type: 'time',
-		  time: {min: '2019-06-13T16:33:48'}
+		  time: {min: init_date}
               }],
 	      yAxes: [{
 		  scaleLabel: {
 		      display: true,
-		      labelString: 'Stock'
+		      labelString: 'Stock ({{ pdt.unit }})'
 		  }
 	      }]
 	  },
