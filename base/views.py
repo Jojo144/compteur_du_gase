@@ -40,10 +40,12 @@ def gestion(request):
     # todo : use aggregate ?
     value_stock=sum([p.value_stock() for p in Product.objects.all()])
     value_accounts=sum([p.account for p in Household.objects.all()])
+    alert_pdts=[p for p in Product.objects.filter(stock_alert__isnull=False) if p.stock < p.stock_alert]
     return render(request, 'base/gestion.html',
-                  {'value_stock': round0(value_stock),
-                   'value_accounts': round0(value_accounts),
-                   'diff_values': round0(value_accounts - value_stock),
+                  {'value_stock': value_stock,
+                   'value_accounts': value_accounts,
+                   'diff_values': value_accounts - value_stock,
+                   'alert_pdts': alert_pdts
                   })
 
 
@@ -61,14 +63,18 @@ def pre_achats(request):
 def achats(request, household_id):
     localsettings = get_local_settings()
     household = Household.objects.get(pk=household_id)
+    purchases_history = Purchase.objects.filter(household_id=household_id).order_by('-date')[:10]
+    history = [{'date': p.date, 'details': PurchaseDetailOp.objects.filter(purchase=p)} for p in purchases_history]
     if request.method == 'POST':
         s = 0
         msg = "Voici votre ticket de caisse :\n"
+        purchase = Purchase(household=household)
+        purchase.save()
         for p, q in request.POST.items():
             if p.startswith('basket_'):
                 pdt = Product.objects.get(pk=int(p[7:]))
                 q = decimal.Decimal(q)
-                op = AchatOp.create(product=pdt, household=household, quantity=-q)
+                op = PurchaseDetailOp.create(product=pdt, purchase=purchase, quantity=-q)
                 op.save()
                 household.account += op.price
                 household.save()
@@ -95,8 +101,17 @@ def achats(request, household_id):
         context = {'household': household,
                    'cats': Category.objects.all(),
                    'max_amount': household.account - localsettings.min_account,
-                   'pdts': pdts}
+                   'pdts': pdts,
+                   'history':history}
         return render(request, 'base/achats.html', context)
+
+
+
+def purchase_history(request, household_id):
+    household = Household.objects.get(pk=household_id)
+    purchases = Purchase.objects.filter(household_id=household_id).order_by('-date')[:10]
+    purchases = [{'date': p.date, 'details': PurchaseDetailOp.objects.filter(purchase=p)} for p in purchases]
+    return render(request, 'base/purchase_history.html', {'household': household, 'purchases': purchases})
 
 
 ### compte
@@ -158,7 +173,7 @@ def detail_product(request, product_id):
             messages.success(request, 'Produit mis à jour !')
             return HttpResponseRedirect(reverse('base:products'))
     else:
-        form = ProductForm(instance=pdt, initial={'value': pdt.value_stock()})
+        form = ProductForm(instance=pdt, initial={'stock': pdt.stock, 'value': pdt.value_stock()})
     return render(request, 'base/product.html', {'form': form})
 
 def products(request):
@@ -344,27 +359,29 @@ def ecarts(request):
     dates = {o.date.date() for o in ope} # on regroupe par jour
     dates = sorted(dates, reverse=True)[:10] # on garde les 10 derniers
     ecarts = [{'date': d,
-               'result': round2(sum([o.price for o in ope.filter(date__date=d)]))}
+               'result': sum([o.price for o in ope.filter(date__date=d)])}
               for d in dates]
     return render(request, 'base/ecarts.html', {'ecarts': ecarts})
 
 
 ### stats
-from jchart import Chart
-from jchart.config import Axes, DataSet, rgba
+# from jchart import Chart
+# from jchart.config import Axes, DataSet, rgba
 
-class LineChart(Chart):
-    chart_type = 'line'
-    scales = {
-        'xAxes': [Axes(type='time', position='bottom')],
-    }
-    def get_datasets(self, product_id):
-        # pdt = Product.objects.get(pk=2)
-        opes = AchatOp.objects.filter(product=product_id)
-        data = [{'y': a.quantity, 'x': a.date.isoformat()[:-13],} for a in opes ]
-        print(data)
-        return [DataSet(type='line', data=data)]
+# class LineChart(Chart):
+#     chart_type = 'line'
+#     scales = {
+#         'xAxes': [Axes(type='time', position='bottom')],
+#     }
+#     def get_datasets(self, product_id):
+#         # pdt = Product.objects.get(pk=2)
+#         opes = PurchaseDetail.objects.filter(product=product_id)
+#         data = [{'y': a.quantity, 'x': a.date.isoformat()[:-13],} for a in opes ]
+#         print(data)
+#         return [DataSet(type='line', data=data)]
 
 def stats(request, product_id):
+    opes = ChangeStockOp.objects.filter(product=product_id)
+    data = [{'stock': str(a.stock), 'date': a.date.isoformat()[:-13],} for a in opes ]
     pdt = Product.objects.get(pk=product_id)
-    return render(request, 'base/stats.html', {'pdt': pdt, 'chart': LineChart(),})
+    return render(request, 'base/stats.html', {'pdt': pdt, 'data': data,})

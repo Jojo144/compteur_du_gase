@@ -37,6 +37,8 @@
 <div class="row justify-content-center">
   {% for o in history %}
   {{ o.date | date:"D d M Y - H \h i" }} : {{ o.amount }} €<br>
+  {% empty %}
+  Pas d'approvisionnement précédent
   {% endfor %}
 </div>
 

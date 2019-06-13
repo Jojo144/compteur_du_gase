@@ -24,13 +24,13 @@ class ProductList(forms.Form):
     def __init__(self, pdts, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for p in pdts:
-            label = "{} ({} / unité, stock actuel : {} unité)".format(p.name, p.price, round_stock(p.stock))
-            self.fields[str(p.pk)] = forms.DecimalField(label=label, required=False)
+            help_text = "{} € / {}, stock actuel : {} {}".format(p.price, p.unit, round_stock(p.stock), p.unit)
+            self.fields[str(p.pk)] = forms.DecimalField(label=p.name, help_text=help_text, required=False)
 
 
 # used for details AND creation
 class ProductForm(forms.ModelForm):
-    stock = forms.DecimalField(disabled=True, initial=0) # initial=0 pour création nveau pdt
+    stock = forms.DecimalField(disabled=True, required=False)
     value = forms.DecimalField(disabled=True, required=False, decimal_places=2,
                                label="Valeur du stock (en €)")
     class Meta:

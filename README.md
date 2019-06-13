@@ -26,14 +26,12 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 - [x] bouton "abandonner" sur page achats
 - [x] doc création des catégories dans l'admin
 - [ ] achat : "valider formulaire" (erreur quand ce n'est pas un nombre + entier quand non vrac)
-- [ ] pouvoir avoir plusieurs référents pour un pdt
+- [ ] pouvoir avoir plusieurs référents pour un pdt -> plutôt non (pas trop de fonctions)
 - [x] page appro stock : montrer le prix des références (+ pourquoi pas stock actuel)
 - [x] que se passe-t-il si on supprime un foyer ?
 - [ ] pouvoir filtrer dans l'inventaire / plus compact
 - [x] envoyer un mail quand appro
-- [ ] mettre des symboles € dans les formulaires avec des thunes
 - [x] unifier inventoryOp et ApproOp
-Expliquer install
 Documenter admin mail
 - [x] check vrac à "dans panier"
 - [x] supprimer une référence du panier -> icone
@@ -46,32 +44,36 @@ détail membre/produit -> commentaire bcp plus petit
 messages
 formulaires de sélection de compte -> moins large
 
+Jo:
+history -> modal vs page à part
+filter(provider= vs filter(provider_id=
+
+## Bugs connus
+- [x] stock à 0 dans détail produit
 
 
 ## Pour la v2!
 - [ ] dans la liste des références, on devrait pouvoir cliquer sur un fournisseur pour en voir les détails
-- [ ] historique des achats (nécessite une page "foyer")
-- [ ] alertes stock au référent (doc)
-- [ ] pouvoir annuler un achat d'une façon ou d'une autre (via admin ?) (doc (dans Gestion ?))
+- [x] historique des achats (nécessite une page "foyer")
+- [x] alertes stock au référent (doc)
+- [x] pouvoir annuler un achat d'une façon ou d'une autre (via admin ?) (doc (dans Gestion ?))
 - [ ] masquer les astérisques des champs obligatoires partout
 - [ ] faire que les messages "Votre compte a bien été appro/débité" s'effacent au bout de qqs secondes
 - [ ] partout autoriser le . et la , comme séparateur décimal
-- [ ] montrer de façon un peu plus clair qu'on peut trier par colonne ?
+- [ ] montrer de façon un peu plus clair qu'on peut trier par colonne ? -> plutôt non
 - [ ] aligner le ♥ avec le milieu de la ligne
 - [ ] achat + appro sélection de son compte au clavier
 - [ ] gestion du prix libre
 - [ ] Afficher le stock et sa valeur pour un produit / une catégorie dans l'interface admin (en readonly)
 - [ ] afficher bilan au fur à mesure (ou pour chaque produit) pour inventaire
-- [ ] ajouter help_text pour ticket de caisse et alertes dans page membre
-- [ ] mieux formatter formulaire page membre
-- [ ] rendre plus calir qu'on peut créer plusieurs membres
-- [ ] une liste des alertes stock
+- [x] ajouter help_text pour ticket de caisse et alertes dans page membre
+- [ ] mieux formater formulaire page membre
+- [ ] rendre plus clair qu'on peut créer plusieurs membres
+- [x] une liste des alertes stock
 - [ ] ne pas envoyer plusieurs fois la même alerte stock
+- [ ] mettre des symboles € dans les formulaires avec des thunes
+- [ ] message d'erreur quand on cherche à enregistrer un foyer sans membre pas ouf
   
-filter(provider= vs filter(provider_id=
-null=False, default="" partout ?
-
-sum type
 
 
 import ipdb; ipdb.set_trace()
@@ -88,6 +90,3 @@ Pour devs :
 provider.html et product.html sont utilisés our la création ET pour le détail
 
 
-Bugs connus :
-pas de message d'erreur quand on cherche à enregistrer un foyer sans membre
-stock à 0 dans détail produit

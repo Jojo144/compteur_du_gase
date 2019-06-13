@@ -1,0 +1,33 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+{% load my_tags %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <h5>Foyer :</h5> &nbsp;{{ household }}
+</div>
+
+<br>
+<br>
+<div class="row justify-content-center">
+  <h5>Historique de vos 10 derniers achats :</h5>
+</div>
+<div class="row justify-content-center">
+  <ul>
+  {% for o in purchases %}
+  <li> Le {{ o.date | date:"D d M Y - H \h i" }} :
+    <ul>
+    {% for p in o.details %}
+    <li> {{ p.product }} : {{ p.quantity | neg | round_stock }} {{ p.product.unit }} ({{ p.price | neg | round2 }} €)</li>
+    {% empty %}
+    <li>Achat vide</li>
+    {% endfor %}
+    </ul>
+  </li>
+  {% empty %}
+  <li>Pas d'achats précédents</li>
+  {% endfor %}
+  </ul>
+</div>
+
+{% endblock content %}

@@ -1,4 +1,5 @@
 {% extends 'base/base.html' %}
+{% load my_tags %}
 
 {% block content %}
 <h4>Interface d'administration</h4>
@@ -37,10 +38,35 @@ Changer le texte de la page d'accueil (dans "Réglages divers").
 
 
 <h4>Valeur du stock et des comptes</h4>
-Valeur du stock total (références non visibles incluses) : {{ value_stock }} €
+Valeur du stock total (références non visibles incluses) : {{ value_stock | round0 }} €
 <br>
-Somme des soldes des comptes : {{ value_accounts }} €
+Somme des soldes des comptes : {{ value_accounts | round0 }} €
 <br>
-Donc il doit y avoir en banque : {{ diff_values }} €
+Donc il doit y avoir en banque : {{ diff_values | round0 }} €
 (si toutes les factures ont été payées et que tous le adhérents ont bien fait leur virement)
+<br>
+<br>
+
+
+<h4>Liste des alertes stock</h4>
+<ul>
+  {% for p in alert_pdts %}
+  <li>
+    {{ p.name }} : {{ p.stock | round_stock }} {{ p.unit }} en stock
+  </li>
+  {% empty %}
+    <li>Pas d'alerte stock !</li>
+  {% endfor %}
+</ul>
+<br>
+<br>
+
+<h4>Astuces</h4>
+<ul>
+<li>
+Pour annuler un achat erronné, une façon de faire est de refaire le même achat en
+mettant des quantités négatives à la place. Cela approvisionne le compte et les
+stocks correctement.
+</li>
+</ul>
 {% endblock content %}

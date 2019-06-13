@@ -1,12 +1,60 @@
-{% include 'base/menu.html' %}
-{% include "base/messages.html" %} 
+{% extends 'base/base.html' %}
 
+{% block content %}
 <h2>Statistiques pour : {{ pdt }}</h2>
 
 <br>
+{{ data | safe }}
 
+<canvas id="myChart"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
+<script>
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var timeFormat = 'MM/DD/YYYY HH:mm';
+  var chart = new Chart(ctx, {
+      type: 'line',
 
+      data: {
+          // labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+          datasets: [{
+              label: 'Stock',
+              backgroundColor: 'rgb(255, 99, 132)',
+              borderColor: 'rgb(255, 99, 132)',
+	      fill: false,
+	      data: [
+		  {% for d in data %}
+		  { x: new Date('{{d.date}}'), y: {{d.stock}}, bl: 'blo' },
+		  {% endfor %}
+	      ]
+          }]
+      },
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
-{% load jchart %}
-{% render_chart chart pdt %}
+      options: {
+	  title: { text: 'Bla bla' },
+	  scales: {
+              xAxes: [{
+                  type: 'time',
+                  time: {
+                      unit: 'month'
+                  }
+              }],
+	      yAxes: [{
+		  scaleLabel: {
+		      display: true,
+		      labelString: 'Stock'
+		  }
+	      }]
+	  },
+          // tooltips: {
+              // callbacks: {
+                  // label: function(tooltipItem, data) {
+		      // console.log(tooltipItem);
+		      // console.log(data.datasets[tooltipItem.datasetIndex]);
+                      // return tooltipItem;
+                  // }
+              // }
+	  // },
+      }
+  });
+</script>
+{% endblock content %}

@@ -82,10 +82,10 @@ class Product(models.Model):
     provider = models.ForeignKey(Provider, verbose_name="fournisseur", on_delete=models.CASCADE)
     category = models.ForeignKey(Category, verbose_name="catégorie", on_delete=models.CASCADE)
     unit = models.ForeignKey(Unit, verbose_name="unité", on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="prix à l'unité (kg/L/...)") # current price, can vary in the time ...
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="prix (en €) à l'unité (kg/L/...)") # current price, can vary in the time ...
     pwyw = models.BooleanField(default=False, verbose_name="prix libre", help_text="Pas encore géré par le logiciel ...") # PWYW = Pay what you want
     visible = models.BooleanField(default=True, help_text="Une référence non visible n'apparait pas dans les produits que l'on peut acheter, on l'utilise généralement pour les produits en rupture de stock", verbose_name="visible")
-    referent = models.ForeignKey(Member, blank=True, null=True, help_text="Le référent reçoit un mail à chaque fois qu'un produit est approvisionné ou que le stock devient bas. (Sauf si il a choisi de désactiver cette fonctionnalité dans son profil.) ", verbose_name="référent", on_delete=models.SET_NULL) # todo : many to many
+    referent = models.ForeignKey(Member, blank=True, null=True, help_text="S'il le souhaite, le référent reçoit un mail à chaque fois qu'un produit est approvisionné ou que le stock devient plus bas que le niveau \"Alerte stock\"", verbose_name="référent", on_delete=models.SET_NULL) # todo : many to many
     stock_alert = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Laisser vide pour pas d'alerte", verbose_name="Alerte stock")
     comment = models.TextField(blank=True, verbose_name="commentaire")
     stock = models.DecimalField(default=0, max_digits=15, decimal_places=3, editable=False, verbose_name="stock") # INVARIANT : stock should be sum of operations
@@ -115,24 +115,39 @@ class ChangeStockOp(Operation):
     product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL) # null if the product was deleted and no longer exists
     quantity = models.DecimalField(max_digits=15, decimal_places=3) # positif for an appro, negative for a normal buying
     price = models.DecimalField(max_digits=15, decimal_places=3) # product.price * quantity
+    stock = models.DecimalField(max_digits=15, decimal_places=3) # stock before the operation
+    label = models.CharField(max_length=20)
     class Meta:
         abstract = True
 
     @classmethod    # constructor computing price
     def create(cls, product=product, quantity=quantity, **kwargs):
         price = product.price * quantity
-        return cls(product=product, quantity=quantity, price=price, **kwargs)
-    def __str__(self):
-        return 'Op {} - {}'.format(self.product, self.quantity)
+        return cls(product=product, quantity=quantity, price=price, stock=product.stock, **kwargs)
 
-class AchatOp(ChangeStockOp):
-    household = models.ForeignKey(Household, null=True, on_delete=models.SET_NULL) # null if the household was deleted and no longer exists
+    def create_appro_stock(cls, **kwargs):
+        cls.create(label='ApproStock', **kwargs)
+
+    def create_inventory(cls, **kwargs):
+        cls.create(label='Inventaire', **kwargs)
+
     def __str__(self):
-        return 'Achat' + super().__str__()
+        return '{} : {} - {}'.format(self.label, self.product, self.quantity)
+
+class Purchase(Operation):
+    household = models.ForeignKey(Household, null=True, on_delete=models.SET_NULL) # null if the household was deleted and no longer exists
+
+class PurchaseDetailOp(ChangeStockOp):
+    purchase = models.ForeignKey(Purchase, null=False, on_delete=models.CASCADE)
+
+    @classmethod
+    def create(cls, *args, **kwargs):
+        super().create(label='Achat', *arsg, **kwargs)
 
 class ApproStockOp(ChangeStockOp):
-    def __str__(self):
-        return 'ApproStock' + super().__str__()
+    @classmethod
+    def create(cls, *args, **kwargs):
+        super().create(label='ApproStock', *arsg, **kwargs)
 
 class InventoryOp(ChangeStockOp):
     def __str__(self):

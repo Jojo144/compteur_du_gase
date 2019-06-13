@@ -23,7 +23,8 @@ admin.site.register(Product)
 admin.site.register(LocalSettings)
 
 # for debugging
-admin.site.register(AchatOp)
+admin.site.register(Purchase)
+admin.site.register(PurchaseDetailOp)
 admin.site.register(InventoryOp)
 admin.site.register(ApproStockOp)
 admin.site.register(ApproCompteOp)
