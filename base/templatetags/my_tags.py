@@ -30,3 +30,14 @@ def round_stock(value):
         return '0'
     else:
         return '{0:.3f}'.format(value)
+
+@register.filter
+def comma_to_dot(value):
+    return str(value).replace(',', '.')
+
+
+def bool_to_utf8(b):
+    if b:
+        return "✔"
+    else:
+        return "✘"

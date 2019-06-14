@@ -116,7 +116,7 @@
 	<tr v-for="(qtity, id) in basket">
           <td>[[ pdts[id].name ]]</td>
           <td>[[ qtity ]]</td>
-          <td>[[ pdts[id].price * qtity ]]</td>
+          <td>[[ _.round(pdts[id].price * qtity, 2) ]]</td>
           <td><a @click="removeBasket(id)">🗑</a></td>
 	  <input type="hidden" :value="qtity" :name="'basket_' + id" :id="'basket_' + id">
 	</tr>
@@ -124,7 +124,7 @@
     </table>
     <div class="row">
       <div class="col">
-	<strong>Montant total : [[ totalAmount() ]] €</strong>
+	<strong>Montant total : [[ _.round(totalAmount(), 2) ]] €</strong>
       </div>
       <div class="col bg-primary text-right">
 	<input class="btn btn-info" type="submit" value="Payer">
@@ -197,7 +197,7 @@
 		  alert ("Votre panier est vide");
 		  e.preventDefault()
 	      }
-	      if (this.totalAmount() >= {{ max_amount }}) {
+	      if (this.totalAmount() >= {{ max_amount | comma_to_dot }}) {
 		  alert ("Vous n'avez pas assez de sous sur votre compte !");
 		  e.preventDefault()
 	      }

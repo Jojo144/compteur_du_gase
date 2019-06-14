@@ -14,11 +14,11 @@
 <body>
 <script>
   function removeAccents(str) {
-      return str.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+      return str.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
   }
   
   function myContains(str, key) {
-      return removeAccents(String(str).toLowerCase()).includes(removeAccents(String(key).toLowerCase()))
+      return removeAccents(String(str).toLowerCase()).includes(removeAccents(String(key).toLowerCase()));
   }
 </script>
 <script src="{% static 'base/jquery-3.3.1.js' %}"></script>

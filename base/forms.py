@@ -2,7 +2,6 @@ from django import forms
 from django.forms import inlineformset_factory, ValidationError
 
 from .models import *
-from .utils import *
 
 
 class HouseholdList(forms.Form):

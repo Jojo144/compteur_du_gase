@@ -44,9 +44,16 @@ détail membre/produit -> commentaire bcp plus petit
 messages
 formulaires de sélection de compte -> moins large
 
+réglages emails dans settings.py + test emails
+
+
 Jo:
 history -> modal vs page à part
 filter(provider= vs filter(provider_id=
+    # todo : use aggregate ?
+les alerts ne sont pas jolis
+decimal separator
+
 
 ## Bugs connus
 - [x] stock à 0 dans détail produit

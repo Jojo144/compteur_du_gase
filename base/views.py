@@ -13,8 +13,8 @@ from django.db import transaction
 
 from .models import *
 from .forms import *
-from .utils import *
-# from compteur.settings import DEFAULT_FROM_EMAIL
+from .templatetags.my_tags import *
+from compteur.settings import DEFAULT_FROM_EMAIL, PURCHASE_HISTORY_SIZE
 
 def get_local_settings():
     localsettings = LocalSettings.objects.first()
@@ -61,10 +61,7 @@ def pre_achats(request):
     return render(request, 'base/pre_achats.html', {'form': form})
 
 def achats(request, household_id):
-    localsettings = get_local_settings()
     household = Household.objects.get(pk=household_id)
-    purchases_history = Purchase.objects.filter(household_id=household_id).order_by('-date')[:10]
-    history = [{'date': p.date, 'details': PurchaseDetailOp.objects.filter(purchase=p)} for p in purchases_history]
     if request.method == 'POST':
         s = 0
         msg = "Voici votre ticket de caisse :\n"
@@ -88,16 +85,20 @@ def achats(request, household_id):
                         my_send_mail(request, subject='Alerte de stock', message='Le stock de {} est bas : il reste {} unités'.format(pdt, pdt.stock), recipient_list=ref,
                                      success_msg='Alerte stock envoyée par mail', error_msg='Erreur : l\'alerte stock n\'a pas été envoyée par mail')
         msg += "Ce qui nous donne un total de {} €.\n\nCiao!".format(s)
-        messages.success(request, 'Votre compte a été débité de ' + str(s) + ' €.')
+        messages.success(request, 'Votre compte a été débité de ' + str(round2(s)) + ' €.')
         mails = household.get_emails_receipt()
         my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,
                      success_msg='Le ticket de caisse a été envoyé par mail', error_msg='Erreur : le ticket de caisse n\'a pas été envoyé par mail')
         return HttpResponseRedirect(reverse('base:index'))
     else:
+        localsettings = get_local_settings()
+        purchases_history = Purchase.objects.filter(household_id=household_id).order_by('-date')[:PURCHASE_HISTORY_SIZE]
+        history = [{'date': p.date, 'details': PurchaseDetailOp.objects.filter(purchase=p)} for p in purchases_history]
         pdts = {str(p.id): {"name": p.name, "category": p.category.id,
                             "price": str(p.price), "pwyw": p.pwyw, "vrac": p.unit.vrac}
                 for p in Product.objects.filter(visible=True)}
         pdts = json.dumps(pdts)
+        print(household.account - localsettings.min_account)
         context = {'household': household,
                    'cats': Category.objects.all(),
                    'max_amount': household.account - localsettings.min_account,
