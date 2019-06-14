@@ -25,4 +25,5 @@ urlpatterns = [
     path('inventaire', views.inventory, name='inventory'),
     path('ecarts', views.ecarts, name='ecarts'),
     path('stats/<int:product_id>', views.stats, name='stats'),
+    path('database', views.database_info, name='database_info'),
 ]

@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.views.generic.edit import CreateView, UpdateView
 from django.db import transaction
+from django.db.models import Sum
 
 from .models import *
 from .forms import *
@@ -357,9 +358,21 @@ def ecarts(request):
               for d in dates]
     return render(request, 'base/ecarts.html', {'ecarts': ecarts})
 
+
 def stats(request, product_id):
     # opes = ChangeStockOp.objects.filter(product=product_id, date__date__gt=datetime.date(2018, 1, 1))
     opes = ChangeStockOp.objects.filter(product=product_id)
     data = [{'stock': str(a.stock), 'date': a.date.isoformat()[:-13], 'label': a.label} for a in opes ]
     pdt = Product.objects.get(pk=product_id)
     return render(request, 'base/stats.html', {'pdt': pdt, 'data': data,})
+
+
+def database_info(request):
+    pdts = [{'name': pdt.name, 'stock': pdt.stock,
+             'computed': ChangeStockOp.objects.filter(product=pdt).aggregate(Sum('quantity'))['quantity__sum']}
+            for pdt in Product.objects.all()]
+    households = [{'name': h.pk, 'account': h.account,
+                   'computed': ApproCompteOp.objects.filter(household=h).aggregate(Sum('amount'))['amount__sum']
+                               + PurchaseDetailOp.objects.filter(purchase__household=h).aggregate(Sum('price'))['price__sum']}
+                  for h in Household.objects.all()]
+    return render(request, 'base/database_info.html', {'pdts': pdts, 'households': households,})
