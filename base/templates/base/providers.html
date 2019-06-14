@@ -1,13 +1,12 @@
 {% extends "base/base.html" %} 
 
 {% block content %}
+<h4>Liste des fournisseurs du GASE</h4>
+<br>
 <div class="row justify-content-center">
   <a class="btn btn-info" href="{% url 'base:create_provider' %}">Créer un nouveau producteur</a>
 </div>
 
-<div class="row justify-content-center">
-Liste des fournisseurs du GASE
-</div>
 <div id="vue-table">
 
   <form>
