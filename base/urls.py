@@ -9,7 +9,6 @@ urlpatterns = [
     path('gestion', views.gestion, name='gestion'),
     path('achats', views.pre_achats, name='pre_achats'),
     path('achats/<int:household_id>', views.achats, name='achats'),
-    path('historique/<int:household_id>', views.purchase_history, name='purchase_history'),
     path('produits', views.products, name='products'),
     path('produit/<int:product_id>', views.detail_product, name='detail_product'),
     path('produit', views.create_product, name='create_product'),

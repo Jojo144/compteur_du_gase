@@ -107,13 +107,6 @@ def achats(request, household_id):
 
 
 
-def purchase_history(request, household_id):
-    household = Household.objects.get(pk=household_id)
-    purchases = Purchase.objects.filter(household_id=household_id).order_by('-date')[:10]
-    purchases = [{'date': p.date, 'details': PurchaseDetailOp.objects.filter(purchase=p)} for p in purchases]
-    return render(request, 'base/purchase_history.html', {'household': household, 'purchases': purchases})
-
-
 ### compte
 
 def pre_compte(request):
