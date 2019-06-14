@@ -53,7 +53,13 @@ filter(provider= vs filter(provider_id=
     # todo : use aggregate ?
 les alerts ne sont pas jolis
 decimal separator
-
+plural unit
+update / backup
+migration
+filtre qui print stock / prix au kg
+	    <!-- todo: better input type ?? -->
+page achat : bouton de la catégorie activée différent
+integrity
 
 ## Bugs connus
 - [x] stock à 0 dans détail produit
@@ -80,7 +86,9 @@ decimal separator
 - [ ] ne pas envoyer plusieurs fois la même alerte stock
 - [ ] mettre des symboles € dans les formulaires avec des thunes
 - [ ] message d'erreur quand on cherche à enregistrer un foyer sans membre pas ouf
-  
+
+plusieurs pdt our les stats
+connection avec accès restreint
 
 
 import ipdb; ipdb.set_trace()

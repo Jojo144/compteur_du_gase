@@ -57,9 +57,9 @@
 
 
 <div class="row justify-content-center bg-primary">
-  <button @click="category=''" class="btn btn-info">Toutes catégories</button>&nbsp;
+  <button @click="category=''" :class="(category=='') ? 'btn' : 'bnt btn-info'">Toutes catégories</button>&nbsp;
   {% for cat in cats %}
-  <button @click="category='{{ cat.pk }}'" class="btn btn-info">{{ cat.name }}</button>&nbsp;
+  <button @click="category='{{ cat.pk }}'" :class="(category=='{{ cat.pk }}') ? 'btn' : 'bnt btn-info'">{{ cat.name }}</button>&nbsp;
   {% endfor %}
 </div>
 
@@ -90,7 +90,8 @@
           <td>[[ pdt.name ]]</td>
           <td>[[ pdt.price ]]</td>
           <td>
-	    <input type="number" class="numberinput form-control" @keyup.enter="inBasket" :id="'input_pdt_' + id">	    
+	    <!-- todo: better input type ?? -->
+	    <input type="text" class="numberinput form-control" @keyup.enter="inBasket" :id="'input_pdt_' + id">	    
 	  </td>
 	</tr>
       </tbody>
@@ -151,9 +152,10 @@
 	      var search = this.search; // important de faire ça sinon this.truc réfère à je sais pas quoi qui est undefined
 	      var category = this.category;
 	      return _.pickBy(this.pdts, (function (row) {
-		  var b = (category.length == 0) || (row.category == category)
-		  return b && myContains(row.name, search)
-		  }))
+		  var cat_ok = (category.length == 0) || (row.category == category);
+		  var filter_ok = myContains(row.name, search);
+		  return cat_ok && filter_ok;
+	      }))
 	  },
 
 	  inBasket: function () {
@@ -161,7 +163,7 @@
 	      for (var id in filtered) {
 		  var input = document.getElementById("input_pdt_" + id);
 		  if (input.value) {
-		      var value = Number(input.value);
+		      var value = Number(_.replace(input.value, ",", "."));
 		      if (value == 0) {
 			  input.value = '';
 		      } else {
@@ -185,9 +187,9 @@
 	  },
 
 	  totalAmount: function () {
-	      var s = 0
+	      var s = 0;
 	      for (var id in this.basket) {
-		  s += this.pdts[id].price * this.basket[id]
+		  s += this.pdts[id].price * this.basket[id];
 	      }
 	      return s
 	  },
