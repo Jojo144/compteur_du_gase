@@ -60,6 +60,8 @@ filtre qui print stock / prix au kg
 	    <!-- todo: better input type ?? -->
 page achat : bouton de la catégorie activée différent
 integrity
+javascript and decimals
+
 
 ## Bugs connus
 - [x] stock à 0 dans détail produit

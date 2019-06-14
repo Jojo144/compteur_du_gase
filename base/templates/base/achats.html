@@ -167,17 +167,22 @@
 		      if (value == 0) {
 			  input.value = '';
 		      } else {
-			  if (value < 0) {
-			      alert("Vous avez rentré une quantité négative. Cela peut être pratique pour rattraper une erreur dans un achat précédent. Mais si vous vous êtes trompé, supprimez la référence de votre panier.");
+			  if (Number.isFinite(value)) {
+			      if (value < 0) {
+				  alert("Vous avez rentré une quantité négative. Cela peut être pratique pour rattraper une erreur dans un achat précédent. Mais si vous vous êtes trompé, supprimez la référence de votre panier.");
+			      }
+			      if(!this.pdts[id].vrac && !Number.isInteger(value)) {
+				  alert("Veuillez utiliser un nombre entier pour : " + this.pdts[id].name);
+			      } else {
+				  var before = (this.basket[id]) ? (this.basket[id]) : 0;
+				  Vue.set(this.basket, id, before + value);
+				  input.value = '';
+			      }
 			  }
-			  if(!this.pdts[id].vrac && !Number.isInteger(value)) {
-			      alert("Veuillez utiliser un nombre entier pour: " + this.pdts[id].name);
-			  } else {
-			      var before = (this.basket[id]) ? (this.basket[id]) : 0;
-			      Vue.set(this.basket, id, before + value);
-			      input.value = '';
+			  else {
+			  alert("Veuillez entrer un nombre pour : " + this.pdts[id].name)
 			  }
-		      }
+		      }	  
 		  }
 	      }
 	  },
