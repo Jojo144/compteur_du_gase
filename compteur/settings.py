@@ -131,7 +131,6 @@ DEFAULT_FROM_EMAIL = 'gase.nantest@mailoo.org'
 SECRET_KEY = "blabla"
 DEBUG = True
 ALLOWED_HOSTS = []
-PURCHASE_HISTORY_SIZE = 10
 
 try:
     from .settings_ynh import *

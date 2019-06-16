@@ -16,6 +16,7 @@ class Category(models.Model):
 class Unit(models.Model):
     name = models.CharField(max_length=200, verbose_name="Nom")
     vrac = models.BooleanField(verbose_name="Vrac", help_text="Oui pour kg, L, ... Non pour sachet, bouteille, ...")
+    pluralize = models.BooleanField(verbose_name="Plurieliser ?", default=False, help_text="Ajouter un 's' au pluriel (par ex. 4 sachets mais 4 kg)")
 
     def __str__(self):
         return self.name

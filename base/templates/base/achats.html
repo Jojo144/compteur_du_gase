@@ -34,7 +34,7 @@
 	  <li> Le {{ o.date | date:"D d M Y - H \h i" }} :
 	    <ul>
 	      {% for p in o.details %}
-	      <li> {{ p.product }} : {{ p.quantity | neg | round_stock }} {{ p.product.unit }} ({{ p.price | neg | round2 }} €)</li>
+	      <li> {{ p.product }} : {{ p | print_neg_quantity_op }} ({{ p.price | neg | round2 }} €)</li>
 	      {% empty %}
 	      <li>Achat vide</li>
 	      {% endfor %}

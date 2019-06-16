@@ -41,3 +41,11 @@ def bool_to_utf8(b):
         return "✔"
     else:
         return "✘"
+
+@register.filter
+def print_neg_quantity_op(op):
+    q = round_stock(-op.quantity)
+    if q=='1' or q=='-1' or q =='0' or (not op.product.unit.pluralize):
+        return str(q) + ' ' + str(op.product.unit)
+    else:
+        return str(q) + ' ' + str(op.product.unit) + 's'

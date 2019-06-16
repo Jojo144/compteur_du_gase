@@ -15,7 +15,7 @@ from django.db.models import Sum
 from .models import *
 from .forms import *
 from .templatetags.my_tags import *
-from compteur.settings import DEFAULT_FROM_EMAIL, PURCHASE_HISTORY_SIZE
+from compteur.settings import DEFAULT_FROM_EMAIL
 
 def get_local_settings():
     localsettings = LocalSettings.objects.first()
@@ -93,7 +93,7 @@ def achats(request, household_id):
         return HttpResponseRedirect(reverse('base:index'))
     else:
         localsettings = get_local_settings()
-        purchases_history = Purchase.objects.filter(household_id=household_id).order_by('-date')[:PURCHASE_HISTORY_SIZE]
+        purchases_history = Purchase.objects.filter(household_id=household_id).order_by('-date')[:10]
         history = [{'date': p.date, 'details': PurchaseDetailOp.objects.filter(purchase=p)} for p in purchases_history]
         pdts = {str(p.id): {"name": p.name, "category": p.category.id,
                             "price": str(p.price), "pwyw": p.pwyw, "vrac": p.unit.vrac}
