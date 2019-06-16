@@ -34,11 +34,11 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 - [x] check vrac à "dans panier"
 - [x] supprimer une référence du panier -> icone
 - [x] confirm si payer avec panier vide
-- [ ] quand même des meilleurs résultats d'inventaire
+- [x] quand même des meilleurs résultats d'inventaire
 - [ ] réglages emails dans settings.py + test emails
 - [ ] Tester / Documenter admin mail
 - [x] page achat : bouton de la catégorie activée différent
-- [ ] plural unit
+- [x] plural unit
 - [ ] update / backup
 - [ ] migration
 - [ ] integrity

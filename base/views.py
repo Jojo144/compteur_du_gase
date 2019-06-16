@@ -354,6 +354,7 @@ def ecarts(request):
     dates = {o.date.date() for o in ope} # on regroupe par jour
     dates = sorted(dates, reverse=True)[:10] # on garde les 10 derniers
     ecarts = [{'date': d,
+               'details': ope.filter(date__date=d),
                'result': sum([o.price for o in ope.filter(date__date=d)])}
               for d in dates]
     return render(request, 'base/ecarts.html', {'ecarts': ecarts})
