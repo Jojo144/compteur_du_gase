@@ -1,31 +1,30 @@
 
-.message {
-    padding: 0.5em;
-    text-align: center;
-    margin: 1em 0;
+.narrow-content {
+    max-width: 30rem;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.message.success {
-    color: #FFFFFF;
-    background-color: #20BA44;
+.medium-content {
+    max-width: 55rem;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.message.warning {
-    color: #620;
-    background-color: #FFAE00;
-    font-style: normal;
-    border-radius: 0;
+.form-buttons {
+    display: flex;
+    text-align: right;
 }
 
-.message.error {
-    color: #B90202;
-    background-color: #FFBABA;
+.form-buttons input, .form-buttons a {
+    flex: 1;
 }
 
-
-.eat-up {
-    margin-top: -1.5em;
+nav {
+    background-color: #c0fcdf;
+    font-weight: bold;
 }
+
 .message.success:before {
     content: "✔ ";
 }

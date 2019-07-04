@@ -2,15 +2,17 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-Cette page sert à approvisionner les stocks à la réception d'une commande.
-<br>
-<br>
-<div><form action="" method="post">
-  {% csrf_token %}
-  {{ form | crispy }}
-  <div class="text-right">
-    <input class="btn btn-info" type="submit" value="Valider">
-    <a class="btn btn-light" href="{% url 'base:index' %}">Annuler</a>
-  </div>
-</form></div>
+<div class="narrow-content">
+    <h4>Approvisionner les stocks à la réception d'une commande</h4>
+    <br>
+    <br>
+    <form action="" method="post">
+	{% csrf_token %}
+	{{ form | crispy }}
+	<div class="form-buttons">
+	    <a class="btn btn-light" href="{% url 'base:index' %}">Annuler</a> &nbsp;
+	    <input class="btn btn-info" type="submit" value="Valider">
+	</div>
+    </form>
+</div>
 {% endblock content %}

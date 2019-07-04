@@ -2,17 +2,18 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<h4>Approvisionnement du stock</h4>
-Fournisseur : {{ provider }}
-
-<br>
-<br>
-<form action="" method="post">
-  {% csrf_token %}
-  {{ form | crispy }}
-  <div class="text-right">
-    <input class="btn btn-info" type="submit" value="Approvisionner">
-    <a class="btn btn-light" href="{% url 'base:pre_appro' %}">Annuler</a>
-  </div>
-</form>
+<div class="narrow-content">
+    <h4>Approvisionner les stocks à la réception d'une commande</h4>
+    <h5>{{ provider }}</h5>
+    <br>
+    <br>
+    <form action="" method="post">
+	{% csrf_token %}
+	{{ form | crispy }}
+	<div class="form-buttons">
+	    <a class="btn btn-light" href="{% url 'base:pre_appro' %}">Annuler</a> &nbsp;
+	    <input class="btn btn-info" type="submit" value="Approvisionner">
+	</div>
+    </form>
+</div>
 {% endblock content %}

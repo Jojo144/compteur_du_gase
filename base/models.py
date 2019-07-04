@@ -86,7 +86,7 @@ class Product(models.Model):
     pwyw = models.BooleanField(default=False, verbose_name="prix libre", help_text="Pas encore géré par le logiciel ...") # PWYW = Pay what you want
     visible = models.BooleanField(default=True, help_text="Une référence non visible n'apparait pas dans les produits que l'on peut acheter, on l'utilise généralement pour les produits en rupture de stock", verbose_name="visible")
     referent = models.ForeignKey(Member, blank=True, null=True, help_text="S'il le souhaite, le référent reçoit un mail à chaque fois qu'un produit est approvisionné ou que le stock devient plus bas que le niveau \"Alerte stock\"", verbose_name="référent", on_delete=models.SET_NULL) # todo : many to many
-    stock_alert = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Laisser vide pour pas d'alerte", verbose_name="Alerte stock")
+    stock_alert = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, help_text="Laisser vide pour pas d'alerte", verbose_name="Seuil de l'alerte stock")
     comment = models.TextField(blank=True, verbose_name="commentaire")
     stock = models.DecimalField(default=0, max_digits=15, decimal_places=3, editable=False, verbose_name="stock") # INVARIANT : stock should be sum of operations
     

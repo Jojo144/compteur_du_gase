@@ -4,7 +4,7 @@
 {% load my_tags %}
 
 {% block content %}
-<h4>Statistiques pour : {{ pdt }}</h4>
+<h4>{{ pdt }}</h4>
 Fournisseur : {{ pdt.provider }}<br>
 Stock actuel : {{ pdt.stock | round_stock }} {{ pdt.unit }}<br>
 Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
@@ -12,8 +12,8 @@ Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
 <canvas id="myChart"></canvas>
 <br>
 <br>
-<button id="removeData">Un mois de moins</button>
-<button id="addData">Un mois de plus</button>
+<button id="removeData">Dézoomer</button>
+<button id="addData">Zoomer</button>
 
 <script src="{% static 'base/moment-with-locales.js' %}"></script>
 <script src="{% static 'base/Chart.js' %}"></script>

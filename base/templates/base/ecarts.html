@@ -2,24 +2,25 @@
 {% load my_tags %}
 
 {% block content %}
-<h5>Bilan des 10 derniers inventaires (regroupés par jour) :</h5>
-Si c'est positif c'est que le GASE gagne de l'argent, si c'est négatif ce sont des pertes à se répartir !
-<br>
-<br>
+<div class="medium-content">
+    <h5>Bilan des 10 derniers inventaires (regroupés par jour) :</h5>
+    Si c'est positif c'est que le GASE gagne de l'argent, si c'est négatif ce sont des pertes à se répartir !
+    <br>
+    <br>
 
-<ul>
-  {% for e in ecarts %}
-  <li>
-    {{ e.date  | date:"l d F Y" | capfirst }} ---
-    <strong>Total :</strong> {{ e.result | round2 }} € <br>
     <ul>
-      {% for d in e.details %}
-      <li> {{ d.product }} : {{ d | print_quantity_op }} ({{ d.price | round2 }} €) </li>
-      {% endfor %}
-      <br>
+	{% for e in ecarts %}
+	<li>
+	    {{ e.date  | date:"l d F Y" | capfirst }} ---
+	    <strong>Total :</strong> {{ e.result | round2 }} € <br>
+	    <ul>
+		{% for d in e.details %}
+		<li> {{ d.product }} : {{ d | print_quantity_op }} ({{ d.price | round2 }} €) </li>
+		{% endfor %}
+		<br>
+	    </ul>
+	</li>
+	{% endfor %}
     </ul>
-  </li>
-  {% endfor %}
-</ul>
-
+</div>
 {% endblock content %}

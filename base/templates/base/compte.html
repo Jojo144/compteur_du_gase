@@ -2,44 +2,48 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <h5>Foyer :</h5> &nbsp;{{ household }}
-</div>
 
-<div class="row justify-content-center">
-  <h5>Solde actuel :</h5> &nbsp;{{ household.account }} €
-</div>
-
-<br>
-<div class="row justify-content-center">
-  <form action="{% url 'base:compte' household.pk %}" method="post">
-    {% csrf_token %}
-    {{ form | crispy }}
-    <div class="text-right">
-      <input class="btn btn-info" type="submit" value="Approvisionner">
-      <a class="btn btn-light" href="{% url 'base:index' %}">Annuler</a>
+<div class="narrow-content">
+    <div class="row">
+	<h2>{{ household }}</h2>
     </div>
-  </form>
-</div>
+    <div class="row">
+	<h5>Solde : {{ household.account }} € </h5>
+    </div>
 
-<br>
-<br>
-<div class="row justify-content-center">
-  <h3>♥</h3>&nbsp;&nbsp; Merci d'approvisionner votre compte &nbsp;<strong>après</strong>&nbsp; avoir réalisé le virement (ou alors de ne vraiment pas oublier !).
-</div>
+    <br>
+    <br>
+    <div class="row justify-content-center">
+	<form action="{% url 'base:compte' household.pk %}" method="post">
+	    {% csrf_token %}
+	    {{ form | crispy }}
+	    <div class="form-buttons">
+		<a class="btn btn-light" href="{% url 'base:index' %}">Annuler</a> &nbsp;
+		<input class="btn btn-info" type="submit" value="Approvisionner">
+	    </div>
+	</form>
+    </div>
 
+    <br>
+    <br>
+    <br>
+    <div class="row">
+	<h4>Historique des 5 derniers virements :</h4>
+    </div>
+    <div class="row">
+	<table class="table">
+	    <tbody>
+		{% for o in history %}
+		<tr>
+		    <td> {{ o.date | date:"D d M Y" | capfirst }}</td>
+		    <td> {{ o.date | date:"H \h i" }}</td>
+		    <td class="text-right"> {{ o.amount }} € </td>
+		</tr>
+		{% empty %}
+		<tr> <td> Pas d'approvisionnement précédent </td> </tr>
+		{% endfor %}
+	    </tbody>
+	</table>
+    </div>
 
-<br>
-<br>
-<div class="row justify-content-center">
-  <h5>Historique des 5 derniers virements :</h5>
-</div>
-<div class="row justify-content-center">
-  {% for o in history %}
-  {{ o.date | date:"D d M Y - H \h i" }} : {{ o.amount }} €<br>
-  {% empty %}
-  Pas d'approvisionnement précédent
-  {% endfor %}
-</div>
-
-{% endblock content %}
+    {% endblock content %}

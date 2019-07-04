@@ -2,214 +2,221 @@
 {% load crispy_forms_tags %}
 {% load my_tags %}
 
-{% block navbar %}
-{% endblock navbar %}
-
-
 {% block content %}
-<div id="vue-table">
-
-<div class="row justify-content-left">
-  <a class="btn btn-info" href="{% url 'base:index' %}" onclick="return confirm('Voulez-vous vraiment abandonner vos achats et revenir à l\'acceuil ? (Vous n\'avez pas payé)')">Abandonner et revenir à l'accueil</a>
-  <!-- Button trigger modal -->
-  <button type="button" class="btn btn-info" data-toggle="modal" data-target="#historyModal">
-    Historique de vos achats
-  </button>
-</div>
-
-
-<!-- Modal -->
-<div class="modal fade" id="historyModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Historique de vos 10 derniers achats</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-	<ul>
-	  {% for o in history %}
-	  <li> Le {{ o.date | date:"D d M Y - H \h i" }} :
-	    <ul>
-	      {% for p in o.details %}
-	      <li> {{ p.product }} : {{ p | print_neg_quantity_op }} ({{ p.price | neg | round2 }} €)</li>
-	      {% empty %}
-	      <li>Achat vide</li>
-	      {% endfor %}
-	    </ul>
-	  </li>
-	  {% empty %}
-	  <li>Pas d'achats précédents</li>
-	  {% endfor %}
-	</ul>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-
-
-<div class="row justify-content-center bg-primary">
-  <button @click="category=''" :class="(category=='') ? 'btn' : 'bnt btn-info'">Toutes catégories</button>&nbsp;
-  {% for cat in cats %}
-  <button @click="category='{{ cat.pk }}'" :class="(category=='{{ cat.pk }}') ? 'btn' : 'bnt btn-info'">{{ cat.name }}</button>&nbsp;
-  {% endfor %}
-</div>
-
-
-<div class="row justify-content-center bg-dark">
-  Nom : {{ household.name }} <br>
-  Solde : {{ household.account }}
-</div>
 
 <div class="row">
-
-  <div class="col col-6 bg-warning">
-
-    <form>
-      <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
-    </form>
-
-    <table class="table table-striped">
-      <thead>
-	<tr>
-          <th>Nom</th>
-          <th>Prix au kilo</th>
-          <th>Quantité</th>
-	</tr>
-      </thead>
-      <tbody>
-	<tr v-for="(pdt, id) in filter()">
-          <td>[[ pdt.name ]]</td>
-          <td>[[ pdt.price ]]</td>
-          <td>
-	    <!-- todo: better input type ?? -->
-	    <input type="text" class="numberinput form-control" @keyup.enter="inBasket" :id="'input_pdt_' + id">	    
-	  </td>
-	</tr>
-      </tbody>
-    </table>  
-    <div class="text-right">
-      <button class="btn btn-primary" @click="inBasket" >Dans panier !</button>
-    </div>
-  </div>
-
-  <div class="col col-6 bg-info">
-    <form action="" @submit="validateForm" method="post">
-    {% csrf_token %}
-    <table class="table table-striped">
-      <thead>
-	<tr>
-          <th>Nom</th>
-          <th>Quantité</th>
-          <th>Prix</th>
-          <th></th>
-	</tr>
-      </thead>
-      <tbody>
-	<tr v-for="(qtity, id) in basket">
-          <td>[[ pdts[id].name ]]</td>
-          <td>[[ qtity ]]</td>
-          <td>[[ _.round(pdts[id].price * qtity, 2) ]]</td>
-          <td><a @click="removeBasket(id)">🗑</a></td>
-	  <input type="hidden" :value="qtity" :name="'basket_' + id" :id="'basket_' + id">
-	</tr>
-      </tbody>
-    </table>
-    <div class="row">
-      <div class="col">
-	<strong>Montant total : [[ _.round(totalAmount(), 2) ]] €</strong>
-      </div>
-      <div class="col bg-primary text-right">
-	<input class="btn btn-info" type="submit" value="Payer">
-      </div>
-    </form>
-    </div>
-  </div>
+    <h2>{{ household }}</h2>
 </div>
+<div class="row">
+    <h5>Solde : {{ household.account }} € </h5>
+</div>
+<div class="row">
+    <button type="button" class="btn btn-info " data-toggle="modal" data-target="#historyModal">
+	Historique de vos achats
+    </button>
+</div>
+
+<div class="modal fade" id="historyModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+	<div class="modal-content">
+	    <div class="modal-header">
+		<h5 class="modal-title" id="exampleModalLabel">Historique de vos 10 derniers achats</h5>
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		    <span aria-hidden="true">&times;</span>
+		</button>
+	    </div>
+	    <div class="modal-body">
+		<ul>
+		    {% for o in history %}
+		    <li> Le {{ o.date | date:"D d M Y - H \h i" }} :
+			<ul>
+			    {% for p in o.details %}
+			    <li> {{ p.product }} : {{ p | print_neg_quantity_op }} ({{ p.price | neg | round2 }} €)</li>
+			    {% empty %}
+			    <li>Achat vide</li>
+			    {% endfor %}
+			</ul>
+		    </li>
+		    {% empty %}
+		    <li>Pas d'achats précédents</li>
+		    {% endfor %}
+		</ul>
+	    </div>
+	    <div class="modal-footer">
+		<button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+	    </div>
+	</div>
+    </div>
+</div>
+
+
+<div id="vue-table">
+    <div class="row">
+	<div class="col col-6">
+
+
+	    <div class="row">
+		<div class="col">
+		    <form>
+			<input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
+		    </form>
+		</div>
+
+		<div class="col text-right">
+		    <div class="dropdown">
+			<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown">
+			    [[ category ]]
+			</button>
+			<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+			    <button class="dropdown-item" @click="category='Toutes catégories'">Toutes catégories</button>
+			    {% for cat in cats %}
+			    <button class="dropdown-item" @click="category='{{ cat }}'">{{ cat.name }}</button>
+			    {% endfor %}
+			</div>
+		    </div>
+		</div>
+	    </div>
+
+	    <table class="table table-striped">
+		<thead>
+		    <tr>
+			<th>Nom</th>
+			<th>Prix au kilo</th>
+			<th>Quantité</th>
+		    </tr>
+		</thead>
+		<tbody>
+		    <tr v-for="(pdt, id) in filter()">
+			<td>[[ pdt.name ]]</td>
+			<td>[[ pdt.price ]]</td>
+			<td>
+			    <!-- todo: better input type ?? -->
+			    <input type="text" class="numberinput form-control" @keyup.enter="inBasket" :id="'input_pdt_' + id">	    
+			</td>
+		    </tr>
+		</tbody>
+	    </table>  
+	    <div class="text-right">
+		<button class="btn btn-info" @click="inBasket" >Dans panier ⇒</button>
+	    </div>
+	</div>
+
+	<div class="col col-6">
+	    <form action="" @submit="validateForm" method="post">
+		{% csrf_token %}
+		<table class="table table-striped">
+		    <thead>
+			<tr>
+			    <th>Nom</th>
+			    <th>Quantité</th>
+			    <th>Prix</th>
+			    <th></th>
+			</tr>
+		    </thead>
+		    <tbody>
+			<tr v-for="(qtity, id) in basket">
+			    <td>[[ pdts[id].name ]]</td>
+			    <td>[[ qtity ]]</td>
+			    <td>[[ _.round(pdts[id].price * qtity, 2) ]]</td>
+			    <td><a @click="removeBasket(id)">🗑</a></td>
+			    <input type="hidden" :value="qtity" :name="'basket_' + id" :id="'basket_' + id">
+			</tr>
+		    </tbody>
+		</table>
+		<div class="row">
+		    <div class="col">
+			<strong>Montant total : [[ _.round(totalAmount(), 2) ]] €</strong>
+		    </div>
+		    <div class="col text-right">
+			<input class="btn btn-info" type="submit" value="Payer">
+		    </div>
+	    </form>
+		</div>
+	</div>
+    </div>
 </div>
 
 <script>
-  new Vue({
-      delimiters: ['[[', ']]'],
-      el: '#vue-table',
-      data: {
-	  search: '',
-	  category: '',
-	  pdts: {{ pdts | safe }},
-	  basket: {}
-      },
+ 
+ $('nav a').click(function(event){
+     if ( ! confirm('Voulez-vous vraiment abandonner vos achats ? (Vous n\'avez pas payé)')) {
+	 event.preventDefault();
+     }
+ })
 
-      methods: {
-	  filter: function () {
-	      var search = this.search; // important de faire ça sinon this.truc réfère à je sais pas quoi qui est undefined
-	      var category = this.category;
-	      return _.pickBy(this.pdts, (function (row) {
-		  var cat_ok = (category.length == 0) || (row.category == category);
-		  var filter_ok = myContains(row.name, search);
-		  return cat_ok && filter_ok;
-	      }))
-	  },
+ new Vue({
+     delimiters: ['[[', ']]'],
+     el: '#vue-table',
+     data: {
+	 search: '',
+	 category: 'Toutes catégories',
+	 pdts: {{ pdts | safe }},
+	 basket: {}
+     },
 
-	  inBasket: function () {
-	      var filtered = this.filter();
-	      for (var id in filtered) {
-		  var input = document.getElementById("input_pdt_" + id);
-		  if (input.value) {
-		      var value = Number(_.replace(input.value, ",", "."));
-		      if (value == 0) {
-			  input.value = '';
-		      } else {
-			  if (Number.isFinite(value)) {
-			      if (value < 0) {
-				  alert("Vous avez rentré une quantité négative. Cela peut être pratique pour rattraper une erreur dans un achat précédent. Mais si vous vous êtes trompé, supprimez la référence de votre panier.");
-			      }
-			      if(!this.pdts[id].vrac && !Number.isInteger(value)) {
-				  alert("Veuillez utiliser un nombre entier pour : " + this.pdts[id].name);
-			      } else {
-				  var before = (this.basket[id]) ? (this.basket[id]) : 0;
-				  Vue.set(this.basket, id, before + value);
-				  input.value = '';
-			      }
-			  }
-			  else {
-			  alert("Veuillez entrer un nombre pour : " + this.pdts[id].name)
-			  }
-		      }	  
-		  }
-	      }
-	  },
+     methods: {
+	 filter: function () {
+	     var search = this.search; // important de faire ça sinon this.truc réfère à je sais pas quoi qui est undefined
+	     var category = this.category;
+	     return _.pickBy(this.pdts, (function (row) {
+		 var cat_ok = (category == 'Toutes catégories') || (row.category == category);
+		 var filter_ok = myContains(row.name, search);
+		 return cat_ok && filter_ok;
+	     }))
+	 },
 
-	  removeBasket: function(id) {
-	      Vue.delete(this.basket, id)
-	  },
+	 inBasket: function () {
+	     var filtered = this.filter();
+	     for (var id in filtered) {
+		 var input = document.getElementById("input_pdt_" + id);
+		 if (input.value) {
+		     var value = Number(_.replace(input.value, ",", "."));
+		     if (value == 0) {
+			 input.value = '';
+		     } else {
+			 if (Number.isFinite(value)) {
+			     if (value < 0) {
+				 alert("Vous avez rentré une quantité négative. Cela peut être pratique pour rattraper une erreur dans un achat précédent. Mais si vous vous êtes trompé, supprimez la référence de votre panier.");
+			     }
+			     if(!this.pdts[id].vrac && !Number.isInteger(value)) {
+				 alert("Veuillez utiliser un nombre entier pour : " + this.pdts[id].name);
+			     } else {
+				 var before = (this.basket[id]) ? (this.basket[id]) : 0;
+				 Vue.set(this.basket, id, before + value);
+				 input.value = '';
+			     }
+			 }
+			 else {
+			     alert("Veuillez entrer un nombre pour : " + this.pdts[id].name)
+			 }
+		     }	  
+		 }
+	     }
+	 },
 
-	  totalAmount: function () {
-	      var s = 0;
-	      for (var id in this.basket) {
-		  s += this.pdts[id].price * this.basket[id];
-	      }
-	      return s
-	  },
+	 removeBasket: function(id) {
+	     Vue.delete(this.basket, id)
+	 },
 
-	  validateForm: function(e) {
-	      if (Object.keys(this.basket).length == 0) {
-		  alert ("Votre panier est vide");
-		  e.preventDefault()
-	      }
-	      if (this.totalAmount() >= {{ max_amount | comma_to_dot }}) {
-		  alert ("Vous n'avez pas assez de sous sur votre compte !");
-		  e.preventDefault()
-	      }
-	  }
-      }
-  })
+	 totalAmount: function () {
+	     var s = 0;
+	     for (var id in this.basket) {
+		 s += this.pdts[id].price * this.basket[id];
+	     }
+	     return s
+	 },
+
+	 validateForm: function(e) {
+	     if (Object.keys(this.basket).length == 0) {
+		 alert ("Votre panier est vide");
+		 e.preventDefault()
+	     }
+	     if (this.totalAmount() >= {{ max_amount | comma_to_dot }}) {
+		 alert ("Vous n'avez pas assez de sous sur votre compte !");
+		 e.preventDefault()
+	     }
+	 }
+     }
+ })
 </script>
 {% endblock content %}

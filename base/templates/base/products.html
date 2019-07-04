@@ -7,11 +7,14 @@
 
 <div id="vue-table">
 
-  <button @click="changeVisible" class="btn btn-info">[[ only_visible ? "Montrer " : "Masquer "]] les non visibles </button>
-
-  <form>
-      <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
-  </form>
+    <div class ="row">
+	<form>
+	    <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
+	</form>
+	<div class="text-right">
+	    <button @click="changeVisible" class="btn btn-secondary">[[ only_visible ? "Montrer " : "Masquer "]] les non visibles </button>
+	</div>
+    </div>
 
   <table class="table table-striped">
     <thead>

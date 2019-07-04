@@ -27,9 +27,9 @@ def my_send_mail(request, subject, message, recipient_list, success_msg, error_m
     if recipient_list:
         try:
             send_mail('[Compteur de GASE] ' + subject, message, DEFAULT_FROM_EMAIL, recipient_list, fail_silently=False)
-            messages.success(request, success_msg)
+            messages.success(request, '✔ ' + success_msg)
         except:
-            messages.error(request, error_msg)
+            messages.error(request, '✘ ' + error_msg)
 
 ### index
 
@@ -86,7 +86,7 @@ def achats(request, household_id):
                         my_send_mail(request, subject='Alerte de stock', message='Le stock de {} est bas : il reste {} unités'.format(pdt, pdt.stock), recipient_list=ref,
                                      success_msg='Alerte stock envoyée par mail', error_msg='Erreur : l\'alerte stock n\'a pas été envoyée par mail')
         msg += "Ce qui nous donne un total de {} €.\n\nCiao!".format(s)
-        messages.success(request, 'Votre compte a été débité de ' + str(round2(s)) + ' €.')
+        messages.success(request, '✔ Votre compte a été débité de ' + str(round2(s)) + ' €')
         mails = household.get_emails_receipt()
         my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,
                      success_msg='Le ticket de caisse a été envoyé par mail', error_msg='Erreur : le ticket de caisse n\'a pas été envoyé par mail')
@@ -95,7 +95,7 @@ def achats(request, household_id):
         localsettings = get_local_settings()
         purchases_history = Purchase.objects.filter(household_id=household_id).order_by('-date')[:10]
         history = [{'date': p.date, 'details': PurchaseDetailOp.objects.filter(purchase=p)} for p in purchases_history]
-        pdts = {str(p.id): {"name": p.name, "category": p.category.id,
+        pdts = {str(p.id): {"name": p.name, "category": p.category.name,
                             "price": str(p.price), "pwyw": p.pwyw, "vrac": p.unit.vrac}
                 for p in Product.objects.filter(visible=True)}
         pdts = json.dumps(pdts)
@@ -131,7 +131,7 @@ def compte(request, household_id):
             op.save()
             household.account += q
             household.save()
-            messages.success(request, 'Approvisionnement du compte effectué')
+            messages.success(request, '✔ Approvisionnement du compte effectué')
             msg = 'Votre compte a été approvisionné de {} €'.format(q)
             mails = household.get_emails_receipt()
             my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,
@@ -153,7 +153,7 @@ def create_product(request):
         form = ProductForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Produit créé !')
+            messages.success(request, '✔ Produit créé !')
             return HttpResponseRedirect(reverse('base:products'))
     else:
         form = ProductForm()
@@ -165,7 +165,7 @@ def detail_product(request, product_id):
         form = ProductForm(request.POST, instance=pdt)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Produit mis à jour !')
+            messages.success(request, '✔ Produit mis à jour !')
             return HttpResponseRedirect(reverse('base:products'))
     else:
         form = ProductForm(instance=pdt, initial={'stock': pdt.stock, 'value': pdt.value_stock()})
@@ -210,7 +210,7 @@ def appro(request, provider_id):
                     print(ref)
                     if ref:
                         msgs[ref] = msgs.get(ref, '') + '{} a été approvisionné de {} unités\n'.format(pdt, q)
-            messages.success(request, 'Approvisionnement effectué')
+            messages.success(request, '✔ Approvisionnement effectué')
             for (key, value) in msgs.items():
                 my_send_mail(request, subject='Approvisionnement', message=value, recipient_list=[key],
                              success_msg='Mail de confirmation envoyé au référent', error_msg='Erreur : le mail de confirmation n\'a pas été envoyé')
@@ -257,6 +257,7 @@ class HouseholdCreate(CreateView):
                 self.object = form.save()
                 members.instance = self.object
                 members.save()
+                messages.success(request, '✔ Foyer créé !')
             else:
                 return self.form_invalid(form)
         return super(HouseholdCreate, self).form_valid(form)
@@ -285,6 +286,7 @@ class HouseholdUpdate(UpdateView):
                 self.object = form.save()
                 members.instance = self.object
                 members.save()
+                messages.success(request, '✔ Foyer mis à jour !')
             else:
                 return self.form_invalid(form)
         return super(HouseholdUpdate, self).form_valid(form)
@@ -306,7 +308,7 @@ def create_provider(request):
         form = ProviderForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Produit créé !')
+            messages.success(request, '✔ Produit créé !')
             return HttpResponseRedirect(reverse('base:providers'))
     else:
         form = ProviderForm()
@@ -318,7 +320,7 @@ def detail_provider(request, provider_id):
         form = ProviderForm(request.POST, instance=provider)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Fournisseur mis à jour')
+            messages.success(request, '✔ Fournisseur mis à jour')
             return HttpResponseRedirect(reverse('base:providers'))
     else:
         form = ProviderForm(instance=provider)
@@ -341,7 +343,7 @@ def inventory(request):
                         op.save()
                         pdt.stock = q
                         pdt.save()
-            messages.success(request, 'Stock mis à jour !')
+            messages.success(request, '✔ Stock mis à jour !')
             return HttpResponseRedirect(reverse('base:ecarts'))
     else:
         form = ProductList(pdts, request.POST)

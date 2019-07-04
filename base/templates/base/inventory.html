@@ -9,12 +9,12 @@ Pour chaque produit pesé/compté, entrer la quantité correspondante puis cliqu
 Ne pas oublier de bien tarer la balance et de faire attention aux unités. Bon courage !
 <br>
 <br>
-<form action="" method="post">
-  {% csrf_token %}
-  {{ form | crispy }}
-  <div class="text-right">
-    <input class="btn btn-info" type="submit" value="Mettre les stocks à jour">
-    <a class="btn btn-light" href="{% url 'base:gestion' %}">Annuler</a>
-  </div>
+<form class="narrow-content" action="" method="post">
+    {% csrf_token %}
+    {{ form | crispy }}
+    <div class="form-buttons">
+	<a class="btn btn-light" href="{% url 'base:gestion' %}">Annuler</a> &nbsp;
+	<input class="btn btn-info" type="submit" value="Mettre les stocks à jour">
+    </div>
 </form>
 {% endblock content %}

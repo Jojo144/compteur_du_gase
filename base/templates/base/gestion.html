@@ -2,78 +2,79 @@
 {% load my_tags %}
 
 {% block content %}
-<h4>Interface d'administration</h4>
-<a class="btn btn-info" href="/admin">Accès à l'interface d'administration</a>
-<br> Cette interface permet de bidouiller tout ce que gère le logiciel, à utiliser avec précaution. En particulier on peut :
-<ul>
-<li>
-Créer/modifier les catégories.
-</li>
-<li>
-Créer/modifier les unités.
-</li>
-<li>
-Supprimer un foyer/fournisseur/référence/catégorie. Une fois un objet supprimé on ne peut pas le retrouver, à utiliser avec modération donc. Attention si l'on supprime un fournisseur / une catégorie cela supprimera aussi tous les produits correspondants (le logiciel demande confirmation avant).
-</li>
-<li>
-Régler le seuil en dessous duquel on ne peut plus faire d'achats (dans "Réglages divers").
-</li>
-<li>
-Changer le texte de la page d'accueil (dans "Réglages divers").
-</li>
-</ul>
+<div class="medium-content">
+    <h4>Interface d'administration</h4>
+    <a class="btn btn-info" href="/admin">Accès à l'interface d'administration</a>
+    <br> Cette interface permet de bidouiller tout ce que gère le logiciel, à utiliser avec précaution. En particulier on peut :
+    <ul>
+	<li>
+	    Créer/modifier les catégories.
+	</li>
+	<li>
+	    Créer/modifier les unités.
+	</li>
+	<li>
+	    Supprimer un foyer/fournisseur/référence/catégorie. Une fois un objet supprimé on ne peut pas le retrouver, à utiliser avec modération donc. Attention si l'on supprime un fournisseur / une catégorie cela supprimera aussi tous les produits correspondants (le logiciel demande confirmation avant).
+	</li>
+	<li>
+	    Régler le seuil en dessous duquel on ne peut plus faire d'achats (dans "Réglages divers").
+	</li>
+	<li>
+	    Changer le texte de la page d'accueil (dans "Réglages divers").
+	</li>
+    </ul>
 
 
-<h4>Fournisseurs</h4>
-<a class="btn btn-info" href="{% url 'base:providers' %}">Liste des fournisseurs</a>
-<br>
-<br>
+    <h4>Fournisseurs</h4>
+    <a class="btn btn-info" href="{% url 'base:providers' %}">Liste des fournisseurs</a>
+    <br>
+    <br>
 
-<h4>Inventaire</h4>
-<a class="btn btn-info" href="{% url 'base:inventory' %}">Nouvel inventaire</a>
-&nbsp;&nbsp;&nbsp;
-<a class="btn btn-info" href="{% url 'base:ecarts' %}">Bilan des inventaires précédents</a>
-<br>
-<br>
-
-
-<h4>Valeur du stock et des comptes</h4>
-Valeur du stock total (références non visibles incluses) : {{ value_stock | round0 }} €
-<br>
-Somme des soldes des comptes : {{ value_accounts | round0 }} €
-<br>
-Donc il doit y avoir en banque : {{ diff_values | round0 }} €
-(si toutes les factures ont été payées et que tous le adhérents ont bien fait leur virement)
-<br>
-<br>
+    <h4>Inventaire</h4>
+    <a class="btn btn-info" href="{% url 'base:inventory' %}">Nouvel inventaire</a>
+    &nbsp;&nbsp;&nbsp;
+    <a class="btn btn-info" href="{% url 'base:ecarts' %}">Bilan des inventaires précédents</a>
+    <br>
+    <br>
 
 
-<h4>Liste des alertes stock</h4>
-<ul>
-  {% for p in alert_pdts %}
-  <li>
-    {{ p.name }} : {{ p.stock | round_stock }} {{ p.unit }} en stock
-  </li>
-  {% empty %}
-    <li>Pas d'alerte stock !</li>
-  {% endfor %}
-</ul>
-<br>
-<br>
+    <h4>Valeur du stock et des comptes</h4>
+    Valeur du stock total (références non visibles incluses) : {{ value_stock | round0 }} €
+    <br>
+    Somme des soldes des comptes : {{ value_accounts | round0 }} €
+    <br>
+    Donc il doit y avoir en banque : {{ diff_values | round0 }} €
+    (si toutes les factures ont été payées et que tous le adhérents ont bien fait leur virement)
+    <br>
+    <br>
 
-<h4>Astuces</h4>
-<ul>
-<li>
-Pour annuler un achat erronné, une façon de faire est de refaire le même achat en
-mettant des quantités négatives à la place. Cela approvisionne le compte et les
-stocks correctement.
-</li>
-</ul>
-<br>
-<br>
 
-<h4>Des remarques, des suggestions ?</h4>
-J'ai tenté de rendre ce logiciel pratique pour l'utilisation que j'en imaginais. Cela dit je suis preneur de retours !
-N'hésitez pas à m'envoyer un petit mail avec vos questions, vos suggestions à : compteurdugase@girole.fr. &nbsp;&nbsp;&nbsp;Simon
+    <h4>Liste des alertes stock</h4>
+    <ul>
+	{% for p in alert_pdts %}
+	<li>
+	    {{ p.name }} : {{ p.stock | round_stock }} {{ p.unit }} en stock
+	</li>
+	{% empty %}
+	<li>Pas d'alerte stock !</li>
+	{% endfor %}
+    </ul>
+    <br>
+    <br>
 
+    <h4>Astuces</h4>
+    <ul>
+	<li>
+	    Pour annuler un achat erronné, une façon de faire est de refaire le même achat en
+	    mettant des quantités négatives à la place. Cela approvisionne le compte et les
+	    stocks correctement.
+	</li>
+    </ul>
+    <br>
+    <br>
+
+    <h4>Des remarques, des suggestions ?</h4>
+    J'ai tenté de rendre ce logiciel pratique pour l'utilisation que j'en imaginais. Cela dit je suis preneur de retours !
+    N'hésitez pas à m'envoyer un petit mail avec vos questions, vos suggestions à : compteurdugase@girole.fr. &nbsp;&nbsp;&nbsp;Simon
+</div>
 {% endblock content %}

@@ -117,6 +117,17 @@ STATIC_URL = '/static/'
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
+from django.contrib.messages import constants as messages
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'badge-info',
+    messages.INFO: 'badge-info',
+    messages.SUCCESS: 'badge-success',
+    messages.WARNING: 'badge-warning',
+    messages.ERROR: 'badge-warning',
+}
+
+
 # todo
 # "mail de l'admin à qui sont reporté les erreurs du logiciel"
 

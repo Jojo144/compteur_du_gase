@@ -2,12 +2,12 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<form action="{% url 'base:pre_compte' %}" method="post">
+<form class="narrow-content" action="{% url 'base:pre_compte' %}" method="post">
     {% csrf_token %}
     {{ form | crispy }}
-  <div class="text-right">
-    <input class="btn btn-info" type="submit" value="Valider">
-    <a class="btn btn-light" href="{% url 'base:index' %}">Annuler</a>
-  </div>
+    <div class="form-buttons">
+	<a class="btn btn-light" href="{% url 'base:index' %}">Annuler</a> &nbsp;
+	<input class="btn btn-info" type="submit" value="Valider">
+    </div>
 </form>
 {% endblock content %}
