@@ -104,6 +104,9 @@ server {
 }
 EOF
 
+echo "* Removing /etc/nginx/sites-enabled/default"
+sudo rm /etc/nginx/sites-enabled/default
+
 echo "* Restarting Nginx"
 sudo systemctl restart nginx
 

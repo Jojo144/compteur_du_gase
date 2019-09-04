@@ -3,15 +3,17 @@ Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en S
 
 # Installation locale
 
-Tested on Ubuntu.
-Requires Python 3 + Nginx.
+Tested on Ubuntu 19.04.
 ```
-	mkdir /opt/compteur_gase
-	cd /opt/compteur_gase
-	git clone https://github.com/Jojo144/compteur_du_gase
-	sudo compteur_du_gase/local_install.sh
+sudo apt-get install python3-venv nginx
+sudo mkdir /opt/compteur_gase
+cd /opt/compteur_gase
+sudo git clone https://github.com/Jojo144/compteur_du_gase
+sudo compteur_du_gase/local_install.sh
 ```
 Then try on http://localhost
+You can chose another directory than `/opt/compteur_gase`, it works the same.
+There are some warning about pip cache, I ignored them for the moment.
 
 
 # TODO
