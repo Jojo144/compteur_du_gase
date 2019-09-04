@@ -1,7 +1,12 @@
 
+## PERSONNALISER CES VARIABLES
+
 admin="admin"
 passwd="adminadmin"
 email="bla@bla.fr"
+
+## FIN DE LA PERSONALISATION
+
 
 app="compteur_du_gase"
 project="compteur"
@@ -82,7 +87,27 @@ PrivateTmp=true
 WantedBy=multi-user.target
 EOF
 
+echo "* Creating /etc/nginx/sites-enabled/$app.conf"
+cat > /etc/nginx/sites-enabled/$app.conf << EOF
+server {
+    listen 80;
+    server_name localhost;
+
+    location /static/ {
+        root $final_path;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:$final_path/sock;
+    }
+}
+EOF
+
+echo "* Restarting Nginx"
+sudo systemctl restart nginx
+
 echo "* Enabling the service"
-# sudo systemctl daemon-reload
-# sudo systemctl start $app
-# sudo systemctl enable $app
+sudo systemctl daemon-reload
+sudo systemctl start $app
+sudo systemctl enable $app

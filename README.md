@@ -1,6 +1,19 @@
 # Le Compteur du Gase (CdG)
 Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en Service Épicerie)
 
+# Installation locale
+
+Tested on Ubuntu.
+Requires Python 3 + Nginx.
+```
+	mkdir /opt/compteur_gase
+	cd /opt/compteur_gase
+	git clone https://github.com/Jojo144/compteur_du_gase
+	sudo compteur_du_gase/local_install.sh
+```
+Then try on http://localhost
+
+
 # TODO
 - [ ] documenter l'install, l'histoire du logiciel
 - [ ] doc backups
