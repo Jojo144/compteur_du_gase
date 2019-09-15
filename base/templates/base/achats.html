@@ -88,10 +88,15 @@
 		<tbody>
 		    <tr v-for="(pdt, id) in filter()">
 			<td>[[ pdt.name ]]</td>
-			<td>[[ pdt.price ]]</td>
+			<td>[[ pdt.price ]] €</td>
 			<td>
 			    <!-- todo: better input type ?? -->
-			    <input type="text" class="numberinput form-control" @keyup.enter="inBasket" :id="'input_pdt_' + id">	    
+			    <div class="input-group">
+				<input type="text" class="form-control" @keyup.enter="inBasket" :id="'input_pdt_' + id">
+				<div class="input-group-append">
+				    <span class="input-group-text"> [[ pdt.unit ]] </span>
+				</div>
+			    </div>
 			</td>
 		    </tr>
 		</tbody>
@@ -116,8 +121,8 @@
 		    <tbody>
 			<tr v-for="(qtity, id) in basket">
 			    <td>[[ pdts[id].name ]]</td>
-			    <td>[[ qtity ]]</td>
-			    <td>[[ _.round(pdts[id].price * qtity, 2) ]]</td>
+			    <td>[[ qtity ]] [[ pdts[id].unit ]] </td>
+			    <td>[[ _.round(pdts[id].price * qtity, 2) ]] €</td>
 			    <td><a @click="removeBasket(id)">🗑</a></td>
 			    <input type="hidden" :value="qtity" :name="'basket_' + id" :id="'basket_' + id">
 			</tr>

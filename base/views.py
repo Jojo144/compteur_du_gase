@@ -96,7 +96,7 @@ def achats(request, household_id):
         purchases_history = Purchase.objects.filter(household_id=household_id).order_by('-date')[:10]
         history = [{'date': p.date, 'details': PurchaseDetailOp.objects.filter(purchase=p)} for p in purchases_history]
         pdts = {str(p.id): {"name": p.name, "category": p.category.name,
-                            "price": str(p.price), "pwyw": p.pwyw, "vrac": p.unit.vrac}
+                            "price": str(p.price), "unit": p.unit.name, "vrac": p.unit.vrac}
                 for p in Product.objects.filter(visible=True)}
         pdts = json.dumps(pdts)
         print(household.account - localsettings.min_account)

@@ -154,6 +154,6 @@ class ApproCompteOp(Operation):
 # there should be only one instance of this model
 class LocalSettings(models.Model):
     min_account = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="seuil en dessous duquel on ne peut plus faire d'achat (en €)")
-    txt_home = models.TextField(blank=True, default="<i>Bienvenu au GASE</i>", verbose_name="texte de la page d'accueil (doit être donnée en code html)")
+    txt_home = models.TextField(blank=True, default="<i>Bienvenu·e au GASE</i>", verbose_name="texte de la page d'accueil (doit être donnée en code html)")
     class Meta:
         verbose_name = "Réglages divers"
