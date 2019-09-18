@@ -14,3 +14,8 @@ domain=$(ynh_app_setting_get "$app" domain)
 # }
 # # Exit if an error occurs during the execution of the script
 # ynh_abort_if_errors
+
+final_path=/opt/$app
+
+cd $final_path && git pull
+sudo systemctl restart $app
