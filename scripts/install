@@ -6,8 +6,8 @@ source /usr/share/yunohost/helpers
 
 app=$YNH_APP_INSTANCE_NAME
 
-domain="/" # for the moment the app works only at root
-path=$YNH_APP_ARG_PATH
+domain=$YNH_APP_ARG_DOMAIN
+path="/" # for the moment the app works only at root
 admin=$YNH_APP_ARG_ADMIN
 passwd=$YNH_APP_ARG_PASSWD
 email=$YNH_APP_ARG_EMAIL
