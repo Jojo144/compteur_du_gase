@@ -1,0 +1,11 @@
+command = '/opt/YNH_APP_INSTANCE_NAME/venv/bin/gunicorn'
+pythonpath = '/opt/YNH_APP_INSTANCE_NAME'
+workers = 4
+user = 'YNH_APP_INSTANCE_NAME'
+bind = 'unix:/opt/YNH_APP_INSTANCE_NAME/sock'
+pid = '/run/gunicorn/YNH_APP_INSTANCE_NAME-pid'
+errorlog = '/var/log/YNH_APP_INSTANCE_NAME/error.log'
+accesslog = '/var/log/YNH_APP_INSTANCE_NAME/access.log'
+access_log_format = '%({X-Real-IP}i)s %({X-Forwarded-For}i)s %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
+loglevel = 'warning'
+capture_output = True

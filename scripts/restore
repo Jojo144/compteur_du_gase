@@ -1,0 +1,47 @@
+#!/bin/bash
+
+source _common.sh
+source /usr/share/yunohost/helpers
+
+ynh_abort_if_errors
+
+app=$YNH_APP_INSTANCE_NAME
+domain=$(ynh_app_setting_get "$app" domain)
+path=$(ynh_app_setting_get "$path" domain)
+
+final_path=/opt/$app
+
+
+ynh_webpath_available $domain $path_url \
+    || ynh_die "Path not available: ${domain}${path_url}"
+
+test ! -d $final_path \
+    || ynh_die "There is already a directory: $final_path "
+nginx_conf=/etc/nginx/conf.d/$domain.d/$app.conf
+if [ -f $conf ]; then
+    ynh_die "There is already a nginx conf file at this path: $conf "
+fi
+gunicorn_path=/etc/systemd/system/$app.service
+if [ -f $gunicorn_path ]; then
+    ynh_die "There is already a gunicorn service file at this path: $gunicorn_path "
+fi
+
+# We do this first so that we have nothing to remove if we fail
+# FIXME don't delete the user in case of failure here!
+sudo useradd $app -d $final_path \
+    || (ynh_die "User already exists: ${app}.\n Aborting.")
+
+ynh_install_app_dependencies $pkg_dependencies
+sudo chown -R $app:www-data $final_path
+
+ynh_restore_file "$final_path"
+ynh_restore_file "$nginx_conf$"
+ynh_restore_file "$gunicorn_path"
+
+# sudo systemctl daemon-reload ?
+sudo service nginx reload
+sudo systemctl start $app
+sudo systemctl enable $app
+sudo yunohost service add $app -l /var/log/gunicorn/$app.log
+
+# sudo yunohost app ssowatconf ?

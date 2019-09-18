@@ -1,0 +1,15 @@
+#!/bin/bash
+
+source _common.sh
+source /usr/share/yunohost/helpers
+
+
+app=$YNH_APP_INSTANCE_NAME
+domain=$(ynh_app_setting_get "$app" domain)
+final_path=/opt/$app
+
+ynh_backup "$final_path"
+ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"
+ynh_backup "/etc/systemd/system/$app.service"
+
+# TODO backup log

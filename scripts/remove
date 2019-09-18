@@ -1,0 +1,25 @@
+#!/bin/bash
+
+source _common.sh
+source /usr/share/yunohost/helpers
+
+
+app=$YNH_APP_INSTANCE_NAME
+domain=$(ynh_app_setting_get "$app" domain)
+
+sudo service $app stop
+# sudo killall $app  # seems useless
+
+# Remove sources and configuration files
+sudo rm -Rf /opt/$app
+sudo rm -f /etc/nginx/conf.d/$domain.d/$app.conf
+
+ynh_remove_app_dependencies
+sudo yunohost service remove $app
+sudo rm -f /etc/systemd/system/$app.service
+sudo systemctl daemon-reload
+sudo service nginx reload
+sudo yunohost app ssowatconf
+sudo userdel $app
+
+# Should we remove the log? Let's say no for the moment.
