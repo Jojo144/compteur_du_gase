@@ -60,9 +60,22 @@ Légumineuses, Conserves, Non alimentaire, ...).
 
 Puis c'est parti !
 
+Pensez ensuite à mettre en place une sauvegarde.
+
 ### Installation en ligne
 
-Paquet Yunohost. TODO
+Paquet Yunohost.
+```
+sudo yunohost app install https://github.com/Jojo144/compteur_du_gase
+```
+Pour le moment seuls les scripts `install` et `remove` fonctionne.
+
+Pour mettre à jour sauvegarder la base, désinstallez et réinstallez.
+
+## Sauvegarde de la base de donnée
+
+Il faut sauvegarder le fichier `db.sqlite3` qui se trouve là où est installée votre application
+(dans `/opt/compteur_gase` par exemple).
 
 ## Migration depuis gase-web et Mysql
 
