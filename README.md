@@ -1,16 +1,26 @@
 # Le Compteur du Gase (CdG)
-Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en Service Épicerie).
+Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en Service Épicerie, une épicerie autogérée).
 
 ## Présentation
 
-Il y a trois GASEs (Groupement d'Achats en Service Épicerie) à Nantes qui sont des épiceries autogérées.
+Le logiciel est pensé pour les groupements d’achats / épiceries fonctionnant de la façon suivante :
+    • Chaque adhérent a un compte qu’il crédite.
+    • Quand on fait des courses, on entre dans le logiciel ce que l’on achète (à la manière d’un logiciel de caisse) et cela débite notre compte en conséquence.
+    • Le logicel met aussi à jour les stocks et propose un suivi de ceux-ci.
 
-Depuis quelques années, on y utilise un logiciel qui s'appelle Money Coop pour gérer les stocks / les comptes des adhérents / la liste des adhérents.
-Ce logiciel est très pratique mais un peu vieillot et difficile à faire évoluer.
+## Historique
 
-Le projet est d'en refaire une version plus moderne, plus pratique, avec des super statistiques et avec un meilleur nom : Le Compteur du GASE !
+Il y a trois GASEs (des épiceries autogérées) à Nantes. Depuis quelques années, on
+y utilise un logiciel ([MoneyCoop](https://github.com/barchstien/gase-web)) pour gérer les stocks / les comptes des adhérents
+/ la liste des adhérents. Ce logiciel est très pratique mais un peu vieillot et
+difficile à faire évoluer.
 
-Version de démo ici : https://test-compteur.girole.fr/
+Le projet est d'en refaire une version plus moderne, plus pratique, avec de
+superbes statistiques et avec un meilleur nom : Le Compteur du GASE ! Il reste
+encore beaucoup à améliorer mais une première version est néanmoins déjà
+utilisable.
+
+Version de démo ici : https://test-compteur.girole.fr
 
 ## Contributions
 
@@ -42,7 +52,11 @@ Tester aussi de redémarrer pour voir si les services se lancent bien tous seuls
 Vous pouvez choisir un autre répertoire que `/opt/compteur_gase` ça devrait marcher.
 Il y a des *warnings* à propos du cache pip, je les ai ignoré pour le moment.
 
-Ensuite, aller dans l'interface d'administration et créer des unités et des catégories.
+### Après l'installation
+
+À la première utilisation il faut aller dans l'interface administration pour créer des unités
+(en général : kg, L, bouteille, sachet, pot) et des catégories (par ex :
+Légumineuses, Conserves, Non alimentaire, ...).
 
 Puis c'est parti !
 
