@@ -7,7 +7,7 @@ from django.utils.timezone import make_aware
 from base.models import *
 
 # Attention, ce script supprime tout avant de migrer ! (sauf les unités)
-
+# Migre tous les produits et toutes les catégories mais seulement les adhérents visibles
 
 # PERSONNALISER CES VARIABLES
 
@@ -55,36 +55,36 @@ if (create_unit):
 ## Catégories ##
 
 if (migrate_categories):
-    print('Migrating Categories')
+    print('\nMigrating Categories')
     Category.objects.all().delete()
     mycursor.execute("SELECT * FROM " + prefix + "CATEGORIES")
     myresult = mycursor.fetchall()
     for x in myresult:
         # seulement les visibles
-        if (x[4] == 1):
-            Category(id=x[0], name=x[1]).save()
+        # if (x[4] == 1):
+        Category(id=x[0], name=x[1]).save()
 
 
 ## Fournisseurs ##
 
 if (migrate_providers):
-    print('Migrating Providers')
+    print('\nMigrating Providers')
     Provider.objects.all().delete()
     mycursor.execute("SELECT * FROM " + prefix + "FOURNISSEURS")
     myresult = mycursor.fetchall()
     for x in myresult:
         # seulement les visibles
-        if (x[10] == 1):
-            fax = '' if (x[7] == '') else ('Fax : ' + x[7])
-            contact="\n".join([y for y in [x[2], x[3], x[4], x[5], x[6], fax]
-                               if y != ''])
-            Provider(id=x[0], name=x[1], contact=contact, comment=x[9]).save()
+        # if (x[10] == 1):
+        fax = '' if (x[7] == '') else ('Fax : ' + x[7])
+        contact="\n".join([y for y in [x[2], x[3], x[4], x[5], x[6], fax]
+                           if y != ''])
+        Provider(id=x[0], name=x[1], contact=contact, comment=x[9]).save()
 
 
 ## Produits ##
 
 if (migrate_products):
-    print('Migrating Products')
+    print('\nMigrating Products')
     Product.objects.all().delete()
     mycursor.execute("SELECT * FROM " + prefix + product_table)
     myresult = mycursor.fetchall()
@@ -103,12 +103,13 @@ if (migrate_products):
 ## Adhérents ##
 
 if (migrate_members):
-    print('Migrating Members')
+    print('\nMigrating Members')
     Household.objects.all().delete()
     Member.objects.all().delete()
     mycursor.execute("SELECT * FROM " + prefix + "ADHERENTS")
     myresult = mycursor.fetchall()
     # ignoring x[11] "RECEIVE_ALERT_STOCK"
+    print("{} adhérents à migrer".format(len(myresult)))
     for x in myresult:
         # seulement les visibles
         if (x[8] == 1):
@@ -127,11 +128,16 @@ if (migrate_members):
 ## Appro Comptes ##
 
 if (migrate_appro_comptes):
-    print('Migrating Appro Comptes')
+    print('\nMigrating Appro Comptes')
     ApproCompteOp.objects.all().delete()
     mycursor.execute("SELECT * FROM " + prefix + "COMPTES WHERE OPERATION='APPROVISIONNEMENT' ORDER BY DATE ASC")
     myresult = mycursor.fetchall()
+    print("{} opérations à migrer".format(len(myresult)))
+    i=1
     for x in myresult:
+        if (i % 100 == 0):
+            print("  - opération {}".format(i))
+        i+=1
         try:
             household=Household.objects.get(id=x[0])
         except ObjectDoesNotExist:
@@ -145,11 +151,16 @@ if (migrate_appro_comptes):
 ## Appro Stock + Inventaire ##
 
 if (migrate_change_stock):
-    print('Migrating Appro Stock + Inventory')
+    print('\nMigrating Appro Stock + Inventory')
     ChangeStockOp.objects.all().delete()
     mycursor.execute("SELECT * FROM " + prefix + "STOCKS ORDER BY DATE ASC")
     myresult = mycursor.fetchall()
+    print("{} opérations à migrer".format(len(myresult)))
+    i=1
     for x in myresult:
+        if (i % 100 == 0):
+            print("  - opération {}".format(i))
+        i+=1
         if (x[2]=='APPROVISIONNEMENT' or x[2]=='INVENTAIRE'):
             try:
                 pdt=Product.objects.get(id=x[0])
@@ -167,12 +178,17 @@ if (migrate_change_stock):
 ## Achats ##
 
 if (migrate_achats):
-    print('Migrating Achats')
+    print('\nMigrating Achats')
     Purchase.objects.all().delete()
     PurchaseDetailOp.objects.all().delete()
     mycursor.execute("SELECT * FROM {}ACHATS ORDER BY DATE_ACHAT ASC ".format(prefix))
     myresult = mycursor.fetchall()
+    print("{} achats à migrer".format(len(myresult)))
+    i=1
     for x in myresult:
+        if (i % 100 == 0):
+            print("  - achat {}".format(i))
+        i+=1
         try:
             hsld=Household.objects.get(id=x[2])
         except ObjectDoesNotExist:
@@ -187,7 +203,8 @@ if (migrate_achats):
                 price=pdt.price * Decimal(-y[4])
             except ObjectDoesNotExist:
                 price=0
-            pd=PurchaseDetailOp(product_id=y[0], purchase=p, quantity=Decimal(-y[4]), price=price, stock=Decimal(y[1]), label='Achat')
+            pd=PurchaseDetailOp(product_id=y[0], purchase=p, quantity=Decimal(-y[4]),
+                                price=price, stock=Decimal(y[1]), label='Achat')
             pd.save()
             date= make_aware(y[3])
             PurchaseDetailOp.objects.filter(id=pd.pk).update(date=date)
