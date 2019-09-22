@@ -84,8 +84,9 @@ def achats(request, household_id):
                     if ref:
                         my_send_mail(request, subject='Alerte de stock', message='Le stock de {} est bas : il reste {} unités'.format(pdt, pdt.stock), recipient_list=ref,
                                      success_msg='Alerte stock envoyée par mail', error_msg='Erreur : l\'alerte stock n\'a pas été envoyée par mail')
+        balance = household.account
         msg += "Ce qui nous donne un total de {} €.\n\nCiao!".format(s)
-        messages.success(request, '✔ Votre compte a été débité de ' + str(round2(s)) + ' €')
+        messages.success(request, '✔ Votre compte a été débité de ' + str(round2(s)) + ' €, solde restant : ' + str(round2(balance)) + ' €')
         mails = household.get_emails_receipt()
         my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,
                      success_msg='Le ticket de caisse a été envoyé par mail', error_msg='Erreur : le ticket de caisse n\'a pas été envoyé par mail')
