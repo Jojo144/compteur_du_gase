@@ -7,12 +7,12 @@ from .templatetags.my_tags import *
 
 class HouseholdList(forms.Form):
     household = forms.ModelChoiceField(label='Sélectionnez votre compte : ',
-                                       queryset=Household.objects.all())
+                                       queryset=Household.objects.order_by('name'))
 
 
 class ProviderList(forms.Form):
     provider = forms.ModelChoiceField(label='Sélectionnez un fournisseur : ',
-                                      queryset=Provider.objects.all())
+                                      queryset=Provider.objects.order_by('name'))
 
 
 class ApproCompteForm(forms.Form):

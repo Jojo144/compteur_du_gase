@@ -23,10 +23,10 @@ product_table = "PRODUITS"
 migrate_categories=False
 migrate_providers=False
 migrate_products=False
-migrate_members=False
+migrate_members=True
 migrate_appro_comptes=False
 migrate_change_stock=False
-migrate_achats=True
+migrate_achats=False
 
 
 # FIN DE LA PERSONALISATION
@@ -60,7 +60,7 @@ if (migrate_categories):
     for x in myresult:
         # seulement les visibles
         # if (x[4] == 1):
-        Category(id=x[0], name=x[1]).save()
+        Category(id=x[0], name=x[1].strip()).save()
 
 
 ## Fournisseurs ##
@@ -76,7 +76,7 @@ if (migrate_providers):
         fax = '' if (x[7] == '') else ('Fax : ' + x[7])
         contact="\n".join([y for y in [x[2], x[3], x[4], x[5], x[6], fax]
                            if y != ''])
-        Provider(id=x[0], name=x[1], contact=contact, comment=x[9]).save()
+        Provider(id=x[0], name=x[1].strip(), contact=contact.strip(), comment=x[9].strip()).save()
 
 
 ## Produits ##
@@ -93,9 +93,9 @@ if (migrate_products):
         rqst="SELECT STOCK FROM  {0}STOCKS WHERE ID_REFERENCE='{1}' AND DATE = (SELECT MAX(DATE) FROM {0}STOCKS WHERE ID_REFERENCE='{1}')".format(prefix, x[0])
         mycursor.execute(rqst)
         myresult2 = mycursor.fetchall()
-        Product(id=x[0], name=x[1], provider_id=x[2], category_id=x[4], unit=unit,
+        Product(id=x[0], name=x[1].strip(), provider_id=x[2], category_id=x[4], unit=unit,
                 price=x[5], pwyw=False, visible=x[7], stock_alert=alert, stock=Decimal(myresult2[0][0]),
-                comment=comment).save()
+                comment=comment.strip()).save()
 
 
 ## Adhérents ##
@@ -119,7 +119,7 @@ if (migrate_members):
             hsld.account=Decimal(myresult2[0][0])
             hsld.save()
             tel = ((x[5] + ' ' + x[6]) if (x[6]) else x[5]) if (x[5]) else x[6]
-            Member(name=name, email=x[3], tel=tel, household=hsld, receipt=x[9],
+            Member(name=name.strip(), email=x[3].strip(), tel=tel.strip(), household=hsld, receipt=x[9],
                    stock_alert=False).save()
 
 
