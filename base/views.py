@@ -1,7 +1,6 @@
 import smtplib, ssl
-import json
-import decimal, datetime
-from collections import defaultdict
+import json, datetime
+from decimal import Decimal
 
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
@@ -71,7 +70,7 @@ def achats(request, household_id):
         for p, q in request.POST.items():
             if p.startswith('basket_'):
                 pdt = Product.objects.get(pk=int(p[7:]))
-                q = decimal.Decimal(q)
+                q = Decimal(q)
                 op = PurchaseDetailOp.create(product=pdt, purchase=purchase, quantity=-q)
                 op.save()
                 household.account += op.price
@@ -374,8 +373,12 @@ def database_info(request):
     pdts = [{'name': pdt.name, 'stock': pdt.stock,
              'computed': ChangeStockOp.objects.filter(product=pdt).aggregate(Sum('quantity'))['quantity__sum']}
             for pdt in Product.objects.all()]
+    def f1(h):
+        x = ApproCompteOp.objects.filter(household=h).aggregate(Sum('amount'))['amount__sum']
+        return x if x else Decimal(0)
+    def f2(h):
+        x = PurchaseDetailOp.objects.filter(purchase__household=h).aggregate(Sum('price'))['price__sum']
+        return x if x else Decimal(0)
     households = [{'name': h.pk, 'account': h.account,
-                   'computed': ApproCompteOp.objects.filter(household=h).aggregate(Sum('amount'))['amount__sum']
-                               + PurchaseDetailOp.objects.filter(purchase__household=h).aggregate(Sum('price'))['price__sum']}
-                  for h in Household.objects.all()]
+                   'computed': f1(h) + f2(h) } for h in Household.objects.all()]
     return render(request, 'base/database_info.html', {'pdts': pdts, 'households': households,})
