@@ -20,7 +20,6 @@ prefix="_inde_"
 # can be PRODUITS or REFERENCES
 product_table = "PRODUITS"
 
-create_unit=True #todo try to get them
 migrate_categories=False
 migrate_providers=False
 migrate_products=False
@@ -44,12 +43,11 @@ mycursor = mydb.cursor()
 
 ## Unités ##
 
-if (create_unit):
-    print('Creating Unit')
-    vrac_unit=Unit(name="kg/L", vrac=True, pluralize=False)
-    vrac_unit.save()
-    non_vrac_unit=Unit(name="unité", vrac=False, pluralize=False)
-    non_vrac_unit.save()
+print('Getting Unit')
+vrac_unit, created = Unit.objects.get_or_create(name="kg/L", vrac=True, pluralize=False)
+print("   kg/L crée" if created else "   kg/l déjà existante")
+non_vrac_unit, created = Unit.objects.get_or_create(name="unité", vrac=False, pluralize=False)
+print("   'unité' crée" if created else "   'unité' déjà existante")
 
 
 ## Catégories ##
@@ -169,7 +167,7 @@ if (migrate_change_stock):
             if (x[2]=='APPROVISIONNEMENT'):
                 op = ChangeStockOp.create_appro_stock(product=pdt, quantity=Decimal(x[4]))
             if (x[2]=='INVENTAIRE'):
-                op = ChangeStockOp.create_inventory(product=pdt, quantity=Decimal(-x[4]))
+                op = ChangeStockOp.create_inventory(product=pdt, quantity=Decimal(x[4]))
             op.save()
             date= make_aware(x[3])
             ChangeStockOp.objects.filter(id=op.pk).update(date=date)
