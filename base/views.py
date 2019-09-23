@@ -363,7 +363,7 @@ def ecarts(request):
 
 def stats(request, product_id):
     # opes = ChangeStockOp.objects.filter(product=product_id, date__date__gt=datetime.date(2018, 1, 1))
-    opes = ChangeStockOp.objects.filter(product=product_id)
+    opes = ChangeStockOp.objects.filter(product=product_id).order_by('date')
     data = [{'stock': str(a.stock), 'date': a.date.isoformat(), 'label': a.label} for a in opes ]
     pdt = Product.objects.get(pk=product_id)
     return render(request, 'base/stats.html', {'pdt': pdt, 'data': data,})

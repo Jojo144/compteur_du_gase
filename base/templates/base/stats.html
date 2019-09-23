@@ -19,63 +19,65 @@ Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
 <script src="{% static 'base/Chart.js' %}"></script>
 
 <script>
-  moment.locale('fr');
-  var ctx = document.getElementById('myChart').getContext('2d');
-  var init_date = new Date();
-  init_date.setFullYear(init_date.getFullYear() - 1);
-  var chart = new Chart(ctx, {
-      type: 'line',
+ moment.locale('fr');
+ var ctx = document.getElementById('myChart').getContext('2d');
+ var init_date = new Date();
+ init_date.setFullYear(init_date.getFullYear() - 1);
+ var chart = new Chart(ctx, {
+     type: 'line',
 
-      data: {
-          datasets: [{
-              label: 'Stock de {{ pdt }}',
-              backgroundColor: 'rgb(255, 99, 132)',
-              borderColor: 'rgb(255, 99, 132)',
-	      fill: false,
-	      data: [
-		  {% for d in data %}
-		  { x: new Date('{{d.date}}'), y: {{d.stock}}, label: '{{d.label}}' },
-		  {% endfor %}
-	      ]
-          }]
-      },
+     data: {
+         datasets: [{
+             label: 'Stock de {{ pdt }}',
+             backgroundColor: 'rgb(255, 99, 132)',
+             borderColor: 'rgb(255, 99, 132)',
+	     fill: false,
+	     lineTension: 0,
+	     data: [
+		 {% for d in data %}
+		 { x: new Date('{{d.date}}'), y: {{d.stock}}, label: '{{d.label}}' },
+		 {% endfor %}
+	     ]
+         }]
+     },
 
-      options: {
-	  title: { text: 'Bla bla' },
-	  scales: {
-              xAxes: [{
-                  type: 'time',
-		  time: {min: init_date}
-              }],
-	      yAxes: [{
-		  scaleLabel: {
-		      display: true,
-		      labelString: 'Stock ({{ pdt.unit }})'
-		  }
-	      }]
-	  },
-          tooltips: {
-              callbacks: {
-                  label: function(tooltipItem, data) {
-                      return data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].label;
-                  }
-              }
-	  },
-      }
-  });
+     options: {
+	 title: { text: 'Bla bla' },
+	 scales: {
+             xAxes: [{
+                 type: 'time',
+		 time: {min: init_date}
+             }],
+	     yAxes: [{
+		 scaleLabel: {
+		     display: true,
+		     labelString: 'Stock ({{ pdt.unit }})'
+		 }
+	     }]
+	 },
+         tooltips: {
+             callbacks: {
+                 label: function(tooltipItem, data) {
+		     var o = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                     return o.label + ". Stock: " + o.y;
+                 }
+             }
+	 },
+     }
+ });
 
-  document.getElementById('addData').addEventListener('click', function() {
-      var date = new Date(chart.options.scales.xAxes[0].time.min);
-      date.setMonth(date.getMonth() - 1);
-      chart.options.scales.xAxes[0].time.min = date;
-      chart.update();
-  });
+ document.getElementById('addData').addEventListener('click', function() {
+     var date = new Date(chart.options.scales.xAxes[0].time.min);
+     date.setMonth(date.getMonth() - 1);
+     chart.options.scales.xAxes[0].time.min = date;
+     chart.update();
+ });
 
-  document.getElementById('removeData').addEventListener('click', function() {
-      var date = new Date(chart.options.scales.xAxes[0].time.min);
-      date.setMonth(date.getMonth() + 1);
-      chart.options.scales.xAxes[0].time.min = date;
-      chart.update();
-  });
+ document.getElementById('removeData').addEventListener('click', function() {
+     var date = new Date(chart.options.scales.xAxes[0].time.min);
+     date.setMonth(date.getMonth() + 1);
+     chart.options.scales.xAxes[0].time.min = date;
+     chart.update();
+ });
 </script>
 {% endblock content %}
