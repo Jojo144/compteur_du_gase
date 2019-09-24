@@ -47,7 +47,22 @@
     (si toutes les factures ont été payées et que tous le adhérents ont bien fait leur virement)
     <br>
     <br>
-
+	
+	<h4>Valeur des approvisionnements des foyers</h4>
+	Valeur des approvisionnements : {{ value_appro | round0 }} €
+	<br>
+	<br>
+	<a class="btn btn-info" href="{% url 'base:approslist' %}">Liste détaillées des approvisionnements</a>
+	<br>
+    <br>
+	
+	<h4>Valeur des achats</h4>
+	Valeur des achats : {{ value_purchase | round0 }} €
+	<br>
+	<br>
+	<a class="btn btn-info" href="{% url 'base:achatslist' %}">Liste détaillées des achats</a>
+    <br>
+    <br>
 
     <h4>Liste des alertes stock</h4>
     Produits en rupture ou proche de la rupture de stock (produits visibles seulements).

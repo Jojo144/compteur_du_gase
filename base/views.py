@@ -37,15 +37,21 @@ def index(request):
     return render(request, 'base/index.html', {'txt_home': txt_home})
 
 def gestion(request):
+    
     # todo : use aggregate ?
     value_stock=sum([p.value_stock() for p in Product.objects.all()])
     value_accounts=sum([p.account for p in Household.objects.all()])
     alert_pdts=[p for p in Product.objects.filter(stock_alert__isnull=False, visible=True).order_by('name') if p.stock < p.stock_alert]
+    value_appro=sum([p.amount for p in ApproCompteOp.objects.all()])
+    value_purchase=sum([p.cost_of_purchase() for p in ChangeStockOp.objects.filter(label="ApproStock")])
+
     return render(request, 'base/gestion.html',
                   {'value_stock': value_stock,
                    'value_accounts': value_accounts,
                    'diff_values': value_accounts - value_stock,
-                   'alert_pdts': alert_pdts
+                   'alert_pdts': alert_pdts,
+                   'value_appro': value_appro,
+                   'value_purchase': value_purchase
                   })
 
 
@@ -84,9 +90,8 @@ def achats(request, household_id):
                     if ref:
                         my_send_mail(request, subject='Alerte de stock', message='Le stock de {} est bas : il reste {} unités'.format(pdt, pdt.stock), recipient_list=ref,
                                      success_msg='Alerte stock envoyée par mail', error_msg='Erreur : l\'alerte stock n\'a pas été envoyée par mail')
-        balance = household.account
         msg += "Ce qui nous donne un total de {} €.\n\nCiao!".format(s)
-        messages.success(request, '✔ Votre compte a été débité de ' + str(round2(s)) + ' €, solde restant : ' + str(round2(balance)) + ' €')
+        messages.success(request, '✔ Votre compte a été débité de ' + str(round2(s)) + ' €')
         mails = household.get_emails_receipt()
         my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,
                      success_msg='Le ticket de caisse a été envoyé par mail', error_msg='Erreur : le ticket de caisse n\'a pas été envoyé par mail')
@@ -107,7 +112,13 @@ def achats(request, household_id):
                    'history':history}
         return render(request, 'base/achats.html', context)
 
-
+def achatslist(request):
+    columns = ['jour', 'mois', 'année', 'fournisseur', 'produit', 'coût total']
+    achats = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "fournisseur": str(p.product.provider), "produit": str(p.product), "coût total": '{0:.2f} €'.format(p.cost_of_purchase())} 
+              for p in ChangeStockOp.objects.filter(label="ApproStock")]
+    columns = json.dumps(columns)
+    appros = json.dumps(achats)
+    return render(request, 'base/achatslist.html', {'columns': columns, 'achats': achats})
 
 ### compte
 
@@ -127,7 +138,8 @@ def compte(request, household_id):
         form = ApproCompteForm(request.POST)
         if form.is_valid():
             q = form.cleaned_data['amount']
-            op = ApproCompteOp(household=household, amount=q)
+            k = form.cleaned_data['kind']
+            op = ApproCompteOp(household=household, amount=q, kind=k)
             op.save()
             household.account += q
             household.save()
@@ -142,6 +154,7 @@ def compte(request, household_id):
     context = {'household': household,
                'form': form,
                'history': history,
+               'number': household.get_formated_number()
     }
     return render(request, 'base/compte.html', context)
 
@@ -172,9 +185,9 @@ def detail_product(request, product_id):
     return render(request, 'base/product.html', {'form': form})
 
 def products(request):
-    columns = ['nom', 'catégorie', 'fournisseur', 'prix', 'vrac', 'visible', 'stock']
-    pdts = [{"id": p.id, "nom": p.name, "catégorie": str(p.category), "fournisseur": str(p.provider),
-             "prix": '{} € / {}'.format(p.price, p.unit), "vrac": bool_to_utf8(p.unit.vrac), "visible": bool_to_utf8(p.visible), "stock": round_stock(p.stock)}
+    columns = ['nom', 'catégorie', 'fournisseur', "prix d'achat", 'prix de vente', 'vrac', 'visible', 'stock']
+    pdts = [{"id": p.id, "nom": p.name, "catégorie": str(p.category), "fournisseur": str(p.provider), "prix d'achat": '{} € / {}'.format(p.cost_of_purchase, p.unit),
+             "prix de vente": '{} € / {}'.format(p.price, p.unit), "vrac": bool_to_utf8(p.unit.vrac), "visible": bool_to_utf8(p.visible), "stock": round_stock(p.stock)}
             for p in Product.objects.all()]
     columns = json.dumps(columns)
     pdts = json.dumps(pdts)
@@ -221,6 +234,14 @@ def appro(request, provider_id):
                'form': form,
     }
     return render(request, 'base/appro.html', context)
+    
+def approslist(request):
+    columns = ['jour', 'mois', 'année', 'foyer', 'approvisionnement', 'type']
+    appros = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "foyer": str(p.household), "approvisionnement": '{} €'.format(p.amount), "type": p.get_kind_display()} 
+              for p in ApproCompteOp.objects.all()]
+    columns = json.dumps(columns)
+    appros = json.dumps(appros)
+    return render(request, 'base/approslist.html', {'columns': columns, 'appros': appros})
 
 
 ### membres

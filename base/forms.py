@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory, ValidationError
+from django.utils.safestring import mark_safe
 
 from .models import *
 from .templatetags.my_tags import *
@@ -17,6 +18,7 @@ class ProviderList(forms.Form):
 
 class ApproCompteForm(forms.Form):
     amount = forms.DecimalField(label="Combien d'argent avez-vous viré sur le compte bancaire du GASE ?", help_text="♥ Merci d'approvisionner votre compte <strong>après</strong> avoir réalisé le virement (ou alors de ne vraiment pas oublier !).", decimal_places=2)
+    kind = forms.ChoiceField(label="Type d'approvisionnement", choices=ApproCompteOp.KIND_CHOICES, help_text="Chèque ou espèces")
 
 
 # utilisé pour inventaire ET appro stock
@@ -24,8 +26,8 @@ class ProductList(forms.Form):
     def __init__(self, pdts, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for p in pdts:
-            help_text = "{} € / {}, stock actuel : {} {}".format(p.price, p.unit, round_stock(p.stock), p.unit)
-            self.fields[str(p.pk)] = forms.DecimalField(label=p.name, help_text=help_text, required=False)
+            help_text = "prix d'achat : {} € / {} <br /> prix de vente : {} € / {} <br /> stock actuel : {} {}".format(p.cost_of_purchase, p.unit, p.price, p.unit, round_stock(p.stock), p.unit)
+            self.fields[str(p.pk)] = forms.DecimalField(label=p.name, help_text=mark_safe(help_text), required=False)
 
 
 # used for details AND creation

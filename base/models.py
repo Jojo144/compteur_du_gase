@@ -43,6 +43,7 @@ class Provider(models.Model):
 # foyer
 class Household(models.Model):
     name = models.CharField(max_length=200, help_text="Nom qui apparaitra dans la liste des comptes pour faire ses achats", verbose_name="nom du foyer")
+    number = models.IntegerField(default=0, verbose_name="numero d'adhérent")
     address = models.CharField(max_length=200, blank=True, help_text="Pas indispensable mais pratique quand on fait des réunions chez les uns les autres", verbose_name="adresse")
     comment = models.TextField(blank=True, verbose_name="commentaire")
     account = models.DecimalField(default=0, max_digits=10, decimal_places=2, editable=False, verbose_name="solde du compte") # INVARIANT : account should be sum of operations
@@ -59,6 +60,9 @@ class Household(models.Model):
 
     class Meta:
         verbose_name = 'Foyer'
+        
+    def get_formated_number(self):
+        return '{0:03d}'.format(self.number)
 
 
 class Member(models.Model):
@@ -82,7 +86,8 @@ class Product(models.Model):
     provider = models.ForeignKey(Provider, verbose_name="fournisseur", on_delete=models.CASCADE)
     category = models.ForeignKey(Category, verbose_name="catégorie", on_delete=models.CASCADE)
     unit = models.ForeignKey(Unit, verbose_name="unité", on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="prix (en €) à l'unité (kg/L/...)") # current price, can vary in the time ...
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="prix de vente (en €) à l'unité (kg/L/...)") # current price, can vary in the time ...  
+    cost_of_purchase = models.DecimalField(default=0.0, max_digits=10, decimal_places=2, verbose_name="prix d'achat (en €) à l'unité (kg/L/...)") # current price, can vary in the time ...
     pwyw = models.BooleanField(default=False, verbose_name="prix libre", help_text="Pas encore géré par le logiciel ...") # PWYW = Pay what you want
     visible = models.BooleanField(default=True, help_text="Une référence non visible n'apparait pas dans les produits que l'on peut acheter, on l'utilise généralement pour les produits en rupture de stock", verbose_name="visible")
     referent = models.ForeignKey(Member, blank=True, null=True, help_text="S'il le souhaite, le référent reçoit un mail à chaque fois qu'un produit est approvisionné ou que le stock devient plus bas que le niveau \"Alerte stock\"", verbose_name="référent", on_delete=models.SET_NULL) # todo : many to many
@@ -95,6 +100,9 @@ class Product(models.Model):
 
     def value_stock(self):
         return self.price * self.stock
+        
+    def value_purchase(self):
+        return self.cost_of_purchase * self.stock
 
     def get_email_stock_alert(self):
         if (self.referent and self.referent.stock_alert and self.referent.email != ''):
@@ -131,6 +139,11 @@ class ChangeStockOp(Operation):
     @classmethod
     def create_inventory(cls, **kwargs):
         return cls.create(label='Inventaire', **kwargs)
+        
+    def cost_of_purchase(self):
+        if self.label != "ApproStock":
+            raise TypeError("Operation must be filter with label==ApproStock")
+        return self.product.cost_of_purchase * self.quantity
 
     def __str__(self):
         return '{} : {} - {}'.format(self.label, self.product, self.quantity)
@@ -147,8 +160,17 @@ class PurchaseDetailOp(ChangeStockOp):
 class ApproCompteOp(Operation):
     household = models.ForeignKey(Household, null=True, on_delete=models.SET_NULL) # null if the household was deleted and no longer exists
     amount = models.DecimalField(max_digits=15, decimal_places=2) # positif for a regular appro
+    CASH = 'cash'
+    CHEQUE = 'cheque'
+    CANCELLATION = 'cancellation'
+    KIND_CHOICES = [
+        (CASH, 'Espèces'),
+        (CHEQUE, 'Chèque'),
+        (CANCELLATION, 'Annulation'),
+    ]
+    kind = models.CharField(max_length=6, choices=KIND_CHOICES, default=CASH)
     def __str__(self):
-        return 'ApproCompteOp {} - {}'.format(self.household, self.amount)
+        return 'ApproCompteOp {} - {} - {}'.format(self.household, self.amount, self.get_kind_display())
 
 
 # there should be only one instance of this model
