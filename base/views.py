@@ -345,7 +345,39 @@ def detail_provider(request, provider_id):
     else:
         form = ProviderForm(instance=provider)
     return render(request, 'base/provider.html', {'form': form})
+    
+### notes
+def notes(request):
+    columns = ['date', 'qui ?', 'message', 'message lu ?', 'action(s) réalisée(s) ?']
+    notes = [{"id": p.id, "date": p.date.strftime("%Y/%m/%d"), "qui ?": str(p.who), "message": p.message, 'message lu ?': bool_to_utf8(p.read), 'action(s) réalisée(s) ?': bool_to_utf8(p.action)}
+             for p in Note.objects.all()]
+    columns = json.dumps(columns)
+    notes = json.dumps(notes)
+    return render(request, 'base/notes.html', {'columns': columns, 'notes': notes})
 
+def create_note(request):
+    if request.method == 'POST':
+        form = NoteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '✔ Message créé !')
+            return HttpResponseRedirect(reverse('base:notes'))
+    else:
+        form = NoteForm()
+    return render(request, 'base/note.html', {'form': form})
+
+def detail_note(request, note_id):
+    pdt = Note.objects.get(pk=note_id)
+    print(note_id)
+    if request.method == 'POST':
+        form = NoteForm(request.POST, instance=pdt)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '✔ Message mis à jour !')
+            return HttpResponseRedirect(reverse('base:notes'))
+    else:
+        form = NoteForm(instance=pdt)
+    return render(request, 'base/note.html', {'form': form})
 
 ## inventaire
 

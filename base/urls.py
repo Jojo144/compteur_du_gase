@@ -28,4 +28,7 @@ urlpatterns = [
     path('ecarts', views.ecarts, name='ecarts'),
     path('stats/<int:product_id>', views.stats, name='stats'),
     path('database', views.database_info, name='database_info'),
+    path('notes', views.notes, name='notes'),
+    path('note', views.create_note, name='create_note'),
+    path('note/<int:note_id>', views.detail_note, name='detail_note'),
 ]

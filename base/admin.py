@@ -20,6 +20,7 @@ admin.site.register(Provider)
 admin.site.register(Member)
 admin.site.register(Household, HouseholdAdmin)
 admin.site.register(Product)
+admin.site.register(Note)
 admin.site.register(LocalSettings)
 
 # for debugging

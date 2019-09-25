@@ -174,6 +174,14 @@ class ApproCompteOp(Operation):
     def __str__(self):
         return 'ApproCompteOp {} - {} - {}'.format(self.household, self.amount, self.get_kind_display())
 
+# message
+class Note(models.Model):    
+    date = models.DateTimeField(auto_now=True) 
+    who = models.ForeignKey(Member, null=True, on_delete=models.SET_NULL, verbose_name="Qui ?") # null if the product was deleted and no longer exists
+    message = models.TextField(blank=False, verbose_name="Message")
+    read = models.BooleanField(verbose_name="Message lu ?", default=False)
+    action = models.BooleanField(verbose_name="Action(s) réalisée(s) ?", default=False, help_text="Si aucune action n'est nécessaire, côcher cette case.")
+
 
 # there should be only one instance of this model
 class LocalSettings(models.Model):

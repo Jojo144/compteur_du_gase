@@ -45,6 +45,12 @@ class ProviderForm(forms.ModelForm):
     class Meta:
         model = Provider
         exclude = []
+        
+# used for details AND creation
+class NoteForm(forms.ModelForm):
+    class Meta:
+        model = Note
+        exclude = []
 
 
 # used for details AND creation

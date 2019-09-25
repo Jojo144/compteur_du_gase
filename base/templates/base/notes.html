@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="row justify-content-center">
-  <a class="btn btn-info" href="{% url 'base:create_product' %}">Créer un nouveau produit</a>
+  <a class="btn btn-info" href="{% url 'base:create_note' %}">Créer un nouveau message</a>
 </div>
 
 <div id="vue-table">
@@ -12,7 +12,10 @@
 	    <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
 	</div>
 	<div class="text-right filter">
-	    <button @click="changeVisible" class="btn btn-secondary">[[ only_visible ? "Montrer " : "Masquer "]] les non visibles </button>
+	    <button @click="changeRead" class="btn btn-secondary">[[ only_not_read ? "Montrer " : "Masquer "]] les messages lus </button>
+	</div>
+	<div class="text-right filter">
+	    <button @click="changeDone" class="btn btn-secondary">[[ only_not_done ? "Montrer " : "Masquer "]] les actions réalisées </button>
 	</div>
     </div>
 
@@ -24,7 +27,6 @@
 	  [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
         </th>
         <th></th>
-        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -32,8 +34,7 @@
         <td v-for="column in columns">
 	  [[ x[column] ]]
 	</td>
-        <td><a :href="'produit/' + x.id">⌬ Détails</a></td>
-        <td><a :href="'stats/' + x.id"><!-- 統計 --> 📈 Stats</a></td>
+        <td><a :href="'note/' + x.id">⌬ Détails</a></td>
       </tr>
     </tbody>
   </table>  
@@ -45,12 +46,13 @@
       delimiters: ['[[', ']]'],
       el: '#vue-table',
       data: {
-	  sortKey: 'nom',
-	  only_visible: true,
+	  sortKey: 'name',
+	  only_not_read: false,
+	  only_not_done: false,
 	  search: '',
 	  reverse: false,
 	  columns: {{ columns | safe }},
-	  raw_data: {{ pdts | safe }}
+	  raw_data: {{ notes | safe }}
       },
 
       computed: {
@@ -65,8 +67,12 @@
       },
 
       methods: {
-	  changeVisible: function() {
-	      this.only_visible = !this.only_visible
+	  changeRead: function() {
+	      this.only_not_read = !this.only_not_read
+	  },
+	  
+	  changeDone: function() {
+	      this.only_not_done = !this.only_not_done
 	  },
 
 	  sortBy: function(sortKey) {
@@ -76,10 +82,12 @@
 
 	  filter: function () {
 	      var search = this.search;
-	      var only_visible = this.only_visible;
+	      var only_not_read = !this.only_not_read;
+		  var only_not_done = !this.only_not_done;
 	      return _.pickBy(this.orderedData, (function (row) {
-		  var b = (!only_visible) || (row.visible == "✔");
-		  return b && (myContains(row.nom, search) || myContains(row.catégorie, search) || myContains(row.fournisseur, search))
+		  var b1 = (only_not_read) || (row["message lu ?"] == "✘");
+		  var b2 = (only_not_done) || (row["action(s) réalisée(s) ?"] == "✘");
+		  return b1 && b2 && (myContains(row.who, search) || myContains(row.message, search))
 	      }))
 	  }
       }

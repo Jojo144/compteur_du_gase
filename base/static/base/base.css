@@ -33,9 +33,9 @@ nav {
     content: "✘ ";
 }
 
-
-
-
+.text-right.filter{
+  margin-right: 15px;
+}
 
 #vue-table {
   margin: 2em 0;

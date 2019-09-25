@@ -8,7 +8,7 @@
   <div id="print-total"></div>
   </br>
   <form class="form-inline">
-  <div class="form-group">
+  <div class="text-right filter">
       <select id="dayList" v-model="selected_day" class="form-control">
         <option value="">Filtrer par jour</option>
         <option value="1">1</option>
@@ -44,7 +44,7 @@
         <option value="31">31</option>
       </select>
   </div>
-  <div class="form-group">
+  <div class="text-right filter">
       <select id="monthList" v-model="selected_month" class="form-control">
         <option value="">Filtrer par mois</option>
         <option value="1">Janvier</option>
@@ -61,7 +61,7 @@
         <option value="12">Décembre</option>
       </select>
   </div>
-  <div class="form-group">
+  <div class="text-right filter">
       <select id="yearList" v-model="selected_year" class="form-control">
         <option value="">Filtrer par année</option>
         <option value="2019">2019</option>
@@ -73,7 +73,7 @@
         <option value="2020">2025</option>
       </select>
   </div>
-  <div class="form-group">
+  <div class="text-right filter">
       <input type="text" v-model="search" class="form-control" size="50" placeholder="Tapez pour filtrer par fournisseur ou par produit...">
   </div>
   </form>
@@ -85,7 +85,6 @@
       [[ _.capitalize(column) ]]
       [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
         </th>
-        <th></th>
       </tr>
     </thead>
     <tbody>
