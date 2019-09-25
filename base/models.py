@@ -163,10 +163,12 @@ class ApproCompteOp(Operation):
     CASH = 'cash'
     CHEQUE = 'cheque'
     CANCELLATION = 'cancellation'
+    REPAYMENT = 'repayment'
     KIND_CHOICES = [
         (CASH, 'Espèces'),
         (CHEQUE, 'Chèque'),
-        (CANCELLATION, 'Annulation'),
+        (CANCELLATION, 'Annulation/Correction'),
+        (REPAYMENT, 'Remboursement')
     ]
     kind = models.CharField(max_length=6, choices=KIND_CHOICES, default=CASH)
     def __str__(self):

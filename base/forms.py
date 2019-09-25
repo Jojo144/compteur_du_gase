@@ -18,7 +18,7 @@ class ProviderList(forms.Form):
 
 class ApproCompteForm(forms.Form):
     amount = forms.DecimalField(label="Combien d'argent avez-vous viré sur le compte bancaire du GASE ?", help_text="♥ Merci d'approvisionner votre compte <strong>après</strong> avoir réalisé le virement (ou alors de ne vraiment pas oublier !).", decimal_places=2)
-    kind = forms.ChoiceField(label="Type d'approvisionnement", choices=ApproCompteOp.KIND_CHOICES, help_text="Chèque ou espèces")
+    kind = forms.ChoiceField(label="Type d'approvisionnement", choices=ApproCompteOp.KIND_CHOICES, help_text="Chèque ou espèces pour un approvisionnement normal (valeur positive)</br>Annulation/correction pour corriger une erreur de saisie (valeur positive ou négative)</br>Remboursement pour un remboursement ou lorsque le foyer clotûre son compte (valeur négative)")
 
 
 # utilisé pour inventaire ET appro stock

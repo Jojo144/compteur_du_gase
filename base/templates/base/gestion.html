@@ -52,15 +52,15 @@
 	Valeur des approvisionnements : {{ value_appro | round0 }} €
 	<br>
 	<br>
-	<a class="btn btn-info" href="{% url 'base:approslist' %}">Liste détaillées des approvisionnements</a>
+	<a class="btn btn-info" href="{% url 'base:compteslist' %}">Liste détaillées des approvisionnements des foyers</a>
 	<br>
     <br>
 	
-	<h4>Valeur des achats</h4>
-	Valeur des achats : {{ value_purchase | round0 }} €
+	<h4>Valeur des approvisionnements de l'épicerie</h4>
+	Valeur des approvisionnements : {{ value_purchase | round0 }} €
 	<br>
 	<br>
-	<a class="btn btn-info" href="{% url 'base:achatslist' %}">Liste détaillées des achats</a>
+	<a class="btn btn-info" href="{% url 'base:approslist' %}">Liste détaillées des approvisionnements de l'épicerie</a>
     <br>
     <br>
 

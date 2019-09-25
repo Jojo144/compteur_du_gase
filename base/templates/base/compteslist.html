@@ -1,7 +1,7 @@
 {% extends "base/base.html" %} 
 
 {% block content %}
-<h4>Liste des achats</h4>
+<h4>Liste détaillées des approvisionnements des foyers</h4>
 
 <div id="vue-table">
 
@@ -61,7 +61,7 @@
         <option value="12">Décembre</option>
       </select>
   </div>
-  <div class="form-group">
+    <div class="form-group">
       <select id="yearList" v-model="selected_year" class="form-control">
         <option value="">Filtrer par année</option>
         <option value="2019">2019</option>
@@ -74,8 +74,8 @@
       </select>
   </div>
   <div class="form-group">
-      <input type="text" v-model="search" class="form-control" size="50" placeholder="Tapez pour filtrer par fournisseur ou par produit...">
-  </div>
+      <input type="text" v-model="search" class="form-control" size="50" placeholder="Tapez pour filtrer par foyer...">
+  </div>  
   </form>
 
   <table id="table" class="table table-striped">
@@ -112,7 +112,7 @@
       reverse: false,
       columns: {{ columns | safe }},
       
-      raw_data: {{ achats | safe }}
+      raw_data: {{ comptes | safe }}
       },
 
       computed: {
@@ -174,7 +174,7 @@
           
           this.total = this.total_sum(data);
           
-          document.getElementById("print-total").innerHTML = "Total des achats sélectionnés : <b>" + this.total + " €</b>"; 
+          document.getElementById("print-total").innerHTML = "Total des approvisionnements des foyers sélectionnés : <b>" + this.total + " €</b>"; 
           
           return data
       },
@@ -182,7 +182,7 @@
       total_sum: function(data){
           let sum = 0;
           data.forEach(function(element) {
-              sum += parseInt(element["coût total"].replace('€', ''));
+              sum += parseInt(element["approvisionnement"].replace('€', ''));
           });
           console.log(sum);
          return sum;

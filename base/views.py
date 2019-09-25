@@ -112,14 +112,6 @@ def achats(request, household_id):
                    'history':history}
         return render(request, 'base/achats.html', context)
 
-def achatslist(request):
-    columns = ['jour', 'mois', 'année', 'fournisseur', 'produit', 'coût total']
-    achats = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "fournisseur": str(p.product.provider), "produit": str(p.product), "coût total": '{0:.2f} €'.format(p.cost_of_purchase())} 
-              for p in ChangeStockOp.objects.filter(label="ApproStock")]
-    columns = json.dumps(columns)
-    appros = json.dumps(achats)
-    return render(request, 'base/achatslist.html', {'columns': columns, 'achats': achats})
-
 ### compte
 
 def pre_compte(request):
@@ -157,6 +149,14 @@ def compte(request, household_id):
                'number': household.get_formated_number()
     }
     return render(request, 'base/compte.html', context)
+    
+def compteslist(request):
+    columns = ['jour', 'mois', 'année', 'foyer', 'approvisionnement', 'type']
+    comptes = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "foyer": str(p.household), "approvisionnement": '{} €'.format(p.amount), "type": p.get_kind_display()} 
+              for p in ApproCompteOp.objects.all()]
+    columns = json.dumps(columns)
+    comptes = json.dumps(comptes)
+    return render(request, 'base/compteslist.html', {'columns': columns, 'comptes': comptes})
 
 
 ### produits
@@ -236,13 +236,12 @@ def appro(request, provider_id):
     return render(request, 'base/appro.html', context)
     
 def approslist(request):
-    columns = ['jour', 'mois', 'année', 'foyer', 'approvisionnement', 'type']
-    appros = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "foyer": str(p.household), "approvisionnement": '{} €'.format(p.amount), "type": p.get_kind_display()} 
-              for p in ApproCompteOp.objects.all()]
+    columns = ['jour', 'mois', 'année', 'fournisseur', 'produit', 'coût total']
+    appros = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "fournisseur": str(p.product.provider), "produit": str(p.product), "coût total": '{0:.2f} €'.format(p.cost_of_purchase())} 
+              for p in ChangeStockOp.objects.filter(label="ApproStock")]
     columns = json.dumps(columns)
     appros = json.dumps(appros)
     return render(request, 'base/approslist.html', {'columns': columns, 'appros': appros})
-
 
 ### membres
 
