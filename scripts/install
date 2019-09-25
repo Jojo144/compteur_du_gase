@@ -56,14 +56,14 @@ $venv_pip install gunicorn
 $venv_pip install -r $final_path/requirements.txt
 
 # Configuration Django
-settings_ynh=$final_path/compteur/settings_ynh.py
-cp $final_path/compteur/settings_ynh.py.example $settings_ynh
-ynh_replace_string "YNH_APP_ARG_ADMIN" $admin $settings_ynh
-ynh_replace_string "YNH_APP_ARG_DOMAIN" $domain $settings_ynh
-ynh_replace_string "YNH_APP_ARG_PATH" $path $settings_ynh
-ynh_replace_string "YNH_APP_ARG_EMAIL" $email $settings_ynh
-ynh_replace_string "YNH_APP_SECRET_KEY" $secret $settings_ynh
-ynh_replace_string "YNH_APP_STATIC_ROOT" $final_path/static $settings_ynh
+settings_local=$final_path/compteur/settings_local.py
+cp $final_path/compteur/settings_local.py.example $settings_local
+ynh_replace_string "YNH_APP_ARG_ADMIN" $admin $settings_local
+ynh_replace_string "YNH_APP_ARG_DOMAIN" $domain $settings_local
+ynh_replace_string "YNH_APP_ARG_PATH" $path $settings_local
+ynh_replace_string "YNH_APP_ARG_EMAIL" $email $settings_local
+ynh_replace_string "YNH_APP_SECRET_KEY" $secret $settings_local
+ynh_replace_string "YNH_APP_STATIC_ROOT" $final_path/static $settings_local
 
 # Set permissions
 sudo chown -R $app:www-data $final_path

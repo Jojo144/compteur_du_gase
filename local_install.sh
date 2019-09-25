@@ -29,8 +29,8 @@ $venv_pip install pip --upgrade
 $venv_pip install gunicorn
 $venv_pip install -r $app_path/requirements.txt
 
-echo "* Creating setting.py"
-cat > $app_path/$project/settings_ynh.py << EOF
+echo "* Creating setting_local.py"
+cat > $app_path/$project/settings_local.py << EOF
 DEBUG = False
 SECRET_KEY = '$secret'
 ALLOWED_HOSTS = ['localhost']

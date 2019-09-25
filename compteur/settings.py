@@ -144,6 +144,6 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 try:
-    from .settings_ynh import *
+    from .settings_local import *
 except ModuleNotFoundError:
-    print('Warning: the file settings_ynh.py was not found, you are in debug mode.')
+    print('Warning: the file settings_local.py was not found, you are in debug mode.')
