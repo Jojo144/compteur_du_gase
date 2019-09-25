@@ -243,6 +243,16 @@ def approslist(request):
     columns = json.dumps(columns)
     appros = json.dumps(appros)
     return render(request, 'base/approslist.html', {'columns': columns, 'appros': appros})
+    
+### stock
+
+def stockslist(request):
+    columns = ['fournisseur', 'catégorie', 'produit', 'valeur totale']
+    stocks = [{"fournisseur": str(p.provider), "catégorie": str(p.category), "produit": str(p), "valeur totale": '{0:.2f} €'.format(p.value_stock())} 
+              for p in Product.objects.all()]
+    columns = json.dumps(columns)
+    stocks = json.dumps(stocks)
+    return render(request, 'base/stockslist.html', {'columns': columns, 'stocks': stocks})
 
 ### membres
 

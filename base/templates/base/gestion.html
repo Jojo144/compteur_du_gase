@@ -5,7 +5,7 @@
 <div class="medium-content">
     <h4>Interface d'administration</h4>
     <a class="btn btn-info" href="/admin">Accès à l'interface d'administration</a>
-    <br> Cette interface permet de bidouiller tout ce que gère le logiciel, à utiliser avec précaution. En particulier on peut :
+    <br> Cette interface permet de bidouiller tout ce que gère le logiciel, <b>à utiliser avec beaucoup de précautions</b>. En particulier on peut :
     <ul>
 	<li>
 	    Créer/modifier les catégories.
@@ -46,6 +46,9 @@
     Donc il doit y avoir en banque : {{ diff_values | round0 }} €
     (si toutes les factures ont été payées et que tous le adhérents ont bien fait leur virement)
     <br>
+    <br>
+	<a class="btn btn-info" href="{% url 'base:stockslist' %}">Liste détaillées de la valeur du stock</a>
+	<br>
     <br>
 	
 	<h4>Valeur des approvisionnements des foyers</h4>

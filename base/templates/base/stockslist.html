@@ -1,0 +1,100 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<h4>Liste détaillées de la valeur du stock de l'épicerie</h4>
+
+<div id="vue-table">
+
+  <div id="print-total"></div>
+  <div>Ici, c'est le prix de vente qui est pris en compte. La valeur des achats de l'épicerie peut être connue quant-à-elle dans la section correspondante.</div>
+  </br>
+  <form class="form-inline">
+  <div class="text-right filter">
+      <input type="text" v-model="search" class="form-control" size="50" placeholder="Tapez pour filtrer par fournisseur, par produit ou par catégorie...">
+  </div>
+  </form>
+
+  <table id="table" class="table table-striped">
+    <thead>
+      <tr>
+        <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
+      [[ _.capitalize(column) ]]
+      [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="x in filter()">
+        <td v-for="column in columns">
+      [[ x[column] ]]
+    </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<script>
+  var vue = new Vue({
+      delimiters: ['[[', ']]'],
+      el: '#vue-table',
+      data: {
+      sortKey: 'date',
+      search: '',
+      reverse: false,
+      columns: {{ columns | safe }},
+
+      raw_data: {{ stocks | safe }}
+      },
+
+      computed: {
+      orderedData: function () {
+          var data = _.orderBy(this.raw_data, this.sortKey);
+          if (this.reverse) {
+          return _.reverse(data)
+          } else {
+          return data
+          }
+      }
+      },
+
+      methods: {
+      sortBy: function(sortKey) {
+          this.reverse = (this.sortKey == sortKey) ? ! this.reverse : false;
+          this.sortKey = sortKey
+      },
+
+      filter: function () {
+          var filterKey = this.search.toLowerCase();
+          var data = this.orderedData;
+
+          
+
+          data = data.filter(function (row) {
+          return Object.keys(row).some(function (key) {
+              return String(row[key]).toLowerCase().indexOf(filterKey) > -1
+          })
+          });
+
+          this.total = this.total_sum(data);
+
+          document.getElementById("print-total").innerHTML = "Total de la valeur des stocks de l'épicerie sélectionnés : <b>" + this.total + " €</b>";
+
+          return data
+      },
+
+      total_sum: function(data){
+          let sum = 0;
+          data.forEach(function(element) {
+              sum += parseInt(element["valeur totale"].replace('€', ''));
+          });
+          console.log(sum);
+         return sum;
+      }
+      }
+  })
+
+  vue.filter();
+
+</script>
+{% endblock %}

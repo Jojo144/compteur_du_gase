@@ -31,4 +31,5 @@ urlpatterns = [
     path('notes', views.notes, name='notes'),
     path('note', views.create_note, name='create_note'),
     path('note/<int:note_id>', views.detail_note, name='detail_note'),
+    path('stockslist', views.stockslist, name='stockslist'),
 ]
