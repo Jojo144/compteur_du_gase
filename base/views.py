@@ -34,6 +34,7 @@ def my_send_mail(request, subject, message, recipient_list, success_msg, error_m
 
 def index(request):
     txt_home = get_local_settings().txt_home
+    
     return render(request, 'base/index.html', {'txt_home': txt_home})
 
 def gestion(request):

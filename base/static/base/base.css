@@ -19,6 +19,12 @@
 .form-buttons input, .form-buttons a {
     flex: 1;
 }
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 33%;
+}
 
 nav {
     background-color: #c0fcdf;
