@@ -1,6 +1,19 @@
 {% extends "base/base.html" %} 
 
 {% block content %}
+<div class="row">
+    <h2>Messages et actions</h2>
+</div>
+<div class="row">
+    <h6>
+	Cette page sert à :
+	 <ul>
+	  <li>créer un nouveau message comportant ou non une action à réaliser ;</li>
+	  <li>signaler qu'un message a été lu ;</li>
+      <li>signaler qu'une action à été réalisée.</li>
+	</ul>
+	</h6>
+</div>
 <div class="row justify-content-center">
   <a class="btn btn-info" href="{% url 'base:create_note' %}">Créer un nouveau message</a>
 </div>

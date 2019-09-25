@@ -35,7 +35,21 @@ def my_send_mail(request, subject, message, recipient_list, success_msg, error_m
 def index(request):
     txt_home = get_local_settings().txt_home
     
-    return render(request, 'base/index.html', {'txt_home': txt_home})
+    note_not_read=len([p for p in Note.objects.all() if not p.read])
+    if note_not_read > 1:
+        note_pluralize = "s"
+    else:
+        note_pluralize = ""
+        
+    action_not_done=len([p for p in Note.objects.all() if not p.action])
+    if action_not_done > 1:
+        action_pluralize = "s"
+    else:
+        action_pluralize = ""
+    
+    txt_message = "Il y a actuellement {0:d} message{1:s} non lu{1:s} et {2:d} action{3:s} non réalisée{3:s}.".format(note_not_read, note_pluralize, action_not_done, action_pluralize)
+    
+    return render(request, 'base/index.html', {'txt_home': txt_home, 'txt_message': txt_message})
 
 def gestion(request):
     
@@ -359,8 +373,8 @@ def detail_provider(request, provider_id):
     
 ### notes
 def notes(request):
-    columns = ['date', 'qui ?', 'message', 'message lu ?', 'action(s) réalisée(s) ?']
-    notes = [{"id": p.id, "date": p.date.strftime("%Y/%m/%d"), "qui ?": str(p.who), "message": p.message, 'message lu ?': bool_to_utf8(p.read), 'action(s) réalisée(s) ?': bool_to_utf8(p.action)}
+    columns = ['date', 'auteur', 'message', 'message lu ?', 'action(s) réalisée(s) ?']
+    notes = [{"id": p.id, "date": p.date.strftime("%Y/%m/%d"), "auteur": str(p.who), "message": p.message, 'message lu ?': bool_to_utf8(p.read), 'action(s) réalisée(s) ?': bool_to_utf8(p.action)}
              for p in Note.objects.all()]
     columns = json.dumps(columns)
     notes = json.dumps(notes)
