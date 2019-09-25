@@ -1,8 +1,20 @@
-{% extends "base/base.html" %} 
+{% extends "base/base.html" %}
 
 {% block content %}
+<div class="row">
+    <h2>Foyers et membres</h2>
+</div>
+<div class="row">
+    <h6>
+	Cette page sert à :
+	 <ul>
+	  <li>créer un nouveau foyer ;</li>
+	  <li>obtenir des informations sur un foyer.</li>
+	</ul>
+	</h6>
+</div>
 <div class="row justify-content-center">
-  <a class="btn btn-info" href="{% url 'base:create_household' %}">Créer un nouveau compte</a>
+  <a class="btn btn-info" href="{% url 'base:create_household' %}">Créer un nouveau foyer</a>
 </div>
 
 <div id="vue-table">
@@ -29,7 +41,7 @@
         <td><a :href="'membre/' + x.household_id">⌬ Détails du foyer</a></td>
       </tr>
     </tbody>
-  </table>  
+  </table>
 
 </div>
 
@@ -42,7 +54,7 @@
 	  search: '',
 	  reverse: false,
 	  columns: {{ columns | safe }},
-	  
+
 	  raw_data: {{ members | safe }}
       },
 

@@ -1,4 +1,4 @@
-{% extends "base/base.html" %} 
+{% extends "base/base.html" %}
 
 {% block content %}
 <h4>Liste détaillées des approvisionnements de l'épicerie</h4>
@@ -94,7 +94,7 @@
     </td>
       </tr>
     </tbody>
-  </table> 
+  </table>
 
 </div>
 
@@ -110,7 +110,7 @@
       search: '',
       reverse: false,
       columns: {{ columns | safe }},
-      
+
       raw_data: {{ appros | safe }}
       },
 
@@ -134,50 +134,50 @@
       filter: function () {
           var filterKey = this.search.toLowerCase();
           var data = this.orderedData;
-          
+
           if (this.selected_year.length > 0 ){
             var selected_year_int = parseInt(this.selected_year);
-            
+
             data = data.filter(function (row) {
             return Object.keys(row).some(function (key) {
                 return row["année"] == selected_year_int
             })
             });
           }
-          
+
           if (this.selected_month.length > 0 ){
             var selected_month_int = parseInt(this.selected_month);
-            
+
             data = data.filter(function (row) {
             return Object.keys(row).some(function (key) {
                 return row["mois"] == selected_month_int
             })
             });
           }
-          
+
           if (this.selected_day.length > 0 ){
             var selected_day_int = parseInt(this.selected_day);
-            
+
             data = data.filter(function (row) {
             return Object.keys(row).some(function (key) {
                 return row["jour"] == selected_day_int
             })
             });
           }
-              
+
           data = data.filter(function (row) {
           return Object.keys(row).some(function (key) {
               return String(row[key]).toLowerCase().indexOf(filterKey) > -1
           })
           });
-          
+
           this.total = this.total_sum(data);
-          
-          document.getElementById("print-total").innerHTML = "Total des approvisionnements de l'épicerie sélectionnés : <b>" + this.total + " €</b>"; 
-          
+
+          document.getElementById("print-total").innerHTML = "Total des approvisionnements de l'épicerie sélectionnés : <b>" + this.total + " €</b>";
+
           return data
       },
-      
+
       total_sum: function(data){
           let sum = 0;
           data.forEach(function(element) {
@@ -185,11 +185,11 @@
           });
           console.log(sum);
          return sum;
-      }      
+      }
       }
   })
-  
+
   vue.filter();
-  
+
 </script>
 {% endblock %}

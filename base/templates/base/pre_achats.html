@@ -2,6 +2,20 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+<div class="row">
+    <h2>Achats</h2>
+</div>
+<div class="row">
+    <h6>
+	Cette page sert à :
+	 <ul>
+	  <li>enregistrer l'achat d'un membre ;</li>
+	  <li>corriger ou annuler un achat déjà effectué.</li>
+	</ul>
+    Pour annuler un achat erronné, une façon de faire est de refaire le même achat en mettant des quantités négatives à la place. Cela approvisionne le compte et les stocks correctement.
+	</h6>
+</div>
+</br>
 <form class="narrow-content" action="" method="post">
     {% csrf_token %}
     {{ form | crispy }}

@@ -1,6 +1,20 @@
-{% extends "base/base.html" %} 
+{% extends "base/base.html" %}
 
 {% block content %}
+<div class="row">
+    <h2>Produits</h2>
+</div>
+<div class="row">
+    <h6>
+	Cette page sert à :
+	 <ul>
+	  <li>créer un nouveau produit ;</li>
+	  <li>obtenir des informations sur les produits.</li>
+	</ul>
+    Pour pouvoir créer un nouveau produit, il faut au préalable que le fournisseur, la catégorie du produit et les unités aient été créées.
+	</h6>
+</div>
+</br>
 <div class="row justify-content-center">
   <a class="btn btn-info" href="{% url 'base:create_product' %}">Créer un nouveau produit</a>
 </div>
@@ -36,7 +50,7 @@
         <td><a :href="'stats/' + x.id"><!-- 統計 --> 📈 Stats</a></td>
       </tr>
     </tbody>
-  </table>  
+  </table>
 
 </div>
 

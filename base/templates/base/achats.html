@@ -100,7 +100,7 @@
 			</td>
 		    </tr>
 		</tbody>
-	    </table>  
+	    </table>
 	    <div class="text-right">
 		<button class="btn btn-info" @click="inBasket" >Dans panier ⇒</button>
 	    </div>
@@ -142,7 +142,7 @@
 </div>
 
 <script>
- 
+
  $('nav a').click(function(event){
      if ( ! confirm('Voulez-vous vraiment abandonner vos achats ? (Vous n\'avez pas payé)')) {
 	 event.preventDefault();
@@ -194,7 +194,7 @@
 			 else {
 			     alert("Veuillez entrer un nombre pour : " + this.pdts[id].name)
 			 }
-		     }	  
+		     }
 		 }
 	     }
 	 },

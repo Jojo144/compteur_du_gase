@@ -2,10 +2,19 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+<div class="row">
+    <h2>Réception d'une commande d'un fournisseur</h2>
+</div>
+<div class="row">
+    <h6>
+	Cette page sert à :
+	 <ul>
+	  <li>approvisionner les stocks à la réception d'une commande d'un fournisseur.</li>
+	</ul>
+    Pour pouvoir réceptionner une commande d'un ou plusieurs produits d'un fournisseur, il faut au préalable que le fournisseur et les produits aient été créés.
+	</h6>
+</div>
 <div class="narrow-content">
-    <h4>Approvisionner les stocks à la réception d'une commande</h4>
-    <br>
-    <br>
     <form action="" method="post">
 	{% csrf_token %}
 	{{ form | crispy }}
