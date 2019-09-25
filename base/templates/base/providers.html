@@ -1,8 +1,18 @@
 {% extends "base/base.html" %} 
 
 {% block content %}
-<h4>Liste des fournisseurs du GASE</h4>
-<br>
+<div class="row">
+    <h2>Fournisseurs</h2>
+</div>
+<div class="row">
+    <h6>
+	Cette page sert à :
+	 <ul>
+	  <li>créer un nouveau fournisseur ;</li>
+	  <li>obtenir des informations sur un fournisseur.</li>
+	</ul>
+	</h6>
+</div>
 <div class="row justify-content-center">
   <a class="btn btn-info" href="{% url 'base:create_provider' %}">Créer un nouveau fournisseur</a>
 </div>
