@@ -271,8 +271,8 @@ def stockslist(request):
 ### membres
 
 def members(request):
-    columns = ['nom', 'foyer', 'email', 'bigophone']
-    members = [{"id": p.id, "nom": p.name, "foyer": str(p.household), "email": p.email, "bigophone": p.tel, "household_id": p.household.id if p.household else 0}
+    columns = ['nom', "numéro d'adhérent", 'foyer', 'email', 'bigophone']
+    members = [{"id": p.id, "nom": p.name, "numéro d'adhérent": p.household.get_formated_number(), "foyer": str(p.household), "email": p.email, "bigophone": p.tel, "household_id": p.household.id if p.household else 0}
                for p in Member.objects.all()]
     columns = json.dumps(columns)
     members = json.dumps(members)
@@ -281,9 +281,14 @@ def members(request):
 
 class HouseholdCreate(CreateView):
     model = Household
-    fields = ['name', 'address', 'comment']
+    fields = ['number', 'name', 'address', 'comment']
     template_name = 'base/household.html'
     success_url = reverse_lazy('base:members')
+
+    def get_initial(self):
+        initial = super(HouseholdCreate, self).get_initial()
+        initial['number'] = get_advised_household_number()
+        return initial
 
     def get_context_data(self, **kwargs):
         data = super(HouseholdCreate, self).get_context_data(**kwargs)
@@ -302,7 +307,7 @@ class HouseholdCreate(CreateView):
                 self.object = form.save()
                 members.instance = self.object
                 members.save()
-                messages.success(request, '✔ Foyer créé !')
+                messages.success(self.request, '✔ Foyer créé !')
             else:
                 return self.form_invalid(form)
         return super(HouseholdCreate, self).form_valid(form)
@@ -310,7 +315,7 @@ class HouseholdCreate(CreateView):
 
 class HouseholdUpdate(UpdateView):
     model = Household
-    fields = ['name', 'address', 'comment']
+    fields = ['number', 'name', 'address', 'comment']
     template_name = 'base/household.html'
     success_url = reverse_lazy('base:members')
 
@@ -331,7 +336,7 @@ class HouseholdUpdate(UpdateView):
                 self.object = form.save()
                 members.instance = self.object
                 members.save()
-                messages.success(request, '✔ Foyer mis à jour !')
+                messages.success(self.request, '✔ Foyer mis à jour !')
             else:
                 return self.form_invalid(form)
         return super(HouseholdUpdate, self).form_valid(form)

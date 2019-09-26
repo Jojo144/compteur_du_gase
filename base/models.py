@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 class Category(models.Model):
     name = models.CharField(max_length=200, verbose_name="Nom")
@@ -41,9 +42,21 @@ class Provider(models.Model):
 
 
 # foyer
+def get_advised_household_number():
+    numbers = [p.number for p in Household.objects.all()]
+    i = 1
+    while i not in numbers:
+        i += 1
+    return i
+        
+def validate_household_number(value):
+    if value in [getattr(p, 'number') for p in Household.objects.all()]:
+        advised_value = get_advised_household_number()
+        raise ValidationError("Le numéro d'adhérent {0:d} est déjà utilisé ! Le numéro conseillé est le {1:d}.".format(value, advised_value))
+        
 class Household(models.Model):
     name = models.CharField(max_length=200, help_text="Nom qui apparaitra dans la liste des comptes pour faire ses achats", verbose_name="nom du foyer")
-    number = models.IntegerField(default=0, verbose_name="numero d'adhérent")
+    number = models.IntegerField(default=0, verbose_name="numero d'adhérent", validators=[validate_household_number])
     address = models.CharField(max_length=200, blank=True, help_text="Pas indispensable mais pratique quand on fait des réunions chez les uns les autres", verbose_name="adresse")
     comment = models.TextField(blank=True, verbose_name="commentaire")
     account = models.DecimalField(default=0, max_digits=10, decimal_places=2, editable=False, verbose_name="solde du compte") # INVARIANT : account should be sum of operations
@@ -63,7 +76,7 @@ class Household(models.Model):
         
     def get_formated_number(self):
         return '{0:03d}'.format(self.number)
-
+        
 
 class Member(models.Model):
     name = models.CharField(max_length=200, verbose_name="nom")
