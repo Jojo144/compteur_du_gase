@@ -13,6 +13,7 @@ urlpatterns = [
     path('produit/<int:product_id>', views.detail_product, name='detail_product'),
     path('produit', views.create_product, name='create_product'),
     path('membres', views.members, name='members'),
+    path('membresstats', views.menbersstats, name='membersstats'),
     path('membre/<int:pk>', views.HouseholdUpdate.as_view(), name='detail_member'),
     path('membre', views.HouseholdCreate.as_view(), name='create_household'),
     path('fournisseurs', views.providers, name='providers'),

@@ -1,0 +1,94 @@
+{% extends 'base/base.html' %}
+
+{% load static %}
+{% load my_tags %}
+
+{% block content %}
+<h4>Nombres de foyers et de membres</h4>
+
+<canvas id="myChart"></canvas>
+<br>
+<br>
+<button id="removeData">Zoomer</button>
+<button id="addData">Dézoomer</button>
+
+<script src="{% static 'base/moment-with-locales.js' %}"></script>
+<script src="{% static 'base/Chart.js' %}"></script>
+
+<script>
+ moment.locale('fr');
+ var ctx = document.getElementById('myChart').getContext('2d');
+ var init_date = new Date();
+ init_date.setMonth(init_date.getMonth() - 6);
+ var end_date = new Date();
+ end_date.setMonth(end_date.getMonth() + 1);
+ var chart = new Chart(ctx, {
+     type: 'line',
+
+     data: {
+         datasets: [{
+             label: 'Nombre de foyers',
+             backgroundColor: 'rgb(255, 99, 132)',
+             borderColor: 'rgb(255, 99, 132)',
+	     fill: false,
+	     lineTension: 0,
+	     data: [
+		 {% for d in households_data %}
+		 { x: new Date('{{d.date}}'), y: {{d.nb}}, label: '{{d.label}}' },
+		 {% endfor %}
+	     ]
+         },
+		 {
+             label: 'Nombre de membres',
+             backgroundColor: 'rgb(0, 204, 255)',
+             borderColor: 'rgb(0, 204, 255)',
+	     fill: false,
+	     lineTension: 0,
+	     data: [
+		 {% for d in members_data %}
+		 { x: new Date('{{d.date}}'), y: {{d.nb}}, label: '{{d.label}}' },
+		 {% endfor %}
+	     ]
+         }],
+     },
+
+     options: {
+	 title: { text: 'Nombre de foyers et de membres' },
+	 scales: {
+             xAxes: [{
+                 type: 'time',
+		 time: {min: init_date, max: end_date}
+             }],
+	     yAxes: [{
+		 scaleLabel: {
+		     display: true,
+		     labelString: 'Nombre'
+		 }
+	     }]
+	 },
+         tooltips: {
+             callbacks: {
+                 label: function(tooltipItem, data) {
+		     var o = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                     return o.label + ". Nombre: " + o.y;
+                 }
+             }
+	 },
+     }
+ });
+
+ document.getElementById('addData').addEventListener('click', function() {
+     var date = new Date(chart.options.scales.xAxes[0].time.min);
+     date.setMonth(date.getMonth() - 1);
+     chart.options.scales.xAxes[0].time.min = date;
+     chart.update();
+ });
+
+ document.getElementById('removeData').addEventListener('click', function() {
+     var date = new Date(chart.options.scales.xAxes[0].time.min);
+     date.setMonth(date.getMonth() + 1);
+     chart.options.scales.xAxes[0].time.min = date;
+     chart.update();
+ });
+</script>
+{% endblock content %}

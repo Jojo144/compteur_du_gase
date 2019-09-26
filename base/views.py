@@ -271,13 +271,52 @@ def stockslist(request):
 ### membres
 
 def members(request):
-    columns = ['nom', "numéro d'adhérent", 'foyer', 'email', 'bigophone']
-    members = [{"id": p.id, "nom": p.name, "numéro d'adhérent": p.household.get_formated_number(), "foyer": str(p.household), "email": p.email, "bigophone": p.tel, "household_id": p.household.id if p.household else 0}
+    columns = ['nom', "numéro d'adhérent", "date d'adhésion", "date de clotûre", 'foyer', 'email', 'bigophone']
+    members = [{"id": p.id, "nom": p.name, "numéro d'adhérent": p.household.get_formated_number(), "date d'adhésion": p.household.date.strftime("%d/%m/%Y"), "date de clotûre": p.household.get_formated_date_closed("%d/%m/%Y"), "foyer": str(p.household), "email": p.email, "bigophone": p.tel, "household_id": p.household.id if p.household else 0}
                for p in Member.objects.all()]
     columns = json.dumps(columns)
     members = json.dumps(members)
-    return render(request, 'base/members.html', {'columns': columns, 'members': members})
+    
+    txt_number_h = str(len([p for p in Household.objects.all() if p.date_closed is None]))
+    txt_number_m = str(len([p for p in Member.objects.all() if p.household.date_closed is None]))
+    
+    return render(request, 'base/members.html', {'columns': columns, 'members': members, 'txt_number_m': txt_number_m, 'txt_number_h': txt_number_h})
 
+def menbersstats(request):
+
+    # dates    
+    dates = [datetime.date.today()]
+    for h in Household.objects.all():
+        if h.date not in dates:
+            dates.append(h.date)
+        if h.date_closed is not None:
+            if h.date_closed not in dates:
+                dates.append(h.date_closed)
+    dates.sort()    
+    
+    # foyers
+    households_stats = [0]*len(dates)    
+    for h in Household.objects.all():
+        for i in range(dates.index(h.date), len(dates)):
+            households_stats[i] += 1
+        if h.date_closed is not None:
+            for i in range(dates.index(h.date_closed), len(dates)):
+                households_stats[i] -= 1        
+    households_data = [{'nb': str(households_stats[i]), 'date': dates[i].isoformat(), 'label': str(households_stats[i])} for i in range(len(dates))]
+    
+    # membres
+    members_stats = [0]*len(dates)
+    for m in Member.objects.all():
+        for i in range(dates.index(m.household.date), len(dates)):
+            members_stats[i] += 1
+        if m.household.date_closed is not None:
+            for i in range(dates.index(m.household.date_closed), len(dates)):
+                members_stats[i] -= 1        
+    members_data = [{'nb': str(members_stats[i]), 'date': dates[i].isoformat(), 'label': str(members_stats[i])} for i in range(len(dates))]
+    
+    # return
+    return render(request, 'base/menbersstats.html', {'households_data': households_data, 'members_data': members_data})
+    
 
 class HouseholdCreate(CreateView):
     model = Household
@@ -315,7 +354,7 @@ class HouseholdCreate(CreateView):
 
 class HouseholdUpdate(UpdateView):
     model = Household
-    fields = ['number', 'name', 'address', 'comment']
+    fields = ['number', 'name', 'date_closed', 'address', 'comment']
     template_name = 'base/household.html'
     success_url = reverse_lazy('base:members')
 
@@ -379,7 +418,7 @@ def detail_provider(request, provider_id):
 ### notes
 def notes(request):
     columns = ['date', 'auteur', 'message', 'message lu ?', 'action(s) réalisée(s) ?']
-    notes = [{"id": p.id, "date": p.date.strftime("%Y/%m/%d"), "auteur": str(p.who), "message": p.message, 'message lu ?': bool_to_utf8(p.read), 'action(s) réalisée(s) ?': bool_to_utf8(p.action)}
+    notes = [{"id": p.id, "date": p.date.strftime("%d/%m/%Y"), "auteur": str(p.who), "message": p.message, 'message lu ?': bool_to_utf8(p.read), 'action(s) réalisée(s) ?': bool_to_utf8(p.action)}
              for p in Note.objects.all()]
     columns = json.dumps(columns)
     notes = json.dumps(notes)

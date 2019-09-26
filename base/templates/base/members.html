@@ -9,10 +9,21 @@
 	Cette page sert à :
 	 <ul>
 	  <li>créer un nouveau foyer ;</li>
+	  <li>modifier les informations d'un foyer (adresse, email, membres, etc.) ;</li>
+	  <li>voir l'évolution du nombre de foyers et de membres ;</li>
 	  <li>obtenir des informations sur un foyer.</li>
-	</ul>
+	</ul> 
+	Si un foyer a été clotûré et qu'il y a une demande de réouverture, en recréer un avec un numéro d'adhérent différent.
+	</br></br>
+	Il y a actuellement {{ txt_number_h | safe }} foyers actifs et {{ txt_number_m | safe }} membres enregistrés.
+    <br>
+	<br>
 	</h6>
 </div>
+<div class="row justify-content-center">
+	<a class="btn btn-info" href="{% url 'base:membersstats' %}">Voir l'évolution du nombre de foyers et de membres.</a>
+</div>
+</br>
 <div class="row justify-content-center">
   <a class="btn btn-info" href="{% url 'base:create_household' %}">Créer un nouveau foyer</a>
 </div>
