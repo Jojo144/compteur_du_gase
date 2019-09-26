@@ -329,7 +329,7 @@ def detail_provider(request, provider_id):
 ## inventaire
 
 def inventory(request):
-    pdts = Product.objects.all()
+    pdts = Product.objects.all().order_by('visible', 'name')
     if request.method == 'POST':
         form = ProductList(pdts, request.POST)
         if form.is_valid():

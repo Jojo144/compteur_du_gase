@@ -24,7 +24,7 @@ class ProductList(forms.Form):
     def __init__(self, pdts, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for p in pdts:
-            help_text = "{} € / {}, stock actuel : {} {}".format(p.price, p.unit, round_stock(p.stock), p.unit)
+            help_text = "{} € / {}, stock actuel théorique : {} {}".format(p.price, p.unit, round_stock(p.stock), p.unit)
             self.fields[str(p.pk)] = forms.DecimalField(label=p.name, help_text=help_text, required=False)
 
 

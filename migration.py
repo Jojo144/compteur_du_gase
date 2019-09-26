@@ -23,10 +23,10 @@ product_table = "PRODUITS"
 migrate_categories=False
 migrate_providers=False
 migrate_products=False
-migrate_members=True
+migrate_members=False
 migrate_appro_comptes=False
 migrate_change_stock=False
-migrate_achats=False
+migrate_achats=True
 
 
 # FIN DE LA PERSONALISATION
