@@ -45,10 +45,13 @@ class Provider(models.Model):
 def get_advised_household_number():
     numbers = [p.number for p in Household.objects.all()]
     i = 1
+    if i not in numbers:
+        return i
     while i not in numbers:
         i += 1
     return i
-        
+
+
 def validate_household_number(value):
     if value in [getattr(p, 'number') for p in Household.objects.all()]:
         advised_value = get_advised_household_number()
