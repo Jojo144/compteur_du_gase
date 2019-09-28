@@ -9,18 +9,17 @@
     <br>
 
     <ul>
-	{% for e in ecarts %}
-	<li>
-	    {{ e.date  | date:"l d F Y" | capfirst }} ---
-	    <strong>Total :</strong> {{ e.result | round2 }} € <br>
-	    <ul>
-		{% for d in e.details %}
-		<li> {{ d.product }} : {{ d | print_quantity_op }} ({{ d.price | round2 }} €) </li>
-		{% endfor %}
-		<br>
-	    </ul>
-	</li>
-	{% endfor %}
+        {% for e in ecarts %}
+        <li>
+            {{ e.date | date:"l d F Y" | capfirst }} ---
+            <strong>Total :</strong> {{ e.result | round2 }} € <br>
+            <ul>
+                {% for d in e.details %}
+                <li> {{ d.product }} : {{ d | print_quantity_op }} ({{ d.price | round2 }} €)</li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% endfor %}
     </ul>
 </div>
 {% endblock content %}

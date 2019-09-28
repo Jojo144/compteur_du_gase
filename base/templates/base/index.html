@@ -4,13 +4,12 @@
 
 {% block content %}
 <div class="row justify-content-center">
-  {{ txt_home | safe }}
+    {{ txt_home | safe }}
 </div>
-</br>
 <div class="row justify-content-center">
-  {{ txt_message | safe }}
+    {{ txt_message | safe }}
 </div>
-</br>
-</br>
-<img src="{% static "base/logo.png" %}" alt=" " class="center">
+<div class="row justify-content-center">
+    <img src="{% static " base\logo.png" %}" alt=" " class="center">
+</div>
 {% endblock content %}

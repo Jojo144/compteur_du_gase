@@ -1,26 +1,26 @@
 <div id="vue-table">
 
-  <form id="filter">
-    <input type="text" v-model="search" class="form-control" />
-  </form>
+    <form id="filter">
+        <input type="text" v-model="search" class="form-control"/>
+    </form>
 
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
-	  [[ _.capitalize(column) ]]
-	  <!-- <span class="arrow" :class="sortKey > 0 ? 'asc' : 'dsc'"></span> -->
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="x in filter()">
-        <td v-for="column in columns">
-	  [[ x[column] ]]
-	</td>
-      </tr>
-    </tbody>
-  </table>  
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
+                [[ _.capitalize(column) ]]
+                <!-- <span class="arrow" :class="sortKey > 0 ? 'asc' : 'dsc'"></span> -->
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="x in filter()">
+            <td v-for="column in columns">
+                [[ x[column] ]]
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
 </div>
 
@@ -29,41 +29,43 @@
       delimiters: ['[[', ']]'],
       el: '#vue-table',
       data: {
-	  sortKey: 'name',
-	  search: '',
-	  reverse: false,
-	  columns: {{ columns | safe }},
-	  
-	  raw_data: {{ pdts | safe }}
+      sortKey: 'name',
+      search: '',
+      reverse: false,
+      columns: {{ columns | safe }},
+      
+      raw_data: {{ pdts | safe }}
       },
 
       computed: {
-	  orderedData: function () {
-	      var data = _.orderBy(this.raw_data, this.sortKey);
-	      if (this.reverse) {
-		  return _.reverse(data)
-	      } else {
-		  return data
-	      }
-	  }
+      orderedData: function () {
+          var data = _.orderBy(this.raw_data, this.sortKey);
+          if (this.reverse) {
+          return _.reverse(data)
+          } else {
+          return data
+          }
+      }
       },
 
       methods: {
-	  sortBy: function(sortKey) {
-	      this.reverse = (this.sortKey == sortKey) ? ! this.reverse : false;
-	      this.sortKey = sortKey
-	  },
+      sortBy: function(sortKey) {
+          this.reverse = (this.sortKey == sortKey) ? ! this.reverse : false;
+          this.sortKey = sortKey
+      },
 
-	  filter: function () {
-	      var filterKey = this.search.toLowerCase();
-	      var data = this.orderedData;
-	      data = data.filter(function (row) {
-		  return Object.keys(row).some(function (key) {
-		      return String(row[key]).toLowerCase().indexOf(filterKey) > -1
-		  })
+      filter: function () {
+          var filterKey = this.search.toLowerCase();
+          var data = this.orderedData;
+          data = data.filter(function (row) {
+          return Object.keys(row).some(function (key) {
+              return String(row[key]).toLowerCase().indexOf(filterKey) > -1
+          })
               });
-	      return data
-	  }
+          return data
+      }
       }
   })
+
+
 </script>

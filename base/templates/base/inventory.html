@@ -13,8 +13,8 @@ Ne pas oublier de bien tarer la balance et de faire attention aux unités. Bon c
     {% csrf_token %}
     {{ form | crispy }}
     <div class="form-buttons">
-	<a class="btn btn-light" href="{% url 'base:gestion' %}">Annuler</a> &nbsp;
-	<input class="btn btn-info" type="submit" value="Mettre les stocks à jour">
+        <a class="btn btn-light" href="{% url 'base:gestion' %}">Annuler</a> &nbsp;
+        <input class="btn btn-info" type="submit" value="Mettre les stocks à jour">
     </div>
 </form>
 {% endblock content %}

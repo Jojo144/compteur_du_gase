@@ -5,32 +5,34 @@
 
 <div id="vue-table">
 
-  <div id="print-total"></div>
-  <div>Ici, c'est le prix de vente qui est pris en compte. La valeur des achats de l'épicerie peut être connue quant-à-elle dans la section correspondante.</div>
-  </br>
-  <form class="form-inline">
-  <div class="text-right filter">
-      <input type="text" v-model="search" class="form-control" size="50" placeholder="Tapez pour filtrer par fournisseur, par produit ou par catégorie...">
-  </div>
-  </form>
+    <div id="print-total"></div>
+    <div class="description">Ici, c'est le prix de vente qui est pris en compte. La valeur des achats de l'épicerie peut
+        être connue quant à elle dans la section correspondante.
+    </div>
+    <form class="form-inline">
+        <div class="text-right filter">
+            <input type="text" v-model="search" class="form-control" size="50"
+                   placeholder="Tapez pour filtrer par fournisseur, par produit ou par catégorie...">
+        </div>
+    </form>
 
-  <table id="table" class="table table-striped">
-    <thead>
-      <tr>
-        <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
-      [[ _.capitalize(column) ]]
-      [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="x in filter()">
-        <td v-for="column in columns">
-      [[ x[column] ]]
-    </td>
-      </tr>
-    </tbody>
-  </table>
+    <table id="table" class="table table-striped">
+        <thead>
+        <tr>
+            <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
+                [[ _.capitalize(column) ]]
+                [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="x in filter()">
+            <td v-for="column in columns">
+                [[ x[column] ]]
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
 </div>
 
@@ -95,6 +97,9 @@
   })
 
   vue.filter();
+
+
+
 
 </script>
 {% endblock %}

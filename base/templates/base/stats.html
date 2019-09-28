@@ -31,38 +31,38 @@ Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
              label: 'Stock de {{ pdt }}',
              backgroundColor: 'rgb(255, 99, 132)',
              borderColor: 'rgb(255, 99, 132)',
-	     fill: false,
-	     lineTension: 0,
-	     data: [
-		 {% for d in data %}
-		 { x: new Date('{{d.date}}'), y: {{d.stock}}, label: '{{d.label}}' },
-		 {% endfor %}
-	     ]
+         fill: false,
+         lineTension: 0,
+         data: [
+         {% for d in data %}
+         { x: new Date('{{d.date}}'), y: {{d.stock}}, label: '{{d.label}}' },
+         {% endfor %}
+         ]
          }]
      },
 
      options: {
-	 title: { text: 'Bla bla' },
-	 scales: {
+     title: { text: 'Bla bla' },
+     scales: {
              xAxes: [{
                  type: 'time',
-		 time: {min: init_date}
+         time: {min: init_date}
              }],
-	     yAxes: [{
-		 scaleLabel: {
-		     display: true,
-		     labelString: 'Stock ({{ pdt.unit }})'
-		 }
-	     }]
-	 },
+         yAxes: [{
+         scaleLabel: {
+             display: true,
+             labelString: 'Stock ({{ pdt.unit }})'
+         }
+         }]
+     },
          tooltips: {
              callbacks: {
                  label: function(tooltipItem, data) {
-		     var o = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+             var o = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
                      return o.label + ". Stock: " + o.y;
                  }
              }
-	 },
+     },
      }
  });
 
@@ -79,5 +79,6 @@ Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
      chart.options.scales.xAxes[0].time.min = date;
      chart.update();
  });
+
 </script>
 {% endblock content %}
