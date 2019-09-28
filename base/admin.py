@@ -7,8 +7,9 @@ from django.contrib.auth.models import User, Group
 class MemberInline(admin.TabularInline):
     model = Member
 
+
 class HouseholdAdmin(admin.ModelAdmin):
-    inlines = [ MemberInline, ]
+    inlines = [MemberInline, ]
 
 
 admin.site.unregister(User)

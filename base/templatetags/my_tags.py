@@ -7,15 +7,18 @@ register = template.Library()
 def neg(value):
     return - value
 
+
 # (pas de chiffre après la virgule)
 @register.filter
 def round0(value):
     return '{0:.0f}'.format(value)
 
+
 # utilisé pour afficher des sommes d'argents (2 chiffres après la virgule)
 @register.filter
 def round2(value):
     return '{0:.2f}'.format(value)
+
 
 @register.filter
 def round_stock(value):
@@ -31,6 +34,7 @@ def round_stock(value):
     else:
         return '{0:.3f}'.format(value)
 
+
 @register.filter
 def comma_to_dot(value):
     return str(value).replace(',', '.')
@@ -42,18 +46,20 @@ def bool_to_utf8(b):
     else:
         return "✘"
 
+
 @register.filter
 def print_quantity_op(op):
     q = round_stock(op.quantity)
-    if q=='1' or q=='-1' or q =='0' or (not op.product.unit.pluralize):
+    if q == '1' or q == '-1' or q == '0' or (not op.product.unit.pluralize):
         return str(q) + ' ' + str(op.product.unit)
     else:
         return str(q) + ' ' + str(op.product.unit) + 's'
 
+
 @register.filter
 def print_neg_quantity_op(op):
     q = round_stock(-op.quantity)
-    if q=='1' or q=='-1' or q =='0' or (not op.product.unit.pluralize):
+    if q == '1' or q == '-1' or q == '0' or (not op.product.unit.pluralize):
         return str(q) + ' ' + str(op.product.unit)
     else:
         return str(q) + ' ' + str(op.product.unit) + 's'

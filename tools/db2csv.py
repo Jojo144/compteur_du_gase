@@ -4,7 +4,7 @@ import sqlite3
 # settings
 
 delimiter = ";"
-output_directory  = "./csv"
+output_directory = "./csv"
 
 # end settings
 
@@ -32,18 +32,18 @@ for table in tables:
 
     # set cursor
     cursor.execute("SELECT * FROM {0:s}".format(table))
-    
+
     # get description
     names = [description[0] for description in cursor.description]
-    
+
     # write header
     fw.write((" " + delimiter).join(names) + "\n")
-    
+
     # write data
     for result in cursor:
         print(result)
         fw.write((" " + delimiter).join([str(r).replace("\n", " ").replace("\r", " ") for r in result]) + "\n")
-        
+
     # close file
     fw.close()
 
