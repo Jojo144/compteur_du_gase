@@ -342,10 +342,9 @@ class HouseholdCreate(CreateView):
         members = context['members']
         with transaction.atomic():
             form.instance.created_by = self.request.user
-            if members.is_valid():
-                self.object = form.save()
-                members.instance = self.object
-                members.save()
+            if member.is_valid():
+                member.instance = form.save()
+                member.save()
                 messages.success(self.request, '✔ Foyer créé !')
             else:
                 return self.form_invalid(form)
@@ -371,10 +370,9 @@ class HouseholdUpdate(UpdateView):
         members = context['members']
         with transaction.atomic():
             form.instance.created_by = self.request.user
-            if members.is_valid():
-                self.object = form.save()
-                members.instance = self.object
-                members.save()
+            if member.is_valid():
+                member.instance = form.save()
+                member.save()
                 messages.success(self.request, '✔ Foyer mis à jour !')
             else:
                 return self.form_invalid(form)
