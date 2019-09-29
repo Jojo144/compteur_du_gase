@@ -20,17 +20,26 @@ Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
 
 <script>
  moment.locale('fr');
+ var style = getComputedStyle(document.body);
+ var chartCol1 = style.getPropertyValue('--chartColor1');
+ var chartColorText = style.getPropertyValue('--chartColorText');
+
+ Chart.defaults.global.defaultFontSize = 16;
+ Chart.defaults.global.defaultFontColor = chartColorText;
+
  var ctx = document.getElementById('myChart').getContext('2d');
  var init_date = new Date();
- init_date.setFullYear(init_date.getFullYear() - 1);
+ init_date.setMonth(init_date.getMonth() - 6);
+ var end_date = new Date();
+ end_date.setMonth(end_date.getMonth() + 1);
  var chart = new Chart(ctx, {
      type: 'line',
 
      data: {
          datasets: [{
              label: 'Stock de {{ pdt }}',
-             backgroundColor: 'rgb(255, 99, 132)',
-             borderColor: 'rgb(255, 99, 132)',
+             backgroundColor: chartCol1,
+             borderColor: chartCol1,
          fill: false,
          lineTension: 0,
          data: [
@@ -46,7 +55,7 @@ Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
      scales: {
              xAxes: [{
                  type: 'time',
-         time: {min: init_date}
+         time: {min: init_date, max: end_date}
              }],
          yAxes: [{
          scaleLabel: {

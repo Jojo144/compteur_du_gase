@@ -1,3 +1,9 @@
+:root {
+    --chartColor1: #00ccff;
+    --chartColor2: #ff6384;
+    --chartColorText: #999999;
+}
+
 .narrow-content {
     max-width: 30rem;
     margin-left: auto;

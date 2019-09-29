@@ -17,6 +17,14 @@
 
 <script>
  moment.locale('fr');
+ var style = getComputedStyle(document.body);
+ var chartCol1 = style.getPropertyValue('--chartColor1');
+ var chartCol2 = style.getPropertyValue('--chartColor2');
+ var chartColorText = style.getPropertyValue('--chartColorText');
+
+ Chart.defaults.global.defaultFontSize = 16;
+ Chart.defaults.global.defaultFontColor = chartColorText;
+
  var ctx = document.getElementById('myChart').getContext('2d');
  var init_date = new Date();
  init_date.setMonth(init_date.getMonth() - 6);
@@ -28,8 +36,8 @@
      data: {
          datasets: [{
              label: 'Nombre de foyers',
-             backgroundColor: 'rgb(255, 99, 132)',
-             borderColor: 'rgb(255, 99, 132)',
+             backgroundColor: chartCol1,
+             borderColor: chartCol1,
          fill: false,
          lineTension: 0,
          data: [
@@ -40,8 +48,8 @@
          },
          {
              label: 'Nombre de membres',
-             backgroundColor: 'rgb(0, 204, 255)',
-             borderColor: 'rgb(0, 204, 255)',
+             backgroundColor: chartCol2,
+             borderColor: chartCol2,
          fill: false,
          lineTension: 0,
          data: [
@@ -90,6 +98,7 @@
      chart.options.scales.xAxes[0].time.min = date;
      chart.update();
  });
+
 
 </script>
 {% endblock content %}
