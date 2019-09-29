@@ -24,11 +24,18 @@
 .form-buttons input, .form-buttons a {
     flex: 1;
 }
-.center {
+
+.index-part {
   display: block;
+  margin-top: 1em;
   margin-left: auto;
   margin-right: auto;
-  width: 33%;
+  text-align: center;
+  justify-content: center !important;
+}
+
+.index-logo {
+  width : 30%;
 }
 
 .description {
