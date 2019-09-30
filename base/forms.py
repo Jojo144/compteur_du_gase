@@ -21,12 +21,19 @@ class ApproCompteForm(forms.Form):
                                 help_text="♥ Merci d'approvisionner votre compte <strong>après</strong> avoir réalisé "
                                           "le virement (ou alors de ne vraiment pas oublier !).",
                                 decimal_places=2)
+
     kind = forms.ChoiceField(label="Type d'approvisionnement", choices=ApproCompteOp.KIND_CHOICES,
                              help_text="Chèque ou espèces pour un approvisionnement normal (valeur positive)"
                                        "</br>Annulation/correction pour corriger une erreur "
                                        "de saisie (valeur positive ou négative)"
                                        "</br>Remboursement pour un remboursement ou "
                                        "lorsque le foyer clotûre son compte (valeur négative)")
+
+    def __init__(self, *args, **kwargs):
+        super(ApproCompteForm, self).__init__(*args, **kwargs)
+        if not LocalSettings.objects.first().use_appro_kind:
+            self.fields.pop('kind')
+
 
 
 # utilisé pour inventaire ET appro stock

@@ -13,7 +13,10 @@
 </div>
 {% endif %}
 
+{% if use_logo_str == 'True' %}
 <div class="index-part">
     <img src="{% static "base\logo.png" %}" alt=" " class="index-logo">
 </div>
+{% endif %}
+
 {% endblock content %}

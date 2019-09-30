@@ -11,13 +11,13 @@
         <li> créer/modifier/supprimer des informations renseignées dans la base de données
             (une fois un objet supprimé on ne peut pas le retrouver, à utiliser avec modération donc.
             Attention si l'on supprime un fournisseur ou une catégorie cela supprime
-            également tous les produits correspondants (le logiciel demande confirmation avant));
+            également tous les produits correspondants (le logiciel demande confirmation avant)) ;
         </li>
         <li>
-            régler le seuil en dessous duquel on ne peut plus faire d'achats (dans "Réglages divers").
+            régler le seuil en dessous duquel on ne peut plus faire d'achats (dans "Réglages divers") ;
         </li>
         <li>
-            Modifier les options du logciel (dans "Réglages divers").
+            modifier les options du logciel (dans "Réglages divers").
         </li>
     </ul>
 
@@ -42,16 +42,16 @@
     </div>
 
     <h4>Valeur des approvisionnements des foyers</h4>
-    Valeur des approvisionnements : {{ value_appro | round0 }} €
+    Valeur des approvisionnements des foyers : {{ value_appro | round0 }} €
     <div class="gestion-btn">
         <a class="btn btn-info" href="{% url 'base:compteslist' %}">Liste détaillées des approvisionnements des
             foyers</a>
     </div>
 
-    <h4>Valeur des approvisionnements de l'épicerie</h4>
-    Valeur des approvisionnements : {{ value_purchase | round0 }} €
+    <h4>Valeur des approvisionnements du stock de l'épicerie</h4>
+    Valeur des approvisionnements du stock de l'épicerie : {{ value_purchase | round0 }} €
     <div class="gestion-btn">
-        <a class="btn btn-info" href="{% url 'base:approslist' %}">Liste détaillées des approvisionnements de
+        <a class="btn btn-info" href="{% url 'base:approslist' %}">Liste détaillées des approvisionnements du stock de
             l'épicerie</a>
     </div>
 

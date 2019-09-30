@@ -1,12 +1,12 @@
 {% extends "base/base.html" %}
 
 {% block content %}
-<h4>Liste détaillées des approvisionnements de l'épicerie</h4>
+<h4>Liste détaillées des approvisionnements du stock de l'épicerie</h4>
 
 <div id="vue-table">
 
     <div id="print-total"></div>
-    <div class="description">Ici, c'est le prix d'achat qui est pris en compte. La valeur du stock peut être connue
+    <div class="description">Ici, c'est le prix d'achat ou le prix de vente qui est pris en compte (selon l'option activée). La valeur du stock peut être connue
         quant à elle dans la section correspondante.
     </div>
     <form class="form-inline">
@@ -176,7 +176,7 @@
 
           this.total = this.total_sum(data);
 
-          document.getElementById("print-total").innerHTML = "Total des approvisionnements de l'épicerie sélectionnés : <b>" + this.total + " €</b>";
+          document.getElementById("print-total").innerHTML = "Total des approvisionnements du stock de l'épicerie sélectionnés : <b>" + this.total + " €</b>";
 
           return data
       },
@@ -184,7 +184,11 @@
       total_sum: function(data){
           let sum = 0;
           data.forEach(function(element) {
-              sum += parseInt(element["coût total"].replace('€', ''));
+              {% if use_cost_of_purchase_str == 'True' %}
+              sum += parseInt(element["coût total (prix d'achat)"].replace('€', ''));
+              {% else %}
+              sum += parseInt(element["coût total (prix de vente)"].replace('€', ''));
+              {% endif %}
           });
           console.log(sum);
          return sum;

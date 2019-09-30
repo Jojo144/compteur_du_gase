@@ -55,7 +55,9 @@ def index(request):
     txt_message = "Il y a actuellement {0:d} message{1:s} non lu{1:s} et {2:d} action{3:s} non réalisée{3:s}.".format(
         note_not_read, note_pluralize, action_not_done, action_pluralize)
 
-    return render(request, 'base/index.html', {'txt_home': txt_home, 'txt_message': txt_message})
+    use_logo_str = str(LocalSettings.objects.first().use_logo)
+
+    return render(request, 'base/index.html', {'txt_home': txt_home, 'txt_message': txt_message, 'use_logo_str' : use_logo_str})
 
 
 def gestion(request):
@@ -65,7 +67,10 @@ def gestion(request):
     alert_pdts = [p for p in Product.objects.filter(stock_alert__isnull=False, visible=True).order_by('name') if
                   p.stock < p.stock_alert]
     value_appro = sum([p.amount for p in ApproCompteOp.objects.all()])
-    value_purchase = sum([p.cost_of_purchase() for p in ChangeStockOp.objects.filter(label="ApproStock")])
+    if LocalSettings.objects.first().use_cost_of_purchase:
+        value_purchase = sum([p.cost_of_purchase() for p in ChangeStockOp.objects.filter(label="ApproStock")])
+    else:
+        value_purchase = sum([p.cost_of_price() for p in ChangeStockOp.objects.filter(label="ApproStock")])
 
     return render(request, 'base/gestion.html',
                   {'value_stock': value_stock,
@@ -186,7 +191,9 @@ def compte(request, household_id):
 
 
 def compteslist(request):
-    columns = ['jour', 'mois', 'année', 'foyer', 'approvisionnement', 'type']
+    columns = ['jour', 'mois', 'année', 'foyer', 'approvisionnement']
+    if LocalSettings.objects.first().use_appro_kind:
+        columns.append("type")
     comptes = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "foyer": str(p.household),
                 "approvisionnement": '{} €'.format(p.amount), "type": p.get_kind_display()}
                for p in ApproCompteOp.objects.all()]
@@ -225,7 +232,9 @@ def detail_product(request, product_id):
 
 
 def products(request):
-    columns = ['nom', 'catégorie', 'fournisseur', "prix d'achat", 'prix de vente', 'vrac', 'visible', 'stock']
+    columns = ['nom', 'catégorie', 'fournisseur', 'prix de vente', 'vrac', 'visible', 'stock']
+    if LocalSettings.objects.first().use_cost_of_purchase:
+        columns.insert(3, "prix d'achat")
     pdts = [{"id": p.id, "nom": p.name, "catégorie": str(p.category), "fournisseur": str(p.provider),
              "prix d'achat": '{} € / {}'.format(p.cost_of_purchase, p.unit),
              "prix de vente": '{} € / {}'.format(p.price, p.unit), "vrac": bool_to_utf8(p.unit.vrac),
@@ -283,13 +292,17 @@ def appro(request, provider_id):
 
 
 def approslist(request):
-    columns = ['jour', 'mois', 'année', 'fournisseur', 'produit', 'coût total']
+    columns = ['jour', 'mois', 'année', 'fournisseur', 'produit', "coût total (prix de vente)"]
+    use_cost_of_purchase_str = str(LocalSettings.objects.first().use_cost_of_purchase)
+    if LocalSettings.objects.first().use_cost_of_purchase:
+        columns.append("coût total (prix d'achat)")
     appros = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "fournisseur": str(p.product.provider),
-               "produit": str(p.product), "coût total": '{0:.2f} €'.format(p.cost_of_purchase())}
+               "produit": str(p.product), "coût total (prix d'achat)": '{0:.2f} €'.format(p.cost_of_purchase()),
+               "coût total (prix de vente)": '{0:.2f} €'.format(p.cost_of_price())}
               for p in ChangeStockOp.objects.filter(label="ApproStock")]
     columns = json.dumps(columns)
     appros = json.dumps(appros)
-    return render(request, 'base/approslist.html', {'columns': columns, 'appros': appros})
+    return render(request, 'base/approslist.html', {'columns': columns, 'appros': appros, 'use_cost_of_purchase_str' : use_cost_of_purchase_str})
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -312,9 +325,12 @@ def stockslist(request):
 
 def members(request):
     columns = ['nom', "numéro d'adhérent", "date d'adhésion", "date de clotûre", 'foyer', 'email', 'bigophone']
+    if LocalSettings.objects.first().use_subscription:
+        columns.insert(4, "costisation d'adhésion du foyer")
     members_data = [{"id": p.id, "nom": p.name, "numéro d'adhérent": p.household.get_formated_number(),
                      "date d'adhésion": p.household.date.strftime("%d/%m/%Y"),
                      "date de clotûre": p.household.get_formated_date_closed("%d/%m/%Y"), "foyer": str(p.household),
+                     "costisation d'adhésion du foyer" : '{0:.2f} €'.format(p.household.subscription),
                      "email": p.email, "bigophone": p.tel, "household_id": p.household.id if p.household else 0}
                     for p in Member.objects.all()]
     columns = json.dumps(columns)
@@ -369,6 +385,8 @@ def menbersstats(request):
 class HouseholdCreate(CreateView):
     model = Household
     fields = ['number', 'name', 'address', 'comment']
+    if LocalSettings.objects.first().use_subscription:
+        fields.insert(3, "subscription")
     template_name = 'base/household.html'
     success_url = reverse_lazy('base:members')
 
