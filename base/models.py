@@ -2,6 +2,42 @@ from django.db import models
 from django.core.exceptions import ValidationError
 
 
+# there should be only one instance of this model
+class LocalSettings(models.Model):
+    min_account = models.DecimalField(max_digits=10, decimal_places=2, default=0,
+                                      verbose_name="seuil en dessous duquel on ne peut plus faire d'achat (en €)")
+
+    txt_home = models.TextField(blank=True, default="<i>Bienvenu·e au GASE</i>",
+                                verbose_name="texte de la page d'accueil (doit être donnée en code html)")
+
+    use_messages = models.BooleanField(verbose_name="Utilisation de la fonction messages/actions ?", default=True,
+                                       help_text="La fonction messages/actions sert à laisser des messages"
+                                                 "entre les différentes permanences ou lister des actions à faire.")
+
+    use_appro_kind = models.BooleanField(verbose_name="Utilisation de la fonction type de paiement ?", default=True,
+                                         help_text="La fonction type de paiement permet de sauvegarder le moyen "
+                                                   "de paiement utilisé.")
+
+    use_subscription = models.BooleanField(verbose_name="Utilisation de la fonction cotisation d'adhésion ?", default=True,
+                                           help_text="La fonction adhésion permet de renseigner la cotisation d'adhésion"
+                                                     "d'adhésion du foyer.")
+
+    use_cost_of_purchase = models.BooleanField(verbose_name="Utilisation de la fonction prix d'achat ?", default=True,
+                                               help_text="La fonction prix d'achat permet de spécifier un prix d'achat "
+                                                         "différent du prix de vente.")
+
+    use_logo = models.BooleanField(verbose_name="Affiche le logo dans la première page ?", default=True,
+                                       help_text="Le fichier de logo doit être placé dans le répertoire base\static\base"
+                                                 " et son nom de fichier doit etre logo.png.")
+
+    use_favicon = models.BooleanField(verbose_name="Affiche une favicon ?", default=True,
+                                       help_text="Le fichier favicon doit être placé dans le répertoire base\static\base"
+                                                 " et son nom de fichier doit etre favicon.ico.")
+
+    class Meta:
+        verbose_name = "Réglages divers"
+
+
 class Category(models.Model):
     name = models.CharField(max_length=200, verbose_name="Nom")
 
@@ -258,37 +294,4 @@ class Note(models.Model):
                                  help_text="Si aucune action n'est nécessaire, côcher cette case.")
 
 
-# there should be only one instance of this model
-class LocalSettings(models.Model):
-    min_account = models.DecimalField(max_digits=10, decimal_places=2, default=0,
-                                      verbose_name="seuil en dessous duquel on ne peut plus faire d'achat (en €)")
 
-    txt_home = models.TextField(blank=True, default="<i>Bienvenu·e au GASE</i>",
-                                verbose_name="texte de la page d'accueil (doit être donnée en code html)")
-
-    use_messages = models.BooleanField(verbose_name="Utilisation de la fonction messages/actions ?", default=True,
-                                       help_text="La fonction messages/actions sert à laisser des messages"
-                                                 "entre les différentes permanences ou lister des actions à faire.")
-
-    use_appro_kind = models.BooleanField(verbose_name="Utilisation de la fonction type de paiement ?", default=True,
-                                         help_text="La fonction type de paiement permet de sauvegarder le moyen "
-                                                   "de paiement utilisé.")
-
-    use_subscription = models.BooleanField(verbose_name="Utilisation de la fonction cotisation d'adhésion ?", default=True,
-                                           help_text="La fonction adhésion permet de renseigner la cotisation d'adhésion"
-                                                     "d'adhésion du foyer.")
-
-    use_cost_of_purchase = models.BooleanField(verbose_name="Utilisation de la fonction prix d'achat ?", default=True,
-                                               help_text="La fonction prix d'achat permet de spécifier un prix d'achat "
-                                                         "différent du prix de vente.")
-
-    use_logo = models.BooleanField(verbose_name="Affiche le logo dans la première page ?", default=True,
-                                       help_text="Le fichier de logo doit être placé dans le répertoire base\static\base"
-                                                 " et son nom de fichier doit etre logo.png.")
-
-    use_favicon = models.BooleanField(verbose_name="Affiche une favicon ?", default=True,
-                                       help_text="Le fichier favicon doit être placé dans le répertoire base\static\base"
-                                                 " et son nom de fichier doit etre favicon.ico.")
-
-    class Meta:
-        verbose_name = "Réglages divers"

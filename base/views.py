@@ -385,10 +385,15 @@ def menbersstats(request):
 class HouseholdCreate(CreateView):
     model = Household
     fields = ['number', 'name', 'address', 'comment']
-    if LocalSettings.objects.first().use_subscription:
-        fields.insert(3, "subscription")
     template_name = 'base/household.html'
     success_url = reverse_lazy('base:members')
+
+    def __init__(self, *args, **kwargs):
+        super(HouseholdCreate, self).__init__(*args, **kwargs)
+        fields = ['number', 'name', 'address', 'comment']
+        if LocalSettings.objects.first().use_subscription:
+            fields.insert(3, "subscription")
+        self.fields = fields
 
     def get_initial(self):
         initial = super(HouseholdCreate, self).get_initial()
@@ -422,6 +427,13 @@ class HouseholdUpdate(UpdateView):
     fields = ['number', 'name', 'date_closed', 'address', 'comment']
     template_name = 'base/household.html'
     success_url = reverse_lazy('base:members')
+
+    def __init__(self, *args, **kwargs):
+        super(HouseholdUpdate, self).__init__(*args, **kwargs)
+        fields = ['number', 'name', 'date_closed', 'address', 'comment']
+        if LocalSettings.objects.first().use_subscription:
+            fields.insert(4, "subscription")
+        self.fields = fields
 
     def get_context_data(self, **kwargs):
         data = super(HouseholdUpdate, self).get_context_data(**kwargs)
