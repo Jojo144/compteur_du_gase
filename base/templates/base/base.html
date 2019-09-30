@@ -37,7 +37,7 @@
                 <li><a class="nav-item nav-link" href="{% url 'base:pre_appro' %}">Réception de commande</a></li>
                 <li><a class="nav-item nav-link" href="{% url 'base:products' %}">Produits</a></li>
                 <li><a class="nav-item nav-link" href="{% url 'base:providers' %}">Fournisseurs</a></li>
-                <li><a class="nav-item nav-link" href="{% url 'base:notes' %}">Messages/Actions</a></li>
+                {% if use_messages_str == 'True' %} <li><a class="nav-item nav-link" href="{% url 'base:notes' %}">Messages/Actions</a></li> {% endif %}
                 <li><a class="nav-item nav-link" href="{% url 'base:gestion' %}">☭ Gestion</a></li>
             </ul>
         </nav>
@@ -49,14 +49,6 @@
         {% endfor %}
         <script>
          $("span.message").delay(5000).fadeOut();
-
-
-
-
-
-
-
-
         </script>
     </div>
 

@@ -258,5 +258,9 @@ class LocalSettings(models.Model):
     txt_home = models.TextField(blank=True, default="<i>Bienvenu·e au GASE</i>",
                                 verbose_name="texte de la page d'accueil (doit être donnée en code html)")
 
+    use_messages = models.BooleanField(verbose_name="Utilisation de la fonction messages/actions ?", default=True,
+                                       help_text="La fonction messages/actions sert à laisser des messages"
+                                                 "entre les différentes permanences ou lister des actions à faire.")
+
     class Meta:
         verbose_name = "Réglages divers"

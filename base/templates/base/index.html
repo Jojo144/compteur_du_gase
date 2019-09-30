@@ -6,9 +6,13 @@
 <div class="index-part">
     {{ txt_home | safe }}
 </div>
+
+{% if use_messages_str == 'True' %}
 <div class="index-part">
     {{ txt_message | safe }}
 </div>
+{% endif %}
+
 <div class="index-part">
     <img src="{% static "base\logo.png" %}" alt=" " class="index-logo">
 </div>
