@@ -239,6 +239,8 @@ class ChangeStockOp(Operation):
     def cost_of_purchase(self):
         if self.label != "ApproStock":
             raise TypeError("Operation must be filter with label==ApproStock")
+        if self.product is None:
+            return 0
         return self.product.cost_of_purchase * self.quantity
 
     def cost_of_price(self):
