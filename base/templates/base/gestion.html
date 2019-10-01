@@ -72,6 +72,13 @@
         <a class="btn btn-info" href="{% url 'base:membersstats' %}">Evolution du nombre de foyers et de membres.</a>
     </div>
 
+    {% if save_mails_str == 'True' %}
+    <h4>Liste des emails</h4>
+    <div class="gestion-btn">
+        <a class="btn btn-info" href="{% url 'base:mailslist' %}">Liste des emails envoyés ou en attente.</a>
+    </div>
+    {% endif %}
+
     <h4>Astuces</h4>
     <ul>
         <li>

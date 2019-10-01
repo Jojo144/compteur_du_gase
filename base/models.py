@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django import forms
 
 
 # there should be only one instance of this model
@@ -33,6 +34,35 @@ class LocalSettings(models.Model):
     use_favicon = models.BooleanField(verbose_name="Affiche une favicon ?", default=True,
                                        help_text="Le fichier favicon doit être placé dans le répertoire base\static\base"
                                                  " et son nom de fichier doit etre favicon.ico.")
+
+    use_mail = models.BooleanField(verbose_name="Utilisation de la fonction envoi d'email ?", default=True,
+                                   help_text="Cette fonction permet d'envoyer les tickets de caisse ou "
+                                             "des alertes stocks aux référents des produits.")
+
+    save_mail = models.BooleanField(verbose_name="Utilisation de la fonction de sauvegarde des emails ?", default=True,
+                                    help_text="Cette fonction permet de sauvegarder les emails envoyés ou en attente.")
+
+    prefix_object_mail = models.CharField(blank=True, verbose_name="Prefix dans l'objet des emails.", default="", max_length=15,
+                                          help_text="Un prefix est souvent encadré par des crochers, exemples : [GASE].")
+
+    debug_mail = models.CharField(blank=True, verbose_name="Si ce champ est renseigné, tous les emails lui seront envoyés.",
+                                  default="", max_length=50,
+                                  help_text="Ce champ permet de tester la fonction email sans envoyer de mails intempestifs.")
+
+    mail_host = models.CharField(blank=False, verbose_name="Hebergeur pour l'envoi des mails.",
+                                  default="", max_length=50,
+                                  help_text="Exemple : smtp.titi.com.")
+
+    mail_port = models.IntegerField(verbose_name="Port smtp pour l'envoi des mails.",
+                                    default=0,
+                                    help_text="Exemple : 587.")
+
+    mail_username = models.CharField(blank=False, verbose_name="Nom d'utilisateur pour l'envoi des mails.",
+                                     default="tata@titi.com", max_length=100,
+                                     help_text="Exemple : tata@titi.com.")
+
+    mail_passwd = models.CharField(blank=False, verbose_name="Mot de passe pour l'envoi des mails.",
+                                   default="xxx", max_length=100)
 
     class Meta:
         verbose_name = "Réglages divers"
@@ -295,5 +325,20 @@ class Note(models.Model):
     action = models.BooleanField(verbose_name="Action(s) réalisée(s) ?", default=False,
                                  help_text="Si aucune action n'est nécessaire, côcher cette case.")
 
+# mails
+class Mail(models.Model):
+    date = models.DateTimeField(auto_now=True)
+    message = models.TextField(blank=False, verbose_name="Message")
+    subject = models.TextField(blank=False, verbose_name="Sujet")
+    recipients = models.TextField(blank=False, verbose_name="Destinataires")
+    send = models.BooleanField(verbose_name="Message envoyé ?", default=False)
+
+    REFERENT = 'referent'
+    RECEIPT = 'receipt'
+    KIND_CHOICES = [
+        (REFERENT, 'Référent'),
+        (RECEIPT, 'Ticket de caisse'),
+    ]
+    kind = models.CharField(max_length=8, choices=KIND_CHOICES, default=REFERENT)
 
 

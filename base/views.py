@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
-from django.core.mail import send_mail
+from django.core.mail import send_mail, get_connection
 from django.views.generic.edit import CreateView, UpdateView
 from django.db import transaction
 from django.db.models import Sum
@@ -24,13 +24,66 @@ def get_local_settings():
     return localsettings
 
 
-def my_send_mail(request, subject, message, recipient_list, success_msg, error_msg):
+def add_prefix_subject(subject):
+    subject_mail = subject
+    subject_pre = str(get_local_settings().prefix_object_mail)
+    if subject_pre != "":
+        if subject_pre.endswith(' '):
+            subject_mail = subject_pre + subject_mail
+        else:
+            subject_mail = subject_pre + ' ' + subject_mail
+    return subject_mail
+
+
+def get_recipient_list(recipient_list):
+    if get_local_settings().debug_mail is not None:
+        if str(get_local_settings().debug_mail) != "":
+            print("*Mode de test pour les mails qui sont automatiquement envoyés à {}.".format(get_local_settings().debug_mail))
+            return [get_local_settings().debug_mail]
+        else:
+            return recipient_list
+    else:
+        return recipient_list
+
+
+def my_connection():
+    connection = get_connection(host=str(get_local_settings().mail_host),
+                                port=get_local_settings().mail_port,
+                                username=str(get_local_settings().mail_username).strip(),
+                                password=str(get_local_settings().mail_passwd).strip(),
+                                use_tls=True)
+    from_email = str(get_local_settings().mail_username)
+    return connection, from_email
+
+def my_send_mail(request, subject, message, recipient_list, success_msg, error_msg, kind, save=True):
+    if not get_local_settings().use_mail:
+        return True
     if recipient_list:
+        save_mail = save and get_local_settings().save_mail
+        if save_mail:
+            mail = Mail(recipients=', '.join(recipient_list), subject=subject, message=message, kind=kind)
+            mail.save()
         try:
-            send_mail('[Compteur de GASE] ' + subject, message, DEFAULT_FROM_EMAIL, recipient_list, fail_silently=False)
+            subject_mail = add_prefix_subject(subject)
+            recipient_list_cleaned = get_recipient_list(recipient_list)
+            connection, from_email = my_connection()
+            connection.open()
+            send_mail(subject_mail, message, from_email, recipient_list_cleaned, fail_silently=False,
+                      connection=connection)
+            connection.close()
+            if save_mail:
+                mail.send = True
+                mail.save()
             messages.success(request, '✔ ' + success_msg)
-        except:
+            return True
+        except Exception as e:
+            if save_mail:
+                mail.send = False
+                mail.save()
             messages.error(request, '✘ ' + error_msg)
+            print("Erreur lors de l'envoi du mail : {}".format(e))
+            return False
+    return False
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -55,7 +108,7 @@ def index(request):
     txt_message = "Il y a actuellement {0:d} message{1:s} non lu{1:s} et {2:d} action{3:s} non réalisée{3:s}.".format(
         note_not_read, note_pluralize, action_not_done, action_pluralize)
 
-    use_logo_str = str(LocalSettings.objects.first().use_logo)
+    use_logo_str = str(get_local_settings().use_logo)
 
     return render(request, 'base/index.html', {'txt_home': txt_home, 'txt_message': txt_message, 'use_logo_str' : use_logo_str})
 
@@ -67,7 +120,7 @@ def gestion(request):
     alert_pdts = [p for p in Product.objects.filter(stock_alert__isnull=False, visible=True).order_by('name') if
                   p.stock < p.stock_alert]
     value_appro = sum([p.amount for p in ApproCompteOp.objects.all()])
-    if LocalSettings.objects.first().use_cost_of_purchase:
+    if get_local_settings().use_cost_of_purchase:
         value_purchase = sum([p.cost_of_purchase() for p in ChangeStockOp.objects.filter(label="ApproStock")])
     else:
         value_purchase = sum([p.cost_of_price() for p in ChangeStockOp.objects.filter(label="ApproStock")])
@@ -78,7 +131,8 @@ def gestion(request):
                    'diff_values': value_accounts - value_stock,
                    'alert_pdts': alert_pdts,
                    'value_appro': value_appro,
-                   'value_purchase': value_purchase
+                   'value_purchase': value_purchase,
+                   'save_mails_str' : str(get_local_settings().save_mail)
                    })
 
 
@@ -120,15 +174,17 @@ def achats(request, household_id):
                     if ref:
                         my_send_mail(request, subject='Alerte de stock',
                                      message='Le stock de {} est bas : il reste {} unités'.format(pdt, pdt.stock),
-                                     recipient_list=ref,
+                                     recipient_list=[ref],
                                      success_msg='Alerte stock envoyée par mail',
-                                     error_msg='Erreur : l\'alerte stock n\'a pas été envoyée par mail')
+                                     error_msg='Erreur : l\'alerte stock n\'a pas été envoyée par mail',
+                                     kind=Mail.REFERENT)
         msg += "Ce qui nous donne un total de {} €.\n\nCiao!".format(s)
         messages.success(request, '✔ Votre compte a été débité de ' + str(round2(s)) + ' €')
         mails = household.get_emails_receipt()
         my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,
                      success_msg='Le ticket de caisse a été envoyé par mail',
-                     error_msg='Erreur : le ticket de caisse n\'a pas été envoyé par mail')
+                     error_msg='Erreur : le ticket de caisse n\'a pas été envoyé par mail',
+                     kind=Mail.RECEIPT)
         return HttpResponseRedirect(reverse('base:index'))
     else:
         localsettings = get_local_settings()
@@ -178,7 +234,8 @@ def compte(request, household_id):
             mails = household.get_emails_receipt()
             my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,
                          success_msg='Le ticket de caisse a été envoyé par mail',
-                         error_msg='Erreur : le ticket de caisse n\'a pas été envoyé par mail')
+                         error_msg='Erreur : le ticket de caisse n\'a pas été envoyé par mail',
+                         kind=Mail.RECEIPT)
             return HttpResponseRedirect(reverse('base:index'))
     else:
         form = ApproCompteForm()
@@ -192,7 +249,7 @@ def compte(request, household_id):
 
 def compteslist(request):
     columns = ['jour', 'mois', 'année', 'foyer', 'approvisionnement']
-    if LocalSettings.objects.first().use_appro_kind:
+    if get_local_settings().use_appro_kind:
         columns.append("type")
     comptes = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "foyer": str(p.household),
                 "approvisionnement": '{} €'.format(p.amount), "type": p.get_kind_display()}
@@ -233,7 +290,7 @@ def detail_product(request, product_id):
 
 def products(request):
     columns = ['nom', 'catégorie', 'fournisseur', 'prix de vente', 'vrac', 'visible', 'stock']
-    if LocalSettings.objects.first().use_cost_of_purchase:
+    if get_local_settings().use_cost_of_purchase:
         columns.insert(3, "prix d'achat")
     pdts = [{"id": p.id, "nom": p.name, "catégorie": str(p.category), "fournisseur": str(p.provider),
              "prix d'achat": '{} € / {}'.format(p.cost_of_purchase, p.unit),
@@ -281,7 +338,8 @@ def appro(request, provider_id):
             for (key, value) in msgs.items():
                 my_send_mail(request, subject='Approvisionnement', message=value, recipient_list=[key],
                              success_msg='Mail de confirmation envoyé au référent',
-                             error_msg='Erreur : le mail de confirmation n\'a pas été envoyé')
+                             error_msg='Erreur : le mail de confirmation n\'a pas été envoyé',
+                             kind=Mail.REFERENT)
             return HttpResponseRedirect(reverse('base:index'))
     else:
         form = ProductList(pdts)
@@ -293,8 +351,8 @@ def appro(request, provider_id):
 
 def approslist(request):
     columns = ['jour', 'mois', 'année', 'fournisseur', 'produit', "coût total (prix de vente)"]
-    use_cost_of_purchase_str = str(LocalSettings.objects.first().use_cost_of_purchase)
-    if LocalSettings.objects.first().use_cost_of_purchase:
+    use_cost_of_purchase_str = str(get_local_settings().use_cost_of_purchase)
+    if get_local_settings().use_cost_of_purchase:
         columns.append("coût total (prix d'achat)")
     appros = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "fournisseur": str(p.product.provider),
                "produit": str(p.product), "coût total (prix d'achat)": '{0:.2f} €'.format(p.cost_of_purchase()),
@@ -325,7 +383,7 @@ def stockslist(request):
 
 def members(request):
     columns = ['nom', "numéro d'adhérent", "date d'adhésion", "date de clotûre", 'foyer', 'email', 'bigophone']
-    if LocalSettings.objects.first().use_subscription:
+    if get_local_settings().use_subscription:
         columns.insert(4, "costisation d'adhésion du foyer")
     members_data = [{"id": p.id, "nom": p.name, "numéro d'adhérent": p.household.get_formated_number(),
                      "date d'adhésion": p.household.date.strftime("%d/%m/%Y"),
@@ -391,7 +449,7 @@ class HouseholdCreate(CreateView):
     def __init__(self, *args, **kwargs):
         super(HouseholdCreate, self).__init__(*args, **kwargs)
         fields = ['number', 'name', 'address', 'comment']
-        if LocalSettings.objects.first().use_subscription:
+        if get_local_settings().use_subscription:
             fields.insert(3, "subscription")
         self.fields = fields
 
@@ -431,7 +489,7 @@ class HouseholdUpdate(UpdateView):
     def __init__(self, *args, **kwargs):
         super(HouseholdUpdate, self).__init__(*args, **kwargs)
         fields = ['number', 'name', 'date_closed', 'address', 'comment']
-        if LocalSettings.objects.first().use_subscription:
+        if get_local_settings().use_subscription:
             fields.insert(4, "subscription")
         self.fields = fields
 
@@ -535,6 +593,87 @@ def detail_note(request, note_id):
         form = NoteForm(instance=pdt)
     return render(request, 'base/note.html', {'form': form})
 
+
+# ----------------------------------------------------------------------------------------------------------------------
+# mails
+# ----------------------------------------------------------------------------------------------------------------------
+
+def mailslist(request):
+    columns = ['jour', 'destinataires', 'sujet', 'message', 'type', 'envoyé ?']
+    mails = [{"id": p.id, "jour": p.date.strftime("%d/%m/%Y"), "destinataires": p.recipients, "sujet": add_prefix_subject(p.subject), "message": p.message,
+              "type" : p.get_kind_display(), "envoyé ?": bool_to_utf8(p.send)}
+               for p in Mail.objects.all()]
+    columns = json.dumps(columns)
+    mails = json.dumps(mails)
+    return render(request, 'base/mailslist.html', {'columns': columns, 'mails': mails})
+
+
+def mails_action(request, mails, action):
+
+    for m in mails:
+        if action == "send":
+            subject = m.subject
+            message = m.message
+            recipient_list = [v.strip() for v in m.recipients.split(',')]
+            success_msg = 'Message envoyé par mail'
+            error_msg = 'Erreur : le message n\'a pas été envoyé par mail'
+            kind = m.kind
+
+            test = my_send_mail(request, subject, message, recipient_list, success_msg, error_msg, kind, save=False)
+
+            if test:
+                m.send = True
+            else:
+                m.send = False
+            m.save()
+        elif action == "del":
+            m.delete()
+        else:
+            raise NotImplementedError("Action inconnue : " + str(action))
+
+    return mailslist(request)
+
+def mails_send_all(request):
+
+    mails = Mail.objects.all()
+
+    return mails_action(request, mails, action="send")
+
+def mails_send_referents(request):
+
+    mails = Mail.objects.filter(kind=Mail.REFERENT)
+
+    return mails_action(request, mails, action="send")
+
+def mails_send_receipts(request):
+
+    mails = Mail.objects.filter(kind=Mail.RECEIPT)
+
+    return mails_action(request, mails, action="send")
+
+def mails_del_send(request):
+
+    mails = Mail.objects.filter(send=True)
+
+    return mails_action(request, mails, action="del")
+
+def mails_del_wait(request):
+
+    mails = Mail.objects.filter(send=False)
+
+    return mails_action(request, mails, action="del")
+
+def mails_del_referents(request):
+
+    mails = Mail.objects.filter(kind=Mail.REFERENT)
+
+    return mails_action(request, mails, action="del")
+
+def mails_del_receipts(request):
+
+    mails = Mail.objects.filter(kind=Mail.RECEIPT)
+
+    return mails_action(request, mails, action="del")
 
 # ----------------------------------------------------------------------------------------------------------------------
 # inventaire

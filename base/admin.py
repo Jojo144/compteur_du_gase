@@ -23,6 +23,7 @@ admin.site.register(Household, HouseholdAdmin)
 admin.site.register(Product)
 admin.site.register(Note)
 admin.site.register(LocalSettings)
+admin.site.register(Mail)
 
 # for debugging
 admin.site.register(Purchase)

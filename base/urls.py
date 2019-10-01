@@ -33,4 +33,12 @@ urlpatterns = [
     path('note', views.create_note, name='create_note'),
     path('note/<int:note_id>', views.detail_note, name='detail_note'),
     path('stockslist', views.stockslist, name='stockslist'),
+    path('mailslist', views.mailslist, name='mailslist'),
+    path('mails_send_all', views.mails_send_all, name='mails_send_all'),
+    path('mails_send_referents', views.mails_send_referents, name='mails_send_referents'),
+    path('mails_send_receipts', views.mails_send_receipts, name='mails_send_receipts'),
+    path('mails_del_send', views.mails_del_send, name='mails_del_send'),
+    path('mails_del_wait', views.mails_del_wait, name='mails_del_wait'),
+    path('mails_del_referents', views.mails_del_referents, name='mails_del_referents'),
+    path('mails_del_receipts', views.mails_del_receipts, name='mails_del_receipts'),
 ]
