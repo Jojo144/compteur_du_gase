@@ -30,6 +30,8 @@
             <button @click="changeVisible" class="btn btn-secondary">[[ only_visible ? "Montrer " : "Masquer "]] les non
                 visibles
             </button>
+            <button @click="changeAlerte" class="btn btn-secondary">[[ only_alerte ? "Ne pas filter les alertes" : "Montrer uniquement les alertes"]]
+            </button>
         </div>
     </div>
 
@@ -64,6 +66,7 @@
       data: {
       sortKey: 'nom',
       only_visible: true,
+      only_alerte: false,
       search: '',
       reverse: false,
       columns: {{ columns | safe }},
@@ -86,6 +89,10 @@
           this.only_visible = !this.only_visible
       },
 
+      changeAlerte: function() {
+          this.only_alerte = !this.only_alerte
+      },
+
       sortBy: function(sortKey) {
           this.reverse = (this.sortKey == sortKey) ? ! this.reverse : false;
           this.sortKey = sortKey
@@ -94,9 +101,11 @@
       filter: function () {
           var search = this.search;
           var only_visible = this.only_visible;
+          var only_alerte = this.only_alerte;
           return _.pickBy(this.orderedData, (function (row) {
           var b = (!only_visible) || (row.visible == "✔");
-          return b && (myContains(row.nom, search) || myContains(row.catégorie, search) || myContains(row.fournisseur, search))
+          var c = !((only_alerte) && (!row["alerte stock"].includes("✔")));
+          return b && c && (myContains(row.nom, search) || myContains(row.catégorie, search) || myContains(row.fournisseur, search))
           }))
       }
       }

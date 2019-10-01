@@ -289,13 +289,15 @@ def detail_product(request, product_id):
 
 
 def products(request):
-    columns = ['nom', 'catégorie', 'fournisseur', 'prix de vente', 'vrac', 'visible', 'stock']
+    columns = ['nom', 'catégorie', 'fournisseur', 'prix de vente', 'vrac', 'visible', 'alerte stock', 'stock']
     if get_local_settings().use_cost_of_purchase:
         columns.insert(3, "prix d'achat")
     pdts = [{"id": p.id, "nom": p.name, "catégorie": str(p.category), "fournisseur": str(p.provider),
              "prix d'achat": '{} € / {}'.format(p.cost_of_purchase, p.unit),
              "prix de vente": '{} € / {}'.format(p.price, p.unit), "vrac": bool_to_utf8(p.unit.vrac),
-             "visible": bool_to_utf8(p.visible), "stock": round_stock(p.stock)}
+             "visible": bool_to_utf8(p.visible),
+             "alerte stock": '{} [{}]'.format(bool_to_utf8(p.stock < p.stock_alert), round_stock(p.stock_alert)),
+             "stock": round_stock(p.stock)}
             for p in Product.objects.all()]
     columns = json.dumps(columns)
     pdts = json.dumps(pdts)
