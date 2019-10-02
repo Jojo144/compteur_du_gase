@@ -176,8 +176,8 @@ class Member(models.Model):
     household = models.ForeignKey(Household, blank=True, null=True, related_name="has_household",
                                   on_delete=models.CASCADE, verbose_name="foyer")
     # receive the receipt by mail
-    receipt = models.BooleanField(default=True, verbose_name="recevoir un ticket de caisse par mail ?")
-    stock_alert = models.BooleanField(default=True,
+    receipt = models.BooleanField(default=False, verbose_name="recevoir un ticket de caisse par mail ?")
+    stock_alert = models.BooleanField(default=False,
                                       verbose_name="recevoir les approvisionnements et les alertes stock par mail ? "
                                                    "(uniquement pour les référents produit)")
 
