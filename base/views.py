@@ -190,7 +190,9 @@ def achats(request, household_id):
     else:
         localsettings = get_local_settings()
         purchases_history = Purchase.objects.filter(household_id=household_id).order_by('-date')[:10]
-        history = [{'date': p.date, 'details': PurchaseDetailOp.objects.filter(purchase=p)} for p in purchases_history]
+        history = [{'date': p.date, 'details': PurchaseDetailOp.objects.filter(purchase=p),
+                    'total' : '{0:.2f} €'.format(sum([-q.price for q in PurchaseDetailOp.objects.filter(purchase=p)]))}
+                   for p in purchases_history]
         pdts = {str(p.id): {"name": p.name, "category": p.category.name,
                             "price": str(p.price), "unit": p.unit.name, "vrac": p.unit.vrac}
                 for p in Product.objects.filter(visible=True)}
