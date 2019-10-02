@@ -150,6 +150,9 @@ class Household(models.Model):
     subscription = models.DecimalField(default=0, max_digits=10, decimal_places=2,
                                        verbose_name="montant de la cotisation d'adhésion (en €)")
 
+    on_the_flight = models.BooleanField(verbose_name="Realise un approvisionnement du montant du panier avant de payer.", default=False,
+                                        help_text="Cette fonction peut être utilise si l'on autorise le payement à la volée.")
+
     def __str__(self):
         return self.name
 
@@ -306,17 +309,18 @@ class ApproCompteOp(Operation):
     CHEQUE = 'cheque'
     CANCELLATION = 'cancellation'
     REPAYMENT = 'repayment'
+    ONTHEFLIGHT = 'ontheflight'
     KIND_CHOICES = [
         (CASH, 'Espèces'),
         (CHEQUE, 'Chèque'),
         (CANCELLATION, 'Annulation/Correction'),
-        (REPAYMENT, 'Remboursement')
+        (REPAYMENT, 'Remboursement'),
+        (ONTHEFLIGHT, 'A la volée'),
     ]
     kind = models.CharField(max_length=6, choices=KIND_CHOICES, default=CASH)
 
     def __str__(self):
         return 'ApproCompteOp {} - {} - {}'.format(self.household, self.amount, self.get_kind_display())
-
 
 # message
 class Note(models.Model):

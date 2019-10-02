@@ -178,9 +178,15 @@ def achats(request, household_id):
                                      success_msg='Alerte stock envoyée par mail',
                                      error_msg='Erreur : l\'alerte stock n\'a pas été envoyée par mail',
                                      kind=Mail.REFERENT)
+        if household.on_the_flight:
+            opa = ApproCompteOp(household=household, amount=s, kind=ApproCompteOp.ONTHEFLIGHT)
+            opa.save()
+            messages.success(request, '✔ Approvisionnement du compte de {0:.2f} € effectué'.format(s))
+
         msg += "Ce qui nous donne un total de {} €.\n\nCiao!".format(s)
         balance = household.account
-        messages.success(request, '✔ Votre compte a été débité de ' + str(round2(s)) + ' €' + 'solde restant : ' + str(round2(balance) + ' €'))
+        messages.success(request, '✔ Votre compte a été débité de ' + str(round2(s)) + ' €')
+        messages.success(request, 'Solde restant : ' + str(round2(balance) + ' €'))
         mails = household.get_emails_receipt()
         my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,
                      success_msg='Le ticket de caisse a été envoyé par mail',
@@ -201,13 +207,17 @@ def achats(request, household_id):
         alerte_balance_amount = get_local_settings().min_balance
         alerte_balance_str = balance < alerte_balance_amount
         alerte_balance_amount = '{0:.2f}'.format(alerte_balance_amount)
+
         context = {'household': household,
                    'cats': Category.objects.all(),
                    'max_amount': household.account - localsettings.min_account,
+                   'balance_amount': balance,
                    'pdts': pdts,
                    'history': history,
                    'alerte_balance_str' : str(alerte_balance_str),
-                   'alerte_balance_amount' : alerte_balance_amount}
+                   'alerte_balance_amount' : alerte_balance_amount,
+                   'on_the_flight' : household.on_the_flight}
+
         return render(request, 'base/achats.html', context)
 
 
@@ -237,7 +247,7 @@ def compte(request, household_id):
             op.save()
             household.account += q
             household.save()
-            messages.success(request, '✔ Approvisionnement du compte effectué')
+            messages.success(request, '✔ Approvisionnement du compte de {0:.2f} € effectué'.format(q))
             msg = 'Votre compte a été approvisionné de {} €'.format(q)
             mails = household.get_emails_receipt()
             my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,

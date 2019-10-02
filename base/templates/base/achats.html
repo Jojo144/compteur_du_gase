@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<div class="modal hide fade" id="myModal">
+<div class="modal hide fade" id="myModalBalance">
   <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -29,6 +29,7 @@
 <div class="row">
     <h5>Solde : {{ household.account }} € </h5>
 </div>
+
 <div class="row">
     <button type="button" class="btn btn-info" data-toggle="modal" data-target="#historyModal">
         Historique de vos achats
@@ -171,7 +172,7 @@
 
     {% if alerte_balance_str == 'True' %}
     $(window).on('load',function(){
-        $('#myModal').modal('show');
+        $('#myModalBalance').modal('show');
     });
     {% endif %}
 
@@ -248,9 +249,23 @@
          alert ("Votre panier est vide");
          e.preventDefault()
          }
-         if (this.totalAmount() >= {{ max_amount | comma_to_dot }}) {
-         alert ("Vous n'avez pas assez de sous sur votre compte !");
-         e.preventDefault()
+         if (! {{ on_the_flight | yesno:"true,false" }})
+             {
+             if (this.totalAmount() >= {{ max_amount | comma_to_dot }}) {
+             alert ("Vous n'avez pas assez de sous sur votre compte !");
+             e.preventDefault()
+             }
+             var balance_end = {{ balance_amount | comma_to_dot }} - this.totalAmount();
+             if (balance_end < 0) {
+                if (! confirm("Ce compte sera en négatif de " + -balance_end.toFixed(2) + " € à la fin la transaction ! Confirmez-vous l'ordre d'achat ?")) {
+                    e.preventDefault()
+                }
+             }
+         }
+         else {
+            if (! confirm("Ce compte est configuré de telle sorte à ce qu'un approvisionnement du compte égal au total des achats soit effectué avant l'ordre d'achat. Confirmez-vous l'ordre d'approvisionnement et d'achat ?")) {
+                e.preventDefault()
+            }
          }
      }
      }
