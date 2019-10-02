@@ -319,7 +319,7 @@ class ApproCompteOp(Operation):
 class Note(models.Model):
     date = models.DateTimeField(auto_now=True)
     who = models.ForeignKey(Member, null=True, on_delete=models.SET_NULL,
-                            verbose_name="Qui ?")  # null if the product was deleted and no longer exists
+                            verbose_name="Auteur")  # null if the product was deleted and no longer exists
     message = models.TextField(blank=False, verbose_name="Message")
     read = models.BooleanField(verbose_name="Message lu ?", default=False)
     action = models.BooleanField(verbose_name="Action(s) réalisée(s) ?", default=False,
