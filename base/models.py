@@ -8,6 +8,9 @@ class LocalSettings(models.Model):
     min_account = models.DecimalField(max_digits=10, decimal_places=2, default=0,
                                       verbose_name="seuil en dessous duquel on ne peut plus faire d'achat (en €)")
 
+    min_balance = models.DecimalField(max_digits=10, decimal_places=2, default=10,
+                                      verbose_name="seuil en dessous duquel une alerte est lancée au moment de commencer un achat (en €)")
+
     txt_home = models.TextField(blank=True, default="<i>Bienvenu·e au GASE</i>",
                                 verbose_name="texte de la page d'accueil (doit être donnée en code html)")
 

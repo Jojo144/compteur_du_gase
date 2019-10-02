@@ -197,12 +197,17 @@ def achats(request, household_id):
                             "price": str(p.price), "unit": p.unit.name, "vrac": p.unit.vrac}
                 for p in Product.objects.filter(visible=True)}
         pdts = json.dumps(pdts)
-        print(household.account - localsettings.min_account)
+        balance = household.account
+        alerte_balance_amount = get_local_settings().min_balance
+        alerte_balance_str = balance < alerte_balance_amount
+        alerte_balance_amount = '{0:.2f}'.format(alerte_balance_amount)
         context = {'household': household,
                    'cats': Category.objects.all(),
                    'max_amount': household.account - localsettings.min_account,
                    'pdts': pdts,
-                   'history': history}
+                   'history': history,
+                   'alerte_balance_str' : str(alerte_balance_str),
+                   'alerte_balance_amount' : alerte_balance_amount}
         return render(request, 'base/achats.html', context)
 
 

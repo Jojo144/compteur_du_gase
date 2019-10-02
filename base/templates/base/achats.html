@@ -4,6 +4,25 @@
 
 {% block content %}
 
+<div class="modal hide fade" id="myModal">
+  <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Alerte solde</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Ce foyer a un solde inférieur à {{ alerte_balance_amount }} €.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <h2>{{ household }}</h2>
 </div>
@@ -146,6 +165,12 @@
 </div>
 
 <script>
+
+    {% if alerte_balance_str == 'True' %}
+    $(window).on('load',function(){
+        $('#myModal').modal('show');
+    });
+    {% endif %}
 
  $('nav a').click(function(event){
      if ( ! confirm('Voulez-vous vraiment abandonner vos achats ? (Vous n\'avez pas payé)')) {
