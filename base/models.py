@@ -116,7 +116,7 @@ def get_advised_household_number():
     i = 1
     if i not in numbers:
         return i
-    while i not in numbers:
+    while i in numbers:
         i += 1
     return i
 
