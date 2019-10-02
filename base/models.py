@@ -8,6 +8,10 @@ class LocalSettings(models.Model):
     min_account = models.DecimalField(max_digits=10, decimal_places=2, default=0,
                                       verbose_name="seuil en dessous duquel on ne peut plus faire d'achat (en €)")
 
+    min_account_allow = models.BooleanField(verbose_name="Lorsque le solde n'est pas suffisant, autoriser quand même après demande de confirmation ?", default=False,
+                                            help_text="Lorsque cette option est activée, si le solde n'est pas suffisant, il y a une demande de confirmation"
+                                                      "lors de l'achat mais il est autorisé. Dans le cas contraire, l'achat est rendu impossible.")
+
     min_balance = models.DecimalField(max_digits=10, decimal_places=2, default=10,
                                       verbose_name="seuil en dessous duquel une alerte est lancée au moment de commencer un achat (en €)")
 

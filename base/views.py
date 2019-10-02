@@ -216,7 +216,8 @@ def achats(request, household_id):
                    'history': history,
                    'alerte_balance_str' : str(alerte_balance_str),
                    'alerte_balance_amount' : alerte_balance_amount,
-                   'on_the_flight' : household.on_the_flight}
+                   'on_the_flight' : household.on_the_flight,
+                   'min_account_allow' : localsettings.min_account_allow}
 
         return render(request, 'base/achats.html', context)
 
