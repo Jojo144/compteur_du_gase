@@ -23,14 +23,14 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row" id="household">
     <h2>{{ household }}</h2>
 </div>
 <div class="row">
     <h5>Solde : {{ household.account }} € </h5>
 </div>
 <div class="row">
-    <button type="button" class="btn btn-info " data-toggle="modal" data-target="#historyModal">
+    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#historyModal">
         Historique de vos achats
     </button>
 </div>
@@ -45,9 +45,10 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" id="modal-html-content">
                 <ul>
                     {% for o in history %}
+                    ----------------------------------
                     <li> Le {{ o.date | date:"D d M Y - H \h i" }} :
                         <ul>
                             {% for p in o.details %}
@@ -57,13 +58,15 @@
                             {% endfor %}
                         </ul>
                     </li>
-                    Total : <b> {{ o.total }} </b>
+                    Total : <b> {{ o.total }} </b></br>
                     {% empty %}
                     <li>Pas d'achats précédents</li>
                     {% endfor %}
+                    ----------------------------------
                 </ul>
             </div>
             <div class="modal-footer">
+                <input type="submit" class="btn btn-info" name="tofile" id="tofile" value="Exporter l'historique"/>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
             </div>
         </div>
@@ -252,6 +255,55 @@
      }
      }
  })
+
+ $(function(){
+    var textFile = null;
+    var makeTextFile = function (text) {
+        var data = new Blob([text], {type: 'text/html'});
+
+        // If we are replacing a previously generated file we need to
+        // manually revoke the object URL to avoid memory leaks.
+        if (textFile !== null) {
+          window.URL.revokeObjectURL(textFile);
+        }
+
+        textFile = window.URL.createObjectURL(data);
+
+        return textFile;
+    };
+
+    var create = document.getElementById('tofile');
+    var modalContent = document.getElementById('modal-html-content');
+
+    create.addEventListener('click', function () {
+        var link = document.createElement('a');
+        var household = '{{ household }}';
+        link.setAttribute('download', 'HistoriqueAchats_' + household + '.html');
+
+        console.log(modalContent.value);
+
+        var content = "<!DOCTYPE html>\n";
+        content += "<html>\n";
+        content += "<head>\n";
+        content += "   <title>Ticket de caisse</title>\n";
+        content += "</head>\n";
+        content += "<body>\n";
+
+        content += modalContent.innerHTML;
+
+        content += "</body>\n";
+        content += "</html>\n";
+
+        link.href = makeTextFile(content);
+        document.body.appendChild(link);
+
+        // wait for the link to be added to the document
+        window.requestAnimationFrame(function () {
+          var event = new MouseEvent('click');
+          link.dispatchEvent(event);
+          document.body.removeChild(link);
+        });}, false);
+})();
 
 </script>
 {% endblock content %}
