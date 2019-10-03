@@ -260,14 +260,16 @@ class ChangeStockOp(Operation):
     quantity = models.DecimalField(max_digits=15,
                                    decimal_places=3)  # positif for an appro, negative for a normal buying
     price = models.DecimalField(max_digits=15, decimal_places=3)  # product.price * quantity
+    purchase_cost = models.DecimalField(max_digits=15, decimal_places=3)  # product.cost_of_purchase * quantity
     stock = models.DecimalField(max_digits=15, decimal_places=3)  # stock after the operation
     label = models.CharField(max_length=20)
 
-    @classmethod  # constructor computing price
+    @classmethod  # constructor computing price and cost_of_purchase
     def create(cls, product=product, quantity=quantity, **kwargs):
         price = product.price * quantity
+        purchase_cost = product.cost_of_purchase * quantity
         newstock = product.stock + quantity
-        return cls(product=product, quantity=quantity, price=price, stock=newstock, **kwargs)
+        return cls(product=product, quantity=quantity, price=price, purchase_cost=purchase_cost, stock=newstock, **kwargs)
 
     @classmethod
     def create_appro_stock(cls, **kwargs):
@@ -280,9 +282,7 @@ class ChangeStockOp(Operation):
     def cost_of_purchase(self):
         if self.label != "ApproStock":
             raise TypeError("Operation must be filter with label==ApproStock")
-        if self.product is None:
-            return 0
-        return self.product.cost_of_purchase * self.quantity
+        return self.purchase_cost
 
     def cost_of_price(self):
         if self.label != "ApproStock":
