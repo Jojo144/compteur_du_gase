@@ -125,6 +125,8 @@ def gestion(request):
     else:
         value_purchase = sum([p.cost_of_price() for p in ChangeStockOp.objects.filter(label="ApproStock")])
 
+    value_purchase_household = -sum([p.price for p in PurchaseDetailOp.objects.all()])
+
     return render(request, 'base/gestion.html',
                   {'value_stock': value_stock,
                    'value_accounts': value_accounts,
@@ -133,7 +135,8 @@ def gestion(request):
                    'value_appro': value_appro,
                    'value_purchase': value_purchase,
                    'save_mails_str' : str(get_local_settings().save_mail),
-                   'use_subscriptions_str' : str(get_local_settings().use_subscription)
+                   'use_subscriptions_str' : str(get_local_settings().use_subscription),
+                   'value_purchase_household' : value_purchase_household
                    })
 
 
@@ -465,6 +468,92 @@ def stockslist(request):
     stocks = json.dumps(stocks)
     return render(request, 'base/stockslist.html', {'columns': columns, 'stocks': stocks})
 
+# ----------------------------------------------------------------------------------------------------------------------
+# achats
+# ----------------------------------------------------------------------------------------------------------------------
+
+def purchaseslist(request):
+    columns = ['jour', 'mois', 'année', 'produit', 'prix']
+    purchases = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "produit": str(p.product),
+                "prix": '{} €'.format(-p.price), "date": p.date.isoformat()}
+               for p in PurchaseDetailOp.objects.all()]
+    columns = json.dumps(columns)
+    purchases = json.dumps(purchases)
+    purchases_stats = get_purchases_stats()
+    return render(request, 'base/purchaseslist.html', {'columns': columns, 'purchases': purchases, 'purchases_stats' : purchases_stats})
+
+def get_purchases_stats():
+
+    # dates
+    dates = [datetime.date.today()]
+    for a in PurchaseDetailOp.objects.all():
+        if a.date.date() not in dates:
+            dates.append(a.date.date())
+
+    dates.sort()
+
+    # value
+    values = [0] * len(dates)
+    labels = [0] * len(dates)
+    for a in PurchaseDetailOp.objects.all():
+        for ii, i in enumerate(range(dates.index(a.date.date()), len(dates))):
+            values[i] -= a.price
+            if ii == 0:
+                labels[i] -= a.price
+
+    # stats
+    purchases_stats = [{'value': '{0:.2f}'.format(values[i]), 'date': dates[i].isoformat(), 'label': 'Evolution : {0:.2f} €'.format(labels[i])}
+                        for i in range(len(dates))]
+
+    return purchases_stats
+
+# ----------------------------------------------------------------------------------------------------------------------
+# fonctionnement de l'epicerie
+# ----------------------------------------------------------------------------------------------------------------------
+
+def valueslist(request):
+
+    # get stats
+    purchases_stats = get_purchases_stats()
+    comptes_stats = get_comptes_stats()
+    appros_stats = get_appros_stats()
+
+    # compute diff
+    diff_stats = []
+    diff_dates = []
+    for a in comptes_stats:
+        date = a['date']
+        if date not in diff_dates:
+            diff_dates.append(date)
+    diff_dates.sort()
+
+    values = [0] * len(diff_dates)
+    labels = [0] * len(diff_dates)
+    for a in comptes_stats:
+        value = float(a['value'])
+        date = a['date']
+        i = diff_dates.index(date)
+        values[i] += value
+
+    for a in appros_stats:
+        value = float(a['value'])
+        date = a['date']
+        i = diff_dates.index(date)
+        values[i] -= value
+
+    labels[0] = values[0]
+    for i in range(1, len(values)):
+        labels[i] = values[i]-values[i-1]
+
+    diff_stats = [{'value': '{0:.2f}'.format(values[i]), 'date': diff_dates[i], 'label': 'Evolution : {0:.2f} €'.format(labels[i])}
+                        for i in range(len(diff_dates))]
+
+
+    # return
+    return render(request, 'base/valueslist.html', {'purchases_stats' : purchases_stats,
+                                                    'comptes_stats': comptes_stats,
+                                                    'appros_stats': appros_stats,
+                                                    'diff_stats': diff_stats})
 
 # ----------------------------------------------------------------------------------------------------------------------
 # membres

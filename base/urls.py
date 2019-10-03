@@ -42,4 +42,6 @@ urlpatterns = [
     path('mails_del_referents', views.mails_del_referents, name='mails_del_referents'),
     path('mails_del_receipts', views.mails_del_receipts, name='mails_del_receipts'),
     path('subscriptionslist', views.subscriptionslist, name='subscriptionslist'),
+    path('purchaseslist', views.purchaseslist, name='purchaseslist'),
+    path('valueslist', views.valueslist, name='valueslist'),
 ]

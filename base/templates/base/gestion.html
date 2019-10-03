@@ -61,6 +61,19 @@
             l'épicerie</a>
     </div>
 
+    <h4>Valeur des achats des foyers</h4>
+    Valeur cumulée des achats des foyers : {{ value_purchase_household | round0 }} €
+    <div class="gestion-btn">
+        <a class="btn btn-info" href="{% url 'base:purchaseslist' %}">Evolution et liste détaillée des achats des foyers</a>
+    </div>
+
+    <hr class="gestion-hr">
+
+    <h4>Fonctionnement de l'épicerie</h4>
+    <div class="gestion-btn">
+        <a class="btn btn-info" href="{% url 'base:valueslist' %}">Analyse des entrées/sorties et des achats.</a>
+    </div>
+
     <hr class="gestion-hr">
 
     <h4>Liste des alertes stock</h4>
