@@ -5,7 +5,7 @@ from datetime import date
 # settings
 
 input_db_default = "../db.sqlite3"
-backup_db_directory_default = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
+backup_db_directory_default = os.path.join(os.path.join(os.path.expanduser('~')), 'Bureau')
 
 
 # end settings
