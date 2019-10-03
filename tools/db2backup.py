@@ -88,7 +88,7 @@ try:
         if connexion_backup:
             # close connexions
             connexion.close()
-            connexion_backup.close()
+            # connexion_backup.close()
 
 except sqlite3.Error as error:
 

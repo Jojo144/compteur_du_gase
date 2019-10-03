@@ -260,7 +260,7 @@ class ChangeStockOp(Operation):
     quantity = models.DecimalField(max_digits=15,
                                    decimal_places=3)  # positif for an appro, negative for a normal buying
     price = models.DecimalField(max_digits=15, decimal_places=3)  # product.price * quantity
-    purchase_cost = models.DecimalField(max_digits=15, decimal_places=3)  # product.cost_of_purchase * quantity
+    purchase_cost = models.DecimalField(max_digits=15, decimal_places=3, default=0)  # product.cost_of_purchase * quantity
     stock = models.DecimalField(max_digits=15, decimal_places=3)  # stock after the operation
     label = models.CharField(max_length=20)
 
