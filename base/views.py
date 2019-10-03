@@ -181,6 +181,8 @@ def achats(request, household_id):
         if household.on_the_flight:
             opa = ApproCompteOp(household=household, amount=s, kind=ApproCompteOp.ONTHEFLIGHT)
             opa.save()
+            household.account += s
+            household.save()
             messages.success(request, '✔ Approvisionnement du compte de {0:.2f} € effectué'.format(s))
 
         msg += "Ce qui nous donne un total de {} €.\n\nCiao!".format(s)

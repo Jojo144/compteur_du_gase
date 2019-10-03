@@ -154,8 +154,9 @@ class Household(models.Model):
     subscription = models.DecimalField(default=0, max_digits=10, decimal_places=2,
                                        verbose_name="montant de la cotisation d'adhésion (en €)")
 
-    on_the_flight = models.BooleanField(verbose_name="Realise un approvisionnement du montant du panier avant de payer.", default=False,
-                                        help_text="Cette fonction peut être utilise si l'on autorise le payement à la volée.")
+    on_the_flight = models.BooleanField(verbose_name="Realise un approvisionnement automatique du montant du panier avant de payer.", default=False,
+                                        help_text="Cette fonction peut être utilise si l'on autorise le payement à la volée, c'est-à-dire lorsque "
+                                                  "le client n'a pas besoin d'approvisionner son compte mais paye la juste somme.")
 
     def __str__(self):
         return self.name

@@ -273,7 +273,7 @@
             }
          }
          else {
-            if (! confirm("Ce compte est configuré de telle sorte à ce qu'un approvisionnement du compte égal au total des achats soit effectué automatique avant l'ordre d'achat (paiement à la volée). Confirmez-vous l'ordre d'approvisionnement et d'achat ?")) {
+            if (! confirm("Ce compte est configuré pour que le client paye la somme exacte après un achat sans approvisionner son compte. Voulez-vous quand même effectuer l'achat ? Si vous acceptez, vous devez encaisser la somme du ticket de caisse qui est de " + this.totalAmount().toFixed(2) + " €")) {
                 e.preventDefault()
             }
          }
