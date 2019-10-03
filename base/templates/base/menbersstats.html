@@ -6,11 +6,12 @@
 {% block content %}
 <h4>Nombres de foyers et de membres</h4>
 
+<div class="medium-content">
 <canvas id="myChart"></canvas>
-<br>
-<br>
 <button id="removeData">Zoomer</button>
 <button id="addData">Dézoomer</button>
+</div>
+</br>
 
 <script src="{% static 'base/moment-with-locales.js' %}"></script>
 <script src="{% static 'base/Chart.js' %}"></script>
@@ -71,6 +72,9 @@
          scaleLabel: {
              display: true,
              labelString: 'Nombre'
+         },
+         ticks: {
+            suggestedMin: 0
          }
          }]
      },

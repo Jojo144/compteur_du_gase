@@ -1,6 +1,98 @@
 {% extends "base/base.html" %}
 
+{% load static %}
+{% load my_tags %}
+
 {% block content %}
+<h4>Evolution des approvisionnements du stock de l'épicerie</h4>
+
+<div class="medium-content">
+<canvas id="myChart"></canvas>
+<button id="removeData">Zoomer</button>
+<button id="addData">Dézoomer</button>
+</div>
+</br>
+
+<script src="{% static 'base/moment-with-locales.js' %}"></script>
+<script src="{% static 'base/Chart.js' %}"></script>
+
+<script>
+ moment.locale('fr');
+ var style = getComputedStyle(document.body);
+ var chartCol1 = style.getPropertyValue('--chartColor1');
+ var chartCol2 = style.getPropertyValue('--chartColor2');
+ var chartColorText = style.getPropertyValue('--chartColorText');
+
+ Chart.defaults.global.defaultFontSize = 16;
+ Chart.defaults.global.defaultFontColor = chartColorText;
+
+ var ctx = document.getElementById('myChart').getContext('2d');
+ var init_date = new Date();
+ init_date.setMonth(init_date.getMonth() - 6);
+ var end_date = new Date();
+ end_date.setMonth(end_date.getMonth() + 1);
+ var chart = new Chart(ctx, {
+     type: 'line',
+
+     data: {
+         datasets: [{
+             label: 'Approvisionnement cumulé des foyers (en €)',
+             backgroundColor: chartCol1,
+             borderColor: chartCol1,
+         fill: false,
+         lineTension: 0,
+         data: [
+         {% for d in appros_stats %}
+         { x: new Date('{{d.date}}'), y: {{d.value}}, label: '{{d.label}}' },
+         {% endfor %}
+         ]
+         },
+         ],
+     },
+
+     options: {
+     title: { text: 'Approvisionnement cumulé des foyers' },
+     scales: {
+             xAxes: [{
+                 type: 'time',
+         time: {min: init_date, max: end_date}
+             }],
+         yAxes: [{
+         scaleLabel: {
+             display: true,
+             labelString: 'Valeur en €'
+         },
+         ticks: {
+            suggestedMin: 0
+         }
+         }]
+     },
+         tooltips: {
+             callbacks: {
+                 label: function(tooltipItem, data) {
+             var o = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                     return o.label + ". Nombre: " + o.y;
+                 }
+             }
+     },
+     }
+ });
+
+ document.getElementById('addData').addEventListener('click', function() {
+     var date = new Date(chart.options.scales.xAxes[0].time.min);
+     date.setMonth(date.getMonth() - 1);
+     chart.options.scales.xAxes[0].time.min = date;
+     chart.update();
+ });
+
+ document.getElementById('removeData').addEventListener('click', function() {
+     var date = new Date(chart.options.scales.xAxes[0].time.min);
+     date.setMonth(date.getMonth() + 1);
+     chart.options.scales.xAxes[0].time.min = date;
+     chart.update();
+ });
+</script>
+
 <h4>Liste détaillées des approvisionnements du stock de l'épicerie</h4>
 
 <div id="vue-table">

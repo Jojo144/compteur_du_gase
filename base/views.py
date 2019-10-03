@@ -277,8 +277,33 @@ def compteslist(request):
                for p in ApproCompteOp.objects.all()]
     columns = json.dumps(columns)
     comptes = json.dumps(comptes)
-    return render(request, 'base/compteslist.html', {'columns': columns, 'comptes': comptes})
+    comptes_stats = get_comptes_stats()
+    return render(request, 'base/compteslist.html', {'columns': columns, 'comptes': comptes, 'comptes_stats' : comptes_stats})
 
+def get_comptes_stats():
+
+    # dates
+    dates = [datetime.date.today()]
+    for a in ApproCompteOp.objects.all():
+        if a.date.date() not in dates:
+            dates.append(a.date.date())
+
+    dates.sort()
+
+    # value
+    values = [0] * len(dates)
+    labels = [0] * len(dates)
+    for a in ApproCompteOp.objects.all():
+        for ii, i in enumerate(range(dates.index(a.date.date()), len(dates))):
+            values[i] += a.amount
+            if ii == 0:
+                labels[i] += a.amount
+
+    # stats
+    comptes_stats = [{'value': '{0:.2f}'.format(values[i]), 'date': dates[i].isoformat(), 'label': 'Evolution : {0:.2f} €'.format(labels[i])}
+                       for i in range(len(dates))]
+
+    return comptes_stats
 
 # ----------------------------------------------------------------------------------------------------------------------
 # produits
@@ -383,8 +408,39 @@ def approslist(request):
               for p in ChangeStockOp.objects.filter(label="ApproStock")]
     columns = json.dumps(columns)
     appros = json.dumps(appros)
-    return render(request, 'base/approslist.html', {'columns': columns, 'appros': appros, 'use_cost_of_purchase_str' : use_cost_of_purchase_str})
+    appros_stats = get_appros_stats()
+    return render(request, 'base/approslist.html', {'columns': columns, 'appros': appros, 'use_cost_of_purchase_str': use_cost_of_purchase_str, 'appros_stats': appros_stats})
 
+def get_appros_stats():
+
+    purchase = get_local_settings().use_cost_of_purchase
+
+    # dates
+    dates = [datetime.date.today()]
+    for p in ChangeStockOp.objects.filter(label="ApproStock"):
+        if p.date.date() not in dates:
+            dates.append(p.date.date())
+
+    dates.sort()
+
+    # value
+    values = [0] * len(dates)
+    labels = [0] * len(dates)
+    for p in ChangeStockOp.objects.filter(label="ApproStock"):
+        for ii, i in enumerate(range(dates.index(p.date.date()), len(dates))):
+            if purchase :
+                value = p.cost_of_purchase()
+            else:
+                value = p.cost_of_price()
+            values[i] += value
+            if ii == 0:
+                labels[i] += value
+
+    # stats
+    comptes_stats = [{'value': '{0:.2f}'.format(values[i]), 'date': dates[i].isoformat(), 'label': 'Evolution : {0:.2f} €'.format(labels[i])}
+                       for i in range(len(dates))]
+
+    return comptes_stats
 
 # ----------------------------------------------------------------------------------------------------------------------
 # stock
