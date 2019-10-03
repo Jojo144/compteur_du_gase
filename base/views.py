@@ -132,7 +132,8 @@ def gestion(request):
                    'alert_pdts': alert_pdts,
                    'value_appro': value_appro,
                    'value_purchase': value_purchase,
-                   'save_mails_str' : str(get_local_settings().save_mail)
+                   'save_mails_str' : str(get_local_settings().save_mail),
+                   'use_subscriptions_str' : str(get_local_settings().use_subscription)
                    })
 
 
@@ -304,6 +305,15 @@ def get_comptes_stats():
                        for i in range(len(dates))]
 
     return comptes_stats
+
+def subscriptionslist(request):
+    columns = ['jour', 'mois', 'année', 'foyer', 'adhesion']
+    subscriptions = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "foyer": str(p),
+                "adhesion": '{} €'.format(p.subscription)}
+               for p in Household.objects.all()]
+    columns = json.dumps(columns)
+    subscriptions = json.dumps(subscriptions)
+    return render(request, 'base/subscriptionslist.html', {'columns': columns, 'subscriptions': subscriptions})
 
 # ----------------------------------------------------------------------------------------------------------------------
 # produits

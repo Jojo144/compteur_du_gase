@@ -44,14 +44,14 @@
     <h4>Valeur des approvisionnements des foyers</h4>
     Valeur des approvisionnements des foyers : {{ value_appro | round0 }} €
     <div class="gestion-btn">
-        <a class="btn btn-info" href="{% url 'base:compteslist' %}">Liste détaillées des approvisionnements des
+        <a class="btn btn-info" href="{% url 'base:compteslist' %}">Evolution et liste détaillée des approvisionnements des
             foyers</a>
     </div>
 
     <h4>Valeur des approvisionnements du stock de l'épicerie</h4>
     Valeur des approvisionnements du stock de l'épicerie : {{ value_purchase | round0 }} €
     <div class="gestion-btn">
-        <a class="btn btn-info" href="{% url 'base:approslist' %}">Liste détaillées des approvisionnements du stock de
+        <a class="btn btn-info" href="{% url 'base:approslist' %}">Evolution et liste détaillée des approvisionnements du stock de
             l'épicerie</a>
     </div>
 
@@ -71,6 +71,14 @@
     <div class="gestion-btn">
         <a class="btn btn-info" href="{% url 'base:membersstats' %}">Evolution du nombre de foyers et de membres.</a>
     </div>
+
+    {% if use_subscriptions_str == 'True' %}
+    <h4>Liste des adhésions des foyers</h4>
+    <div class="gestion-btn">
+        <a class="btn btn-info" href="{% url 'base:subscriptionslist' %}">Evolution et liste détaillée des adhésions des
+            foyers</a>
+    </div>
+    {% endif %}
 
     {% if save_mails_str == 'True' %}
     <h4>Liste des emails</h4>

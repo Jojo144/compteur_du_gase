@@ -41,4 +41,5 @@ urlpatterns = [
     path('mails_del_wait', views.mails_del_wait, name='mails_del_wait'),
     path('mails_del_referents', views.mails_del_referents, name='mails_del_referents'),
     path('mails_del_receipts', views.mails_del_receipts, name='mails_del_receipts'),
+    path('subscriptionslist', views.subscriptionslist, name='subscriptionslist'),
 ]
