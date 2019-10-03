@@ -129,6 +129,7 @@ def get_advised_household_number():
 
 
 def validate_household_number(value):
+    return # cette verification empeche de modifier un foyer, a corriger
     if value in [getattr(p, 'number') for p in Household.objects.all()]:
         advised_value = get_advised_household_number()
         raise ValidationError(
