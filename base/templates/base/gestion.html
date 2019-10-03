@@ -3,6 +3,9 @@
 
 {% block content %}
 <div class="medium-content">
+
+    <hr class="gestion-hr">
+
     <h4>Interface d'administration</h4>
     <a class="btn btn-info" href="/admin">Accès à l'interface d'administration</a>
     <br> Cette interface permet de bidouiller tout ce que gère le logiciel, <b>à utiliser avec beaucoup de
@@ -21,6 +24,8 @@
         </li>
     </ul>
 
+    <hr class="gestion-hr">
+
     <h4>Inventaire</h4>
     Ici, on peut réaliser un inventaire ou voir les inventaires déjà réalisés. Un inventaire modifie les stocks des
     produits.
@@ -29,6 +34,7 @@
         <a class="btn btn-info" href="{% url 'base:ecarts' %}">Bilan des inventaires précédents</a>
     </div>
 
+    <hr class="gestion-hr">
 
     <h4>Valeur du stock et des comptes</h4>
     Valeur du stock total (références non visibles incluses) : {{ value_stock | round0 }} €
@@ -55,6 +61,8 @@
             l'épicerie</a>
     </div>
 
+    <hr class="gestion-hr">
+
     <h4>Liste des alertes stock</h4>
     Produits en rupture ou proche de la rupture de stock (produits visibles seulements).
     <ul>
@@ -66,6 +74,8 @@
         <li>Pas d'alerte stock !</li>
         {% endfor %}
     </ul>
+
+    <hr class="gestion-hr">
 
     <h4>Nombre de foyers et de membres</h4>
     <div class="gestion-btn">
@@ -80,11 +90,16 @@
     </div>
     {% endif %}
 
+    <hr class="gestion-hr">
+
     {% if save_mails_str == 'True' %}
     <h4>Liste des emails</h4>
     <div class="gestion-btn">
         <a class="btn btn-info" href="{% url 'base:mailslist' %}">Liste des emails envoyés ou en attente.</a>
     </div>
+
+    <hr class="gestion-hr">
+
     {% endif %}
 
     <h4>Astuces</h4>
@@ -102,10 +117,14 @@
         </li>
     </ul>
 
+    <hr class="gestion-hr">
+
     <h4>Des remarques, des suggestions ?</h4>
     J'ai tenté de rendre ce logiciel pratique pour l'utilisation que j'en imaginais. Cela dit je suis preneur de retours
     !
     N'hésitez pas à m'envoyer un petit mail avec vos questions, vos suggestions à : jojo144@girole.fr.
     &nbsp;&nbsp;&nbsp;Jojo
+
+    <hr class="gestion-hr">
 </div>
 {% endblock content %}
