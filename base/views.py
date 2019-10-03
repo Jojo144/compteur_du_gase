@@ -277,7 +277,7 @@ def compteslist(request):
     if get_local_settings().use_appro_kind:
         columns.append("type")
     comptes = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "foyer": str(p.household),
-                "approvisionnement": '{} €'.format(p.amount), "type": p.get_kind_display()}
+                "approvisionnement": '{} €'.format(p.amount), "type": p.get_kind_display(), "date": p.date.isoformat()}
                for p in ApproCompteOp.objects.all()]
     columns = json.dumps(columns)
     comptes = json.dumps(comptes)
@@ -417,7 +417,8 @@ def approslist(request):
         columns.append("coût total (prix d'achat)")
     appros = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "fournisseur": str(p.product.provider),
                "produit": str(p.product), "coût total (prix d'achat)": '{0:.2f} €'.format(p.cost_of_purchase()),
-               "coût total (prix de vente)": '{0:.2f} €'.format(p.cost_of_price())}
+               "coût total (prix de vente)": '{0:.2f} €'.format(p.cost_of_price()), 
+               "date": p.date.isoformat()}
               for p in ChangeStockOp.objects.filter(label="ApproStock")]
     columns = json.dumps(columns)
     appros = json.dumps(appros)
