@@ -275,7 +275,7 @@
       total_sum: function(data){
           let sum = 0;
           data.forEach(function(element) {
-              sum += parseFloat(element["prix"].replace('€', ''));
+              sum += parseFloat(element["total"].replace('€', ''));
           });
           console.log(sum);
          return sum;

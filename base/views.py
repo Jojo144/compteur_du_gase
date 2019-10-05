@@ -38,7 +38,8 @@ def add_prefix_subject(subject):
 def get_recipient_list(recipient_list):
     if get_local_settings().debug_mail is not None:
         if str(get_local_settings().debug_mail) != "":
-            print("*Mode de test pour les mails qui sont automatiquement envoyés à {}.".format(get_local_settings().debug_mail))
+            print("*Mode de test pour les mails qui sont automatiquement envoyés à {}.".format(
+                get_local_settings().debug_mail))
             return [get_local_settings().debug_mail]
         else:
             return recipient_list
@@ -54,6 +55,7 @@ def my_connection():
                                 use_tls=True)
     from_email = str(get_local_settings().mail_username)
     return connection, from_email
+
 
 def my_send_mail(request, subject, message, recipient_list, success_msg, error_msg, kind, save=True):
     if not get_local_settings().use_mail:
@@ -110,7 +112,8 @@ def index(request):
 
     use_logo_str = str(get_local_settings().use_logo)
 
-    return render(request, 'base/index.html', {'txt_home': txt_home, 'txt_message': txt_message, 'use_logo_str' : use_logo_str})
+    return render(request, 'base/index.html',
+                  {'txt_home': txt_home, 'txt_message': txt_message, 'use_logo_str': use_logo_str})
 
 
 def gestion(request):
@@ -134,9 +137,9 @@ def gestion(request):
                    'alert_pdts': alert_pdts,
                    'value_appro': value_appro,
                    'value_purchase': value_purchase,
-                   'save_mails_str' : str(get_local_settings().save_mail),
-                   'use_subscriptions_str' : str(get_local_settings().use_subscription),
-                   'value_purchase_household' : value_purchase_household
+                   'save_mails_str': str(get_local_settings().save_mail),
+                   'use_subscriptions_str': str(get_local_settings().use_subscription),
+                   'value_purchase_household': value_purchase_household
                    })
 
 
@@ -203,7 +206,7 @@ def achats(request, household_id):
         localsettings = get_local_settings()
         purchases_history = Purchase.objects.filter(household_id=household_id).order_by('-date')[:10]
         history = [{'date': p.date, 'details': PurchaseDetailOp.objects.filter(purchase=p),
-                    'total' : '{0:.2f} €'.format(sum([-q.price for q in PurchaseDetailOp.objects.filter(purchase=p)]))}
+                    'total': '{0:.2f} €'.format(sum([-q.price for q in PurchaseDetailOp.objects.filter(purchase=p)]))}
                    for p in purchases_history]
         pdts = {str(p.id): {"name": p.name, "category": p.category.name,
                             "price": str(p.price), "unit": p.unit.name, "vrac": p.unit.vrac}
@@ -220,10 +223,10 @@ def achats(request, household_id):
                    'balance_amount': balance,
                    'pdts': pdts,
                    'history': history,
-                   'alerte_balance_str' : str(alerte_balance_str),
-                   'alerte_balance_amount' : alerte_balance_amount,
-                   'on_the_flight' : household.on_the_flight,
-                   'min_account_allow' : localsettings.min_account_allow}
+                   'alerte_balance_str': str(alerte_balance_str),
+                   'alerte_balance_amount': alerte_balance_amount,
+                   'on_the_flight': household.on_the_flight,
+                   'min_account_allow': localsettings.min_account_allow}
 
         return render(request, 'base/achats.html', context)
 
@@ -282,10 +285,11 @@ def compteslist(request):
     columns = json.dumps(columns)
     comptes = json.dumps(comptes)
     comptes_stats = get_comptes_stats()
-    return render(request, 'base/compteslist.html', {'columns': columns, 'comptes': comptes, 'comptes_stats' : comptes_stats})
+    return render(request, 'base/compteslist.html',
+                  {'columns': columns, 'comptes': comptes, 'comptes_stats': comptes_stats})
+
 
 def get_comptes_stats():
-
     # dates
     dates = [datetime.date.today()]
     for a in ApproCompteOp.objects.all():
@@ -304,19 +308,22 @@ def get_comptes_stats():
                 labels[i] += a.amount
 
     # stats
-    comptes_stats = [{'value': '{0:.2f}'.format(values[i]), 'date': dates[i].isoformat(), 'label': 'Evolution : {0:.2f} €'.format(labels[i])}
-                       for i in range(len(dates))]
+    comptes_stats = [{'value': '{0:.2f}'.format(values[i]), 'date': dates[i].isoformat(),
+                      'label': 'Evolution : {0:.2f} €'.format(labels[i])}
+                     for i in range(len(dates))]
 
     return comptes_stats
+
 
 def subscriptionslist(request):
     columns = ['jour', 'mois', 'année', 'foyer', 'adhesion']
     subscriptions = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "foyer": str(p),
-                "adhesion": '{} €'.format(p.subscription)}
-               for p in Household.objects.all()]
+                      "adhesion": '{} €'.format(p.subscription)}
+                     for p in Household.objects.all()]
     columns = json.dumps(columns)
     subscriptions = json.dumps(subscriptions)
     return render(request, 'base/subscriptionslist.html', {'columns': columns, 'subscriptions': subscriptions})
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # produits
@@ -417,16 +424,18 @@ def approslist(request):
         columns.append("coût total (prix d'achat)")
     appros = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "fournisseur": str(p.product.provider),
                "produit": str(p.product), "coût total (prix d'achat)": '{0:.2f} €'.format(p.cost_of_purchase()),
-               "coût total (prix de vente)": '{0:.2f} €'.format(p.cost_of_price()), 
+               "coût total (prix de vente)": '{0:.2f} €'.format(p.cost_of_price()),
                "date": p.date.isoformat()}
               for p in ChangeStockOp.objects.filter(label="ApproStock")]
     columns = json.dumps(columns)
     appros = json.dumps(appros)
     appros_stats = get_appros_stats()
-    return render(request, 'base/approslist.html', {'columns': columns, 'appros': appros, 'use_cost_of_purchase_str': use_cost_of_purchase_str, 'appros_stats': appros_stats})
+    return render(request, 'base/approslist.html',
+                  {'columns': columns, 'appros': appros, 'use_cost_of_purchase_str': use_cost_of_purchase_str,
+                   'appros_stats': appros_stats})
+
 
 def get_appros_stats():
-
     purchase = get_local_settings().use_cost_of_purchase
 
     # dates
@@ -442,7 +451,7 @@ def get_appros_stats():
     labels = [0] * len(dates)
     for p in ChangeStockOp.objects.filter(label="ApproStock"):
         for ii, i in enumerate(range(dates.index(p.date.date()), len(dates))):
-            if purchase :
+            if purchase:
                 value = p.cost_of_purchase()
             else:
                 value = p.cost_of_price()
@@ -451,10 +460,12 @@ def get_appros_stats():
                 labels[i] += value
 
     # stats
-    comptes_stats = [{'value': '{0:.2f}'.format(values[i]), 'date': dates[i].isoformat(), 'label': 'Evolution : {0:.2f} €'.format(labels[i])}
-                       for i in range(len(dates))]
+    comptes_stats = [{'value': '{0:.2f}'.format(values[i]), 'date': dates[i].isoformat(),
+                      'label': 'Evolution : {0:.2f} €'.format(labels[i])}
+                     for i in range(len(dates))]
 
     return comptes_stats
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # stock
@@ -469,22 +480,46 @@ def stockslist(request):
     stocks = json.dumps(stocks)
     return render(request, 'base/stockslist.html', {'columns': columns, 'stocks': stocks})
 
+
 # ----------------------------------------------------------------------------------------------------------------------
 # achats
 # ----------------------------------------------------------------------------------------------------------------------
 
 def purchaseslist(request):
-    columns = ['jour', 'mois', 'année', 'produit', 'prix']
-    purchases = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "produit": str(p.product),
-                "prix": '{} €'.format(-p.price), "date": p.date.isoformat()}
-               for p in PurchaseDetailOp.objects.all()]
+    columns = ['jour', 'mois', 'année', 'prix moyen du panier', 'nombre de paniers', 'total']
+
+    dates = []
+    for d in Purchase.objects.all():
+        date = d.date.date()
+        if date not in dates:
+            dates.append(date)
+
+    dates.sort()
+
+    purchases = []
+
+    for date in dates:
+        baskets = []
+        for p in Purchase.objects.all():
+            if p.date.date() == date:
+                price = PurchaseDetailOp.objects.filter(purchase=p).aggregate(Sum('price'))['price__sum']
+                baskets.append(-price)
+        total_baskets = sum(baskets)
+        mean_baskets = total_baskets / len(baskets)
+        purchases.append({"date": date.isoformat(), "jour": date.day, "mois": date.month, "année": date.year,
+                          'prix moyen du panier': '{0:.2f} €'.format(mean_baskets), 'nombre de paniers': len(baskets),
+                          'total': '{0:.2f} €'.format(total_baskets)})
+
+    print(purchases)
+
     columns = json.dumps(columns)
     purchases = json.dumps(purchases)
     purchases_stats = get_purchases_stats()
-    return render(request, 'base/purchaseslist.html', {'columns': columns, 'purchases': purchases, 'purchases_stats' : purchases_stats})
+    return render(request, 'base/purchaseslist.html',
+                  {'columns': columns, 'purchases': purchases, 'purchases_stats': purchases_stats})
+
 
 def get_purchases_stats():
-
     # dates
     dates = [datetime.date.today()]
     for a in PurchaseDetailOp.objects.all():
@@ -503,26 +538,30 @@ def get_purchases_stats():
                 labels[i] -= a.price
 
     # stats
-    purchases_stats = [{'value': '{0:.2f}'.format(values[i]), 'date': dates[i].isoformat(), 'label': 'Evolution : {0:.2f} €'.format(labels[i])}
-                        for i in range(len(dates))]
+    purchases_stats = [{'value': '{0:.2f}'.format(values[i]), 'date': dates[i].isoformat(),
+                        'label': 'Evolution : {0:.2f} €'.format(labels[i])}
+                       for i in range(len(dates))]
 
     return purchases_stats
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # fonctionnement de l'epicerie
 # ----------------------------------------------------------------------------------------------------------------------
 
 def valueslist(request):
-
     # get stats
     purchases_stats = get_purchases_stats()
     comptes_stats = get_comptes_stats()
     appros_stats = get_appros_stats()
 
     # compute diff
-    diff_stats = []
     diff_dates = []
     for a in comptes_stats:
+        date = a['date']
+        if date not in diff_dates:
+            diff_dates.append(date)
+    for a in appros_stats:
         date = a['date']
         if date not in diff_dates:
             diff_dates.append(date)
@@ -544,17 +583,18 @@ def valueslist(request):
 
     labels[0] = values[0]
     for i in range(1, len(values)):
-        labels[i] = values[i]-values[i-1]
+        labels[i] = values[i] - values[i - 1]
 
-    diff_stats = [{'value': '{0:.2f}'.format(values[i]), 'date': diff_dates[i], 'label': 'Evolution : {0:.2f} €'.format(labels[i])}
-                        for i in range(len(diff_dates))]
-
+    diff_stats = [{'value': '{0:.2f}'.format(values[i]), 'date': diff_dates[i],
+                   'label': 'Evolution : {0:.2f} €'.format(labels[i])}
+                  for i in range(len(diff_dates))]
 
     # return
-    return render(request, 'base/valueslist.html', {'purchases_stats' : purchases_stats,
+    return render(request, 'base/valueslist.html', {'purchases_stats': purchases_stats,
                                                     'comptes_stats': comptes_stats,
                                                     'appros_stats': appros_stats,
                                                     'diff_stats': diff_stats})
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # membres
@@ -567,7 +607,7 @@ def members(request):
     members_data = [{"id": p.id, "nom": p.name, "numéro d'adhérent": p.household.get_formated_number(),
                      "date d'adhésion": p.household.date.strftime("%d/%m/%Y"),
                      "date de clotûre": p.household.get_formated_date_closed("%d/%m/%Y"), "foyer": str(p.household),
-                     "costisation d'adhésion du foyer" : '{0:.2f} €'.format(p.household.subscription),
+                     "costisation d'adhésion du foyer": '{0:.2f} €'.format(p.household.subscription),
                      "email": p.email, "bigophone": p.tel, "household_id": p.household.id if p.household else 0}
                     for p in Member.objects.all()]
     columns = json.dumps(columns)
@@ -779,16 +819,16 @@ def detail_note(request, note_id):
 
 def mailslist(request):
     columns = ['jour', 'destinataires', 'sujet', 'message', 'type', 'envoyé ?']
-    mails = [{"id": p.id, "jour": p.date.strftime("%d/%m/%Y"), "destinataires": p.recipients, "sujet": add_prefix_subject(p.subject), "message": p.message,
-              "type" : p.get_kind_display(), "envoyé ?": bool_to_utf8(p.send)}
-               for p in Mail.objects.all()]
+    mails = [{"id": p.id, "jour": p.date.strftime("%d/%m/%Y"), "destinataires": p.recipients,
+              "sujet": add_prefix_subject(p.subject), "message": p.message,
+              "type": p.get_kind_display(), "envoyé ?": bool_to_utf8(p.send)}
+             for p in Mail.objects.all()]
     columns = json.dumps(columns)
     mails = json.dumps(mails)
     return render(request, 'base/mailslist.html', {'columns': columns, 'mails': mails})
 
 
 def mails_action(request, mails, action):
-
     for m in mails:
         if action == "send":
             subject = m.subject
@@ -812,47 +852,48 @@ def mails_action(request, mails, action):
 
     return mailslist(request)
 
-def mails_send_all(request):
 
+def mails_send_all(request):
     mails = Mail.objects.all()
 
     return mails_action(request, mails, action="send")
 
-def mails_send_referents(request):
 
+def mails_send_referents(request):
     mails = Mail.objects.filter(kind=Mail.REFERENT)
 
     return mails_action(request, mails, action="send")
 
-def mails_send_receipts(request):
 
+def mails_send_receipts(request):
     mails = Mail.objects.filter(kind=Mail.RECEIPT)
 
     return mails_action(request, mails, action="send")
 
-def mails_del_send(request):
 
+def mails_del_send(request):
     mails = Mail.objects.filter(send=True)
 
     return mails_action(request, mails, action="del")
 
-def mails_del_wait(request):
 
+def mails_del_wait(request):
     mails = Mail.objects.filter(send=False)
 
     return mails_action(request, mails, action="del")
 
-def mails_del_referents(request):
 
+def mails_del_referents(request):
     mails = Mail.objects.filter(kind=Mail.REFERENT)
 
     return mails_action(request, mails, action="del")
 
-def mails_del_receipts(request):
 
+def mails_del_receipts(request):
     mails = Mail.objects.filter(kind=Mail.RECEIPT)
 
     return mails_action(request, mails, action="del")
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # inventaire
