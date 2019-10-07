@@ -18,6 +18,7 @@
 
 <div class="row justify-content-center">
     <a class="btn btn-info" href="{% url 'base:create_product' %}">Créer un nouveau produit</a>
+
 </div>
 
 <div id="vue-table">
@@ -33,9 +34,12 @@
             <button @click="changeAlerte" class="btn btn-secondary">[[ only_alerte ? "Ne pas filter les alertes" : "Montrer uniquement les alertes"]]
             </button>
         </div>
+        <div class="text-right filter">
+            <input type="submit" class="btn btn-info" name="tofile" id="tofile" value="Exporter le tableau"/>
+        </div>
     </div>
 
-    <table class="table table-striped">
+    <table class="table table-striped" id="produits-table">
         <thead>
         <tr>
             <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
@@ -110,6 +114,55 @@
       }
       }
   })
+
+  $(function(){
+    var textFile = null;
+    var makeTextFile = function (text) {
+        var data = new Blob([text], {type: 'text/html'});
+
+        // If we are replacing a previously generated file we need to
+        // manually revoke the object URL to avoid memory leaks.
+        if (textFile !== null) {
+          window.URL.revokeObjectURL(textFile);
+        }
+
+        textFile = window.URL.createObjectURL(data);
+
+        return textFile;
+    };
+
+    var create = document.getElementById('tofile');
+    var arrayContent = document.getElementById('produits-table');
+
+    create.addEventListener('click', function () {
+        var link = document.createElement('a');
+        var household = '{{ household }}';
+        link.setAttribute('download', 'Produits.html');
+
+        var content = "<!DOCTYPE html>\n";
+        content += "<html>\n";
+        content += "<head>\n";
+        content += "   <title>Produits</title>\n";
+        content += "</head>\n";
+        content += "<body>\n";
+
+        content += '<table border="1">\n';
+        content += arrayContent.innerHTML;
+        content += "</table>\n";
+
+        content += "</body>\n";
+        content += "</html>\n";
+
+        link.href = makeTextFile(content);
+        document.body.appendChild(link);
+
+        // wait for the link to be added to the document
+        window.requestAnimationFrame(function () {
+          var event = new MouseEvent('click');
+          link.dispatchEvent(event);
+          document.body.removeChild(link);
+        });}, false);
+})();
 
 </script>
 {% endblock %}
