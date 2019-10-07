@@ -20,12 +20,12 @@ prefix="_inde_"
 # can be PRODUITS or REFERENCES
 product_table = "PRODUITS"
 
-migrate_categories=False
-migrate_providers=False
-migrate_products=False
-migrate_members=False
-migrate_appro_comptes=False
-migrate_change_stock=False
+migrate_categories=True
+migrate_providers=True
+migrate_products=True
+migrate_members=True
+migrate_appro_comptes=True
+migrate_change_stock=True
 migrate_achats=True
 
 
