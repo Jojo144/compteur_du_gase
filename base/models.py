@@ -222,9 +222,10 @@ class Product(models.Model):
                                            " est approvisionné ou que le stock devient plus bas"
                                            " que le niveau \"Alerte stock\"",
                                  verbose_name="référent", on_delete=models.SET_NULL)  # todo : many to many
-    stock_alert = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True,
+    stock_alert = models.DecimalField(max_digits=10, decimal_places=2, blank=False, null=True,
                                       help_text="Laisser vide pour pas d'alerte",
-                                      verbose_name="Seuil de l'alerte stock")
+                                      verbose_name="Seuil de l'alerte stock",
+                                      default=0)
     comment = models.TextField(blank=True, verbose_name="commentaire")
     stock = models.DecimalField(default=0, max_digits=15, decimal_places=3, editable=False,
                                 verbose_name="stock")  # INVARIANT : stock should be sum of operations
