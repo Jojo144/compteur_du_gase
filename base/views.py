@@ -362,7 +362,7 @@ def products(request):
              "prix d'achat": '{} € / {}'.format(p.cost_of_purchase, p.unit),
              "prix de vente": '{} € / {}'.format(p.price, p.unit), "vrac": bool_to_utf8(p.unit.vrac),
              "visible": bool_to_utf8(p.visible),
-             "alerte stock": '{} [{}]'.format(bool_to_utf8(p.stock < p.stock_alert), round_stock(p.stock_alert)),
+             "alerte stock": '{} [{}]'.format(bool_to_utf8(p.stock < p.stock_alert), round_stock(p.stock_alert)) if (p.stock_alert) else '',
              "stock": round_stock(p.stock)}
             for p in Product.objects.all()]
     columns = json.dumps(columns)
