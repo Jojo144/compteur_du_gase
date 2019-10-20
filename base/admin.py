@@ -26,7 +26,7 @@ admin.site.register(LocalSettings)
 admin.site.register(Mail)
 
 # for debugging
-admin.site.register(Purchase)
-admin.site.register(PurchaseDetailOp)
-admin.site.register(ChangeStockOp)
-admin.site.register(ApproCompteOp)
+# admin.site.register(Purchase)
+# admin.site.register(PurchaseDetailOp)
+# admin.site.register(ChangeStockOp)
+# admin.site.register(ApproCompteOp)

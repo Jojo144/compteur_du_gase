@@ -73,6 +73,7 @@ class LocalSettings(models.Model):
 
     class Meta:
         verbose_name = "Réglages divers"
+        verbose_name_plural = "Réglages divers"
 
 def get_local_settings():
     localsettings = LocalSettings.objects.first()
