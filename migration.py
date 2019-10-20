@@ -160,14 +160,19 @@ if (migrate_change_stock):
             print("  - opération {}".format(i))
         i+=1
         if (x[2]=='APPROVISIONNEMENT' or x[2]=='INVENTAIRE'):
+            quantity=Decimal(x[4])
             try:
                 pdt=Product.objects.get(id=x[0])
+                price = pdt.price * quantity
             except ObjectDoesNotExist:
                 pdt=None
+                price=0
             if (x[2]=='APPROVISIONNEMENT'):
-                op = ChangeStockOp.create_appro_stock(product=pdt, quantity=Decimal(x[4]))
+                label='ApproStock'
             if (x[2]=='INVENTAIRE'):
-                op = ChangeStockOp.create_inventory(product=pdt, quantity=Decimal(x[4]))
+                label='Inventaire'
+            op = ChangeStockOp(product=pdt, quantity=quantity, price=price,
+                               stock=Decimal(x[1]), label=label)
             op.save()
             date= make_aware(x[3])
             ChangeStockOp.objects.filter(id=op.pk).update(date=date)
