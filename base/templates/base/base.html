@@ -45,7 +45,7 @@
 
     <div class="row justify-content-center">
         {% for message in messages %}
-        <span class="m-1 badge {{ message.tags }} message">{{ message }}</span>
+        <span class="m-1 badge {{ message.tags }} message">{{ message | safe }}</span>
         {% endfor %}
         <script>
          $("span.message").delay(5000).fadeOut();

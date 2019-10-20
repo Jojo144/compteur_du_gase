@@ -188,8 +188,7 @@ def achats(request, household_id):
 
         msg += "Ce qui nous donne un total de {} €.\n\nCiao!".format(s)
         balance = household.account
-        messages.success(request, '✔ Votre compte a été débité de ' + str(round2(s)) + ' €')
-        messages.success(request, 'Solde restant : ' + str(round2(balance) + ' €'))
+        messages.success(request, '✔ Votre compte a été débité de {} €<br>Solde restant : {} €'.format(round2(s), round2(balance)))
         mails = household.get_emails_receipt()
         my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,
                      success_msg='Le ticket de caisse a été envoyé par mail',
