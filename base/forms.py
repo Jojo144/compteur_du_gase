@@ -37,8 +37,12 @@ class ProductList(forms.Form):
     def __init__(self, pdts, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for p in pdts:
-            help_text = "prix d'achat : {} € / {} <br /> prix de vente : {} € / {} <br /> stock actuel : {} {}".format(
-                p.cost_of_purchase, p.unit, p.price, p.unit, round_stock(p.stock), p.unit)
+            if (get_local_settings().use_cost_of_purchase):
+                help_text = "prix d'achat : {} € / {} <br /> prix de vente : {} € / {} <br /> stock actuel : {} {}".format(
+                    p.cost_of_purchase, p.unit, p.price, p.unit, round_stock(p.stock), p.unit)
+            else:
+                help_text = "prix : {} € / {} <br /> stock actuel : {} {}".format(
+                    p.price, p.unit, round_stock(p.stock), p.unit)
             self.fields[str(p.pk)] = forms.DecimalField(label=p.name, help_text=mark_safe(help_text), required=False)
 
 
@@ -50,7 +54,7 @@ class ProductForm(forms.ModelForm):
 
     class Meta:
         model = Product
-        exclude = []
+        exclude = ['cost_of_purchase']
 
 
 # used for details AND creation

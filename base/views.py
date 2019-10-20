@@ -348,9 +348,10 @@ def detail_product(request, product_id):
 
 
 def products(request):
-    columns = ['nom', 'catégorie', 'fournisseur', 'prix de vente', 'vrac', 'visible', 'alerte stock', 'stock']
     if get_local_settings().use_cost_of_purchase:
-        columns.insert(3, "prix d'achat")
+        columns = ['nom', 'catégorie', 'fournisseur', "prix d'achat", 'prix de vente', 'vrac', 'visible', 'alerte stock', 'stock']
+    else:
+        columns = ['nom', 'catégorie', 'fournisseur', 'prix', 'vrac', 'visible', 'alerte stock', 'stock']
     pdts = [{"id": p.id, "nom": p.name, "catégorie": str(p.category), "fournisseur": str(p.provider),
              "prix d'achat": '{} € / {}'.format(p.cost_of_purchase, p.unit),
              "prix de vente": '{} € / {}'.format(p.price, p.unit), "vrac": bool_to_utf8(p.unit.vrac),
