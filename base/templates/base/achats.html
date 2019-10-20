@@ -97,7 +97,7 @@
                             <button class="dropdown-item" @click="category='Toutes catégories'">Toutes catégories
                             </button>
                             {% for cat in cats %}
-                            <button class="dropdown-item" @click="category='{{ cat }}'">{{ cat.name }}</button>
+                            <button class="dropdown-item" @click="category='{{ cat | escapejs }}'">{{ cat.name | escape }}</button>
                             {% endfor %}
                         </div>
                     </div>
