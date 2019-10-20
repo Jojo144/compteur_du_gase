@@ -17,12 +17,6 @@ from .templatetags.my_tags import *
 from compteur.settings import DEFAULT_FROM_EMAIL
 
 
-def get_local_settings():
-    localsettings = LocalSettings.objects.first()
-    if localsettings is None:
-        localsettings = LocalSettings.objects.create()
-    return localsettings
-
 
 def add_prefix_subject(subject):
     subject_mail = subject
@@ -252,7 +246,7 @@ def compte(request, household_id):
         form = ApproCompteForm(request.POST)
         if form.is_valid():
             q = form.cleaned_data['amount']
-            k = form.cleaned_data['kind']
+            k = form.cleaned_data.get('kind') # None if kinds are not used
             op = ApproCompteOp(household=household, amount=q, kind=k)
             op.save()
             household.account += q

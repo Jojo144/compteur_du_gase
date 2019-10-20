@@ -74,6 +74,12 @@ class LocalSettings(models.Model):
     class Meta:
         verbose_name = "Réglages divers"
 
+def get_local_settings():
+    localsettings = LocalSettings.objects.first()
+    if localsettings is None:
+        localsettings = LocalSettings.objects.create()
+    return localsettings
+
 
 class Category(models.Model):
     name = models.CharField(max_length=200, verbose_name="Nom")
@@ -323,10 +329,11 @@ class ApproCompteOp(Operation):
         (REPAYMENT, 'Remboursement'),
         (ONTHEFLIGHT, 'A la volée'),
     ]
-    kind = models.CharField(max_length=6, choices=KIND_CHOICES, default=CASH)
+    kind = models.CharField(max_length=6, choices=KIND_CHOICES, default=CASH, null=True)
 
     def __str__(self):
         return 'ApproCompteOp {} - {} - {}'.format(self.household, self.amount, self.get_kind_display())
+
 
 # message
 class Note(models.Model):

@@ -41,7 +41,7 @@
                 <td> {{ o.date | date:"D d M Y" | capfirst }}</td>
                 <td> {{ o.date | date:"H \h i" }}</td>
                 <td class="text-right"> {{ o.amount }} €</td>
-                <td class="text-right"> {{ o.get_kind_display }}</td>
+                {% if o.get_kind_display %}<td class="text-right"> {{ o.get_kind_display }}</td> {% endif %}
             </tr>
             {% empty %}
             <tr>
