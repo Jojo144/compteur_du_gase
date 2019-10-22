@@ -14,7 +14,6 @@ from django.db.models import Sum
 from .models import *
 from .forms import *
 from .templatetags.my_tags import *
-from compteur.settings import DEFAULT_FROM_EMAIL
 
 
 
@@ -32,7 +31,7 @@ def add_prefix_subject(subject):
 def get_recipient_list(recipient_list):
     if get_local_settings().debug_mail is not None:
         if str(get_local_settings().debug_mail) != "":
-            print("*Mode de test pour les mails qui sont automatiquement envoyés à {}.".format(
+            print("* Mode de test pour les mails qui sont automatiquement envoyés à {}.".format(
                 get_local_settings().debug_mail))
             return [get_local_settings().debug_mail]
         else:
@@ -42,13 +41,13 @@ def get_recipient_list(recipient_list):
 
 
 def my_connection():
-    connection = get_connection(host=str(get_local_settings().mail_host),
-                                port=get_local_settings().mail_port,
-                                username=str(get_local_settings().mail_username).strip(),
-                                password=str(get_local_settings().mail_passwd).strip(),
-                                use_tls=True)
-    from_email = str(get_local_settings().mail_username)
-    return connection, from_email
+    return get_connection(host=str(get_local_settings().mail_host),
+                          port=get_local_settings().mail_port,
+                          username=str(get_local_settings().mail_username),
+                          password=str(get_local_settings().mail_passwd),
+                          use_tls=(get_local_settings().mail_protocole == 'tls'),
+                          use_ssl=(get_local_settings().mail_protocole == 'ssl'),
+                          timeout=get_local_settings().mail_timeout)
 
 
 def my_send_mail(request, subject, message, recipient_list, success_msg, error_msg, kind, save=True):
@@ -62,7 +61,8 @@ def my_send_mail(request, subject, message, recipient_list, success_msg, error_m
         try:
             subject_mail = add_prefix_subject(subject)
             recipient_list_cleaned = get_recipient_list(recipient_list)
-            connection, from_email = my_connection()
+            from_email = str(get_local_settings().mail_username)
+            connection = my_connection()
             connection.open()
             send_mail(subject_mail, message, from_email, recipient_list_cleaned, fail_silently=False,
                       connection=connection)

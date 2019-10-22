@@ -57,12 +57,18 @@ class LocalSettings(models.Model):
                                   help_text="Ce champ permet de tester la fonction email sans envoyer de mails intempestifs.")
 
     mail_host = models.CharField(blank=False, verbose_name="Hebergeur pour l'envoi des mails.",
-                                  default="", max_length=50,
+                                  default="xxx", max_length=50,
                                   help_text="Exemple : smtp.titi.com.")
 
     mail_port = models.IntegerField(verbose_name="Port smtp pour l'envoi des mails.",
-                                    default=0,
-                                    help_text="Exemple : 587.")
+                                    default=465,
+                                    help_text="Exemple : 25 (sans chiffrement), 465 (chiffrement implicite, SSL), 587 (chiffrement explicite, TLS).")
+
+    mail_protocole = models.CharField(choices=[('no', 'Pas de chiffrement'), ('tls', 'Utiliser TLS'), ('ssl', 'Utiliser SSL')],
+                                        verbose_name="Protocole utilisé pour l'envoie de mails.",
+                                        default="no", max_length=100)
+
+    mail_timeout = models.IntegerField(default=4, verbose_name="Timeout pour l'envoi de mail.")
 
     mail_username = models.CharField(blank=False, verbose_name="Nom d'utilisateur pour l'envoi des mails.",
                                      default="tata@titi.com", max_length=100,
