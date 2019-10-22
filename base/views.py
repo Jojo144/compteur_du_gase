@@ -188,7 +188,7 @@ def achats(request, household_id):
                      kind=Mail.RECEIPT)
         return HttpResponseRedirect(reverse('base:index'))
     else:
-        localsettings = get_local_settings()
+        local_settings = get_local_settings()
         purchases_history = Purchase.objects.filter(household_id=household_id).order_by('-date')[:10]
         history = [{'date': p.date, 'details': PurchaseDetailOp.objects.filter(purchase=p),
                     'total': '{0:.2f} €'.format(sum([-q.price for q in PurchaseDetailOp.objects.filter(purchase=p)]))}
@@ -202,7 +202,7 @@ def achats(request, household_id):
 
         context = {'household': household,
                    'cats': Category.objects.all(),
-                   'max_amount': household.account - localsettings.min_account,
+                   'max_amount': household.account - local_settings.min_account,
                    'balance_amount': balance,
                    'pdts': pdts,
                    'history': history,
@@ -210,7 +210,7 @@ def achats(request, household_id):
                    'alerte_balance': balance < alerte_balance_amount,
                    'alerte_balance_amount': '{0:.2f}'.format(alerte_balance_amount),
                    'on_the_flight': household.on_the_flight,
-                   'min_account_allow': localsettings.min_account_allow}
+                   'min_account_allow': local_settings.min_account_allow}
 
         return render(request, 'base/achats.html', context)
 
