@@ -59,7 +59,7 @@
         {% endfor %}
     </ul>
 
-    {% if use_subscriptions_str == 'True' %}
+    {% if use_subscriptions %}
     <hr class="gestion-hr">
 
     <h4>Liste des adhésions des foyers</h4>
@@ -78,7 +78,7 @@
 
     <hr class="gestion-hr">
 
-    {% if save_mails_str == 'True' %}
+    {% if save_mails %}
     <h4>Liste des emails</h4>
     <div class="gestion-btn">
         <a class="btn btn-info" href="{% url 'base:mailslist' %}">Liste des emails envoyés ou en attente.</a>

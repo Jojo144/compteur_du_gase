@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    {% if use_favicon_str == 'True' %} <link rel="shortcut icon" type="image/png" href="{% static 'base/favicon.ico' %}"/> {% endif %}
+    {% if use_favicon %} <link rel="shortcut icon" type="image/png" href="{% static 'base/favicon.ico' %}"/> {% endif %}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <script src="{% static 'base/lodash.js' %}"></script>
@@ -37,7 +37,7 @@
                 <li><a class="nav-item nav-link" href="{% url 'base:pre_appro' %}">Réception de commande</a></li>
                 <li><a class="nav-item nav-link" href="{% url 'base:products' %}">Produits</a></li>
                 <li><a class="nav-item nav-link" href="{% url 'base:providers' %}">Fournisseurs</a></li>
-                {% if use_messages_str == 'True' %} <li><a class="nav-item nav-link" href="{% url 'base:notes' %}">Messages/Actions</a></li> {% endif %}
+                {% if use_messages %} <li><a class="nav-item nav-link" href="{% url 'base:notes' %}">Messages/Actions</a></li> {% endif %}
                 <li><a class="nav-item nav-link" href="{% url 'base:gestion' %}">☭ Gestion</a></li>
             </ul>
         </nav>

@@ -276,7 +276,7 @@
       total_sum: function(data){
           let sum = 0;
           data.forEach(function(element) {
-              {% if use_cost_of_purchase_str == 'True' %}
+              {% if use_cost_of_purchase %}
               sum += parseFloat(element["coût total (prix d'achat)"].replace('€', ''));
               {% else %}
               sum += parseFloat(element["coût total (prix de vente)"].replace('€', ''));

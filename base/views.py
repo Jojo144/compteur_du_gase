@@ -17,52 +17,38 @@ from .templatetags.my_tags import *
 
 
 
-def add_prefix_subject(subject):
-    subject_mail = subject
-    subject_pre = str(get_local_settings().prefix_object_mail)
-    if subject_pre != "":
-        if subject_pre.endswith(' '):
-            subject_mail = subject_pre + subject_mail
-        else:
-            subject_mail = subject_pre + ' ' + subject_mail
-    return subject_mail
-
-
-def get_recipient_list(recipient_list):
-    if get_local_settings().debug_mail is not None:
-        if str(get_local_settings().debug_mail) != "":
-            print("* Mode de test pour les mails qui sont automatiquement envoyés à {}.".format(
-                get_local_settings().debug_mail))
-            return [get_local_settings().debug_mail]
-        else:
-            return recipient_list
+def add_prefix_subject(subject, prefix=get_local_settings().prefix_object_mail):
+    if prefix:
+        return ' '.join([prefix, subject])
     else:
-        return recipient_list
-
-
-def my_connection():
-    return get_connection(host=str(get_local_settings().mail_host),
-                          port=get_local_settings().mail_port,
-                          username=str(get_local_settings().mail_username),
-                          password=str(get_local_settings().mail_passwd),
-                          use_tls=(get_local_settings().mail_protocole == 'tls'),
-                          use_ssl=(get_local_settings().mail_protocole == 'ssl'),
-                          timeout=get_local_settings().mail_timeout)
-
+        return subject
 
 def my_send_mail(request, subject, message, recipient_list, success_msg, error_msg, kind, save=True):
-    if not get_local_settings().use_mail:
+    local_settings = get_local_settings()
+    if not local_settings.use_mail:
         return True
     if recipient_list:
-        save_mail = save and get_local_settings().save_mail
+        save_mail = save and local_settings.save_mail
         if save_mail:
             mail = Mail(recipients=', '.join(recipient_list), subject=subject, message=message, kind=kind)
             mail.save()
+        subject_mail = add_prefix_subject(subject, prefix=local_settings.prefix_object_mail)
+        debug_mail = local_settings.debug_mail
+        if debug_mail:
+            print("* Mode de test pour les mails qui sont automatiquement envoyés à {}.".format(debug_mail))
+            recipient_list_cleaned = [debug_mail]
+        else:
+            recipient_list_cleaned = recipient_list
+        from_email = str(local_settings.mail_username)
         try:
-            subject_mail = add_prefix_subject(subject)
-            recipient_list_cleaned = get_recipient_list(recipient_list)
-            from_email = str(get_local_settings().mail_username)
-            connection = my_connection()
+            connection = get_connection(host=local_settings.mail_host,
+                                        port=local_settings.mail_port,
+                                        username=local_settings.mail_username,
+                                        password=local_settings.mail_passwd,
+                                        use_tls=(local_settings.mail_protocole == 'tls'),
+                                        use_ssl=(local_settings.mail_protocole == 'ssl'),
+                                        timeout=local_settings.mail_timeout)
+
             connection.open()
             send_mail(subject_mail, message, from_email, recipient_list_cleaned, fail_silently=False,
                       connection=connection)
@@ -87,7 +73,8 @@ def my_send_mail(request, subject, message, recipient_list, success_msg, error_m
 # ----------------------------------------------------------------------------------------------------------------------
 
 def index(request):
-    txt_home = get_local_settings().txt_home
+    local_settings = get_local_settings()
+    txt_home = local_settings.txt_home
 
     note_not_read = len([p for p in Note.objects.all() if not p.read])
     if note_not_read > 1:
@@ -104,13 +91,14 @@ def index(request):
     txt_message = "Il y a actuellement {0:d} message{1:s} non lu{1:s} et {2:d} action{3:s} non réalisée{3:s}.".format(
         note_not_read, note_pluralize, action_not_done, action_pluralize)
 
-    use_logo_str = str(get_local_settings().use_logo)
-
     return render(request, 'base/index.html',
-                  {'txt_home': txt_home, 'txt_message': txt_message, 'use_logo_str': use_logo_str})
+                  {'txt_home': txt_home,
+                   'txt_message': txt_message,
+                   'use_logo': local_settings.use_logo})
 
 
 def gestion(request):
+    local_settings = get_local_settings()
     # todo : use aggregate ?
     value_stock = sum([p.value_stock() for p in Product.objects.all()])
     value_accounts = sum([p.account for p in Household.objects.all()])
@@ -121,8 +109,8 @@ def gestion(request):
                    'value_accounts': value_accounts,
                    'diff_values': value_accounts - value_stock,
                    'alert_pdts': alert_pdts,
-                   'save_mails_str': str(get_local_settings().save_mail),
-                   'use_subscriptions_str': str(get_local_settings().use_subscription),
+                   'save_mails': local_settings.save_mail,
+                   'use_subscriptions': local_settings.use_subscription,
                    })
 
 def otherstats(request):
@@ -210,9 +198,7 @@ def achats(request, household_id):
                 for p in Product.objects.filter(visible=True)}
         pdts = json.dumps(pdts)
         balance = household.account
-        alerte_balance_amount = get_local_settings().min_balance
-        alerte_balance_str = balance < alerte_balance_amount
-        alerte_balance_amount = '{0:.2f}'.format(alerte_balance_amount)
+        alerte_balance_amount = local_settings.min_balance
 
         context = {'household': household,
                    'cats': Category.objects.all(),
@@ -220,8 +206,8 @@ def achats(request, household_id):
                    'balance_amount': balance,
                    'pdts': pdts,
                    'history': history,
-                   'alerte_balance_str': str(alerte_balance_str),
-                   'alerte_balance_amount': alerte_balance_amount,
+                   'alerte_balance': balance < alerte_balance_amount,
+                   'alerte_balance_amount': '{0:.2f}'.format(alerte_balance_amount),
                    'on_the_flight': household.on_the_flight,
                    'min_account_allow': localsettings.min_account_allow}
 
@@ -416,9 +402,9 @@ def appro(request, provider_id):
 
 
 def approslist(request):
+    use_cost_of_purchase = get_local_settings().use_cost_of_purchase
     columns = ['jour', 'mois', 'année', 'fournisseur', 'produit', "coût total (prix de vente)"]
-    use_cost_of_purchase_str = str(get_local_settings().use_cost_of_purchase)
-    if get_local_settings().use_cost_of_purchase:
+    if use_cost_of_purchase:
         columns.append("coût total (prix d'achat)")
     appros = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "fournisseur": str(p.product.provider),
                "produit": str(p.product), "coût total (prix d'achat)": '{0:.2f} €'.format(p.cost_of_purchase()),
@@ -429,7 +415,7 @@ def approslist(request):
     appros = json.dumps(appros)
     appros_stats = get_appros_stats()
     return render(request, 'base/approslist.html',
-                  {'columns': columns, 'appros': appros, 'use_cost_of_purchase_str': use_cost_of_purchase_str,
+                  {'columns': columns, 'appros': appros, 'use_cost_of_purchase': use_cost_of_purchase,
                    'appros_stats': appros_stats})
 
 
@@ -599,7 +585,8 @@ def valueslist(request):
 # ----------------------------------------------------------------------------------------------------------------------
 
 def members(request):
-    if get_local_settings().use_subscription:
+    local_settings = get_local_settings()
+    if local_settings.use_subscription:
         columns = ['nom', "numéro d'adhérent", "date d'adhésion", "date de clotûre", "costisation d'adhésion du foyer", 'foyer', 'email', 'bigophone']
     else:
         columns = ['nom', "date d'adhésion", 'foyer', 'email', 'bigophone']
@@ -619,7 +606,7 @@ def members(request):
                   {'columns': columns, 'members': members_data,
                    'txt_number_m': txt_number_m,
                    'txt_number_h': txt_number_h,
-                   'use_subscription': get_local_settings().use_subscription})
+                   'use_subscription': local_settings.use_subscription})
 
 
 def menbersstats(request):

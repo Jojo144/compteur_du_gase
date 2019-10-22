@@ -1,9 +1,5 @@
 from .models import *
 
-def use_messages(request):
-
-    use_messages_str = str(LocalSettings.objects.first().use_messages)
-
-    use_favicon_str = str(LocalSettings.objects.first().use_favicon)
-
-    return {'use_messages_str': use_messages_str, 'use_favicon_str': use_favicon_str}
+def base_processor(request):
+    return {'use_messages': get_local_settings().use_messages,
+            'use_favicon': get_local_settings().use_favicon}
