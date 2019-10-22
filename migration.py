@@ -79,7 +79,7 @@ if migrate_providers:
         fax = '' if (x[7] == '') else ('Fax : ' + x[7])
         contact = "\n".join([y for y in [x[2], x[3], x[4], x[5], x[6], fax]
                              if y != ''])
-        Provider(id=x[0], name=x[1].strip(), contact=contact.strip(), comment=x[9].strip()).save()
+        Provider(id=x[0], name=x[1].strip().title(), contact=contact.strip(), comment=x[9].strip()).save()
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Produits
@@ -98,7 +98,7 @@ if migrate_products:
                " DATE = (SELECT MAX(DATE) FROM {0}STOCKS WHERE ID_REFERENCE='{1}')".format(prefix, x[0])
         mycursor.execute(rqst)
         myresult2 = mycursor.fetchall()
-        Product(id=x[0], name=x[1].strip(), provider_id=x[2], category_id=x[4], unit=unit,
+        Product(id=x[0], name=x[1].strip().title(), provider_id=x[2], category_id=x[4], unit=unit,
                 price=x[5], pwyw=False, visible=x[7], stock_alert=alert, stock=Decimal(myresult2[0][0]),
                 comment=comment.strip()).save()
 
@@ -117,16 +117,18 @@ if migrate_members:
     for x in myresult:
         # seulement les visibles
         if x[8] == 1:
-            name = x[2] + ' ' + x[1]
-            hsld = Household(id=x[0], name=name, address=x[4], comment=x[7], date=x[10])
+            name = (x[2] + ' ' + x[1]).strip().title()
+            hsld = Household(id=x[0], name=name, address=x[4].strip(), comment=x[7], date=x[10])
             rqst = "SELECT SOLDE FROM  {0}COMPTES WHERE ID_ADHERENT='{1}' AND " \
                    "DATE = (SELECT MAX(DATE) FROM {0}COMPTES WHERE ID_ADHERENT='{1}')".format(prefix, x[0])
             mycursor.execute(rqst)
             myresult2 = mycursor.fetchall()
             hsld.account = Decimal(myresult2[0][0])
             hsld.save()
+            date= make_aware(x[10])
+            Household.objects.filter(id=x[0]).update(date=date)
             tel = ((x[5] + ' ' + x[6]) if (x[6]) else x[5]) if (x[5]) else x[6]
-            Member(name=name.strip(), email=x[3].strip(), tel=tel.strip(), household=hsld, receipt=x[9],
+            Member(name=name, email=x[3].strip(), tel=tel.strip(), household=hsld, receipt=x[9],
                    stock_alert=False).save()
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -169,16 +171,19 @@ if migrate_change_stock:
             print("  - opération {}".format(i))
         i += 1
         if x[2] == 'APPROVISIONNEMENT' or x[2] == 'INVENTAIRE':
+            quantity = Decimal(x[4])
             try:
                 pdt = Product.objects.get(id=x[0])
+                price = pdt.price * quantity
             except ObjectDoesNotExist:
                 pdt = None
+                price=0
             if x[2] == 'APPROVISIONNEMENT':
-                op = ChangeStockOp.create_appro_stock(product=pdt, quantity=Decimal(x[4]))
-            elif x[2] == 'INVENTAIRE':
-                op = ChangeStockOp.create_inventory(product=pdt, quantity=Decimal(x[4]))
-            else:
-                raise NotImplementedError("x[2]={0:s}".format(x[2]))
+                label='ApproStock'
+            if x[2] == 'INVENTAIRE':
+                label='Inventaire'
+            op = ChangeStockOp(product=pdt, quantity=quantity, price=price,
+                               stock=Decimal(x[1]), label=label)
             op.save()
             date = make_aware(x[3])
             ChangeStockOp.objects.filter(id=op.pk).update(date=date)
