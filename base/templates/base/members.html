@@ -13,9 +13,11 @@
                 <li>obtenir des informations sur un foyer.</li>
             </ul>
         </div>
+	{% if use_subscription %}
         Si un foyer a été clotûré et qu'il y a une demande de réouverture, en recréer un avec un numéro d'adhérent
         différent.
         <br>
+	{% endif %}
         Il y a actuellement {{ txt_number_h | safe }} foyers actifs et {{ txt_number_m | safe }} membres enregistrés.
     </div>
 </div>

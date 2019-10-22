@@ -595,9 +595,10 @@ def valueslist(request):
 # ----------------------------------------------------------------------------------------------------------------------
 
 def members(request):
-    columns = ['nom', "numéro d'adhérent", "date d'adhésion", "date de clotûre", 'foyer', 'email', 'bigophone']
     if get_local_settings().use_subscription:
-        columns.insert(4, "costisation d'adhésion du foyer")
+        columns = ['nom', "numéro d'adhérent", "date d'adhésion", "date de clotûre", "costisation d'adhésion du foyer", 'foyer', 'email', 'bigophone']
+    else:
+        columns = ['nom', "date d'adhésion", 'foyer', 'email', 'bigophone']
     members_data = [{"id": p.id, "nom": p.name, "numéro d'adhérent": p.household.get_formated_number(),
                      "date d'adhésion": p.household.date.strftime("%d/%m/%Y"),
                      "date de clotûre": p.household.get_formated_date_closed("%d/%m/%Y"), "foyer": str(p.household),
@@ -613,7 +614,8 @@ def members(request):
     return render(request, 'base/members.html',
                   {'columns': columns, 'members': members_data,
                    'txt_number_m': txt_number_m,
-                   'txt_number_h': txt_number_h})
+                   'txt_number_h': txt_number_h,
+                   'use_subscription': get_local_settings().use_subscription})
 
 
 def menbersstats(request):
@@ -661,9 +663,10 @@ class HouseholdCreate(CreateView):
 
     def __init__(self, *args, **kwargs):
         super(HouseholdCreate, self).__init__(*args, **kwargs)
-        fields = ['number', 'name', 'address', 'comment']
         if get_local_settings().use_subscription:
-            fields.insert(3, "subscription")
+            fields = ['number', 'name', 'address', 'subscription', 'comment']
+        else:
+            fields = ['name', 'address', 'comment']
         self.fields = fields
 
     def get_initial(self):
@@ -701,9 +704,10 @@ class HouseholdUpdate(UpdateView):
 
     def __init__(self, *args, **kwargs):
         super(HouseholdUpdate, self).__init__(*args, **kwargs)
-        fields = ['number', 'name', 'date_closed', 'address', 'comment']
         if get_local_settings().use_subscription:
-            fields.insert(4, "subscription")
+            fields = ['number', 'name', 'date_closed', 'address', 'comment']
+        else:
+            fields = ['name', 'address', 'comment']
         self.fields = fields
 
     def get_context_data(self, **kwargs):
