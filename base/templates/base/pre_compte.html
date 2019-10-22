@@ -2,12 +2,31 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+<div class="medium-content">
+    <h3>Mon compte</h3>
+    <div class="description">
+        Cette page sert à :
+        <div class="description-list">
+            <ul>
+                <li>enregistrer un approvisionnement du compte d'un foyer ;</li>
+                <li>corriger ou annuler un approvisionnement d'un foyer déjà effectué ;</li>
+                <li>clotûrer le compte d'un foyer.</li>
+            </ul>
+        </div>
+        Pour annuler un approvisionnement erronné, une façon de faire est de refaire le même approvisionnement en
+        mettant des quantités négatives à la place et en choisissant l'option Annulation/Correction.
+        <br>
+        Pour clotûrer le compte d'un foyer, faire un approvisionnement négatif du solde restant et choisir l'option
+        remboursement.
+    </div>
+</div>
+
 <form class="narrow-content" action="{% url 'base:pre_compte' %}" method="post">
     {% csrf_token %}
     {{ form | crispy }}
     <div class="form-buttons">
-	<a class="btn btn-light" href="{% url 'base:index' %}">Annuler</a> &nbsp;
-	<input class="btn btn-info" type="submit" value="Valider">
+        <a class="btn btn-light" href="{% url 'base:index' %}">Annuler</a> &nbsp;
+        <input class="btn btn-info" type="submit" value="Valider">
     </div>
 </form>
 {% endblock content %}

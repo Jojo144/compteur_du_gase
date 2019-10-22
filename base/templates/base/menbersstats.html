@@ -4,16 +4,14 @@
 {% load my_tags %}
 
 {% block content %}
-<h4>{{ pdt }}</h4>
-Fournisseur : {{ pdt.provider }}<br>
-Stock actuel : {{ pdt.stock | round_stock }} {{ pdt.unit }}<br>
-Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
+<h4>Nombres de foyers et de membres</h4>
 
+<div class="medium-content">
 <canvas id="myChart"></canvas>
-<br>
-<br>
 <button id="removeData">Zoomer</button>
 <button id="addData">Dézoomer</button>
+</div>
+</br>
 
 <script src="{% static 'base/moment-with-locales.js' %}"></script>
 <script src="{% static 'base/Chart.js' %}"></script>
@@ -22,6 +20,7 @@ Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
  moment.locale('fr');
  var style = getComputedStyle(document.body);
  var chartCol1 = style.getPropertyValue('--chartColor1');
+ var chartCol2 = style.getPropertyValue('--chartColor2');
  var chartColorText = style.getPropertyValue('--chartColorText');
 
  Chart.defaults.global.defaultFontSize = 16;
@@ -37,21 +36,33 @@ Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
 
      data: {
          datasets: [{
-             label: 'Stock de {{ pdt }}',
+             label: 'Nombre de foyers',
              backgroundColor: chartCol1,
              borderColor: chartCol1,
          fill: false,
          lineTension: 0,
          data: [
-         {% for d in data %}
-         { x: new Date('{{d.date}}'), y: {{d.stock}}, label: '{{d.label}}' },
+         {% for d in households_data %}
+         { x: new Date('{{d.date}}'), y: {{d.nb}}, label: '{{d.label}}' },
          {% endfor %}
          ]
-         }]
+         },
+         {
+             label: 'Nombre de membres',
+             backgroundColor: chartCol2,
+             borderColor: chartCol2,
+         fill: false,
+         lineTension: 0,
+         data: [
+         {% for d in members_data %}
+         { x: new Date('{{d.date}}'), y: {{d.nb}}, label: '{{d.label}}' },
+         {% endfor %}
+         ]
+         }],
      },
 
      options: {
-     title: { text: 'Bla bla' },
+     title: { text: 'Nombre de foyers et de membres' },
      scales: {
              xAxes: [{
                  type: 'time',
@@ -60,7 +71,7 @@ Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
          yAxes: [{
          scaleLabel: {
              display: true,
-             labelString: 'Stock ({{ pdt.unit }})'
+             labelString: 'Nombre'
          },
          ticks: {
             suggestedMin: 0
@@ -71,7 +82,7 @@ Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
              callbacks: {
                  label: function(tooltipItem, data) {
              var o = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                     return o.label + ". Stock: " + o.y;
+                     return o.label + ". Nombre: " + o.y;
                  }
              }
      },
@@ -91,6 +102,7 @@ Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
      chart.options.scales.xAxes[0].time.min = date;
      chart.update();
  });
+
 
 </script>
 {% endblock content %}

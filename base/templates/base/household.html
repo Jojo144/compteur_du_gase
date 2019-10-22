@@ -9,46 +9,47 @@
 
     <h4>Membres du foyer</h4>
     <table class="table table-striped">
-	{{ members.management_form }}
+        {{ members.management_form }}
 
-	{% for form in members.forms %}
-	{% if forloop.first %}
-	<thead>
-	    <tr>
-		<th>Nom</th>
-		<th>Email</th>
-		<th>Téléphone</th>
-		<th>Ticket caisse</th>
-		<th>Alertes stock</th>
-		<th></th>
-	    </tr>
-	</thead>
-	{% endif %}
-	<tr class="formset_row">
-	    {% for field in form.visible_fields %}
-	    <td>
-		{# Include the hidden fields in the form #}
-		{% if forloop.first %}
-		{% for hidden in form.hidden_fields %}
-		{{ hidden }}
-		{% endfor %}
-		{% endif %}
-		{{ field.errors.as_ul }}
-		{{ field }}
-	    </td>
-	    {% endfor %}
-	</tr>
-	{% endfor %}
+        {% for form in members.forms %}
+        {% if forloop.first %}
+        <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Téléphone</th>
+            <th>Ticket caisse</th>
+            <th>Alertes stock</th>
+            <th></th>
+        </tr>
+        </thead>
+        {% endif %}
+        <tr class="formset_row">
+            {% for field in form.visible_fields %}
+            <td>
+                {# Include the hidden fields in the form #}
+                {% if forloop.first %}
+                {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+                {% endfor %}
+                {% endif %}
+                {{ field.errors.as_ul }}
+                {{ field }}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
     </table>
     Cochez la case "Ticket de caisse" pour recevoir un ticket de caisse par mail après chaque achat.
     <br>
-    Cochez la case "Alertes stock" pour recevoir les alertes stocks des produits dont vous êtes le référent (utile seulement pour les référents produits).
+    Cochez la case "Alertes stock" pour recevoir les alertes stocks des produits dont vous êtes le référent (utile
+    seulement pour les référents produits).
     <br>
     <br>
 
     <div class="text-right">
-	<input class="btn btn-info" type="submit" value="Enregister">
-	<a class="btn btn-light" href="{% url 'base:members' %}">Annuler</a>
+        <input class="btn btn-info" type="submit" value="Enregistrer">
+        <a class="btn btn-light" href="{% url 'base:members' %}">Annuler</a>
     </div>
 </form>
 
@@ -59,5 +60,7 @@
      deleteText: '🗑',
      prefix: 'has_household'
  });
+
+
 </script>
 {% endblock content %}

@@ -22,6 +22,14 @@ utilisable.
 
 Version de démo ici : https://test-compteur.girole.fr
 
+## Configuration
+
+Ce logiciel peut être utilié tel quel.
+
+Néanmoins, pour personnaliser l'interface graphique, il faut créer un fichier local.css dans le répertoire contenant le fichier base.css.
+
+Différentes options sont également disponibles dans l'interface graphique dans Gestion>Interface d'administration>Réglages divers.  
+
 ## Contributions
 
 Toutes les remarques et contributions sont les bienvenues. N'hésitez pas à entrer en contact avec moi si vous souhaitez l'installer dans votre épicerie.

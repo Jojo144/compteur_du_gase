@@ -3,40 +3,36 @@
 
 {% block content %}
 <div class="medium-content">
+
     <h4>Interface d'administration</h4>
     <a class="btn btn-info" href="/admin">Accès à l'interface d'administration</a>
-    <br> Cette interface permet de bidouiller tout ce que gère le logiciel, à utiliser avec précaution. En particulier on peut :
+    <br> Cette interface permet de bidouiller tout ce que gère le logiciel, <b>à utiliser avec
+    précaution</b>. En particulier on peut :
     <ul>
-	<li>
-	    Créer/modifier les catégories.
-	</li>
-	<li>
-	    Créer/modifier les unités.
-	</li>
-	<li>
-	    Supprimer un foyer/fournisseur/référence/catégorie. Une fois un objet supprimé on ne peut pas le retrouver, à utiliser avec modération donc. Attention si l'on supprime un fournisseur / une catégorie cela supprimera aussi tous les produits correspondants (le logiciel demande confirmation avant).
-	</li>
-	<li>
-	    Régler le seuil en dessous duquel on ne peut plus faire d'achats (dans "Réglages divers").
-	</li>
-	<li>
-	    Changer le texte de la page d'accueil (dans "Réglages divers").
-	</li>
+        <li> créer/modifier/supprimer des informations renseignées dans la base de données
+            (une fois un objet supprimé on ne peut pas le retrouver, à utiliser avec modération donc.
+            Attention si l'on supprime un fournisseur ou une catégorie cela supprime
+            également tous les produits correspondants (le logiciel demande confirmation avant)) ;
+        </li>
+        <li>
+            régler le seuil en dessous duquel on ne peut plus faire d'achats (dans "Réglages divers") ;
+        </li>
+        <li>
+            modifier les options du logciel (dans "Réglages divers").
+        </li>
     </ul>
 
-
-    <h4>Fournisseurs</h4>
-    <a class="btn btn-info" href="{% url 'base:providers' %}">Liste des fournisseurs</a>
-    <br>
-    <br>
+    <hr class="gestion-hr">
 
     <h4>Inventaire</h4>
-    <a class="btn btn-info" href="{% url 'base:inventory' %}">Nouvel inventaire</a>
-    &nbsp;&nbsp;&nbsp;
-    <a class="btn btn-info" href="{% url 'base:ecarts' %}">Bilan des inventaires précédents</a>
-    <br>
-    <br>
+    Ici, on peut réaliser un inventaire ou voir les inventaires déjà réalisés. Un inventaire modifie les stocks des
+    produits.
+    <div class="gestion-btn">
+        <a class="btn btn-info" href="{% url 'base:inventory' %}">Nouvel inventaire</a>
+        <a class="btn btn-info" href="{% url 'base:ecarts' %}">Bilan des inventaires précédents</a>
+    </div>
 
+    <hr class="gestion-hr">
 
     <h4>Valeur du stock et des comptes</h4>
     Valeur du stock total (références non visibles incluses) : {{ value_stock | round0 }} €
@@ -44,44 +40,78 @@
     Somme des soldes des comptes : {{ value_accounts | round0 }} €
     <br>
     Donc il doit y avoir en banque : {{ diff_values | round0 }} €
-    (si toutes les factures ont été payées et que tous les adhérents ont bien fait leur virement).
-    <br>
-    <br>
+    (si toutes les factures ont été payées et que tous les adhérents ont bien fait leur virement)
+    <div class="gestion-btn">
+        <a class="btn btn-info" href="{% url 'base:stockslist' %}">Liste détaillées de la valeur du stock</a>
+    </div>
 
+    <hr class="gestion-hr">
 
     <h4>Liste des alertes stock</h4>
     Produits en rupture ou proche de la rupture de stock (produits visibles seulements).
     <ul>
-	{% for p in alert_pdts %}
-	<li>
-	    {{ p.name }} : {{ p.stock | round_stock }} {{ p.unit }} en stock
-	</li>
-	{% empty %}
-	<li>Pas d'alerte stock !</li>
-	{% endfor %}
+        {% for p in alert_pdts %}
+        <li>
+            {{ p.name }} : {{ p.stock | round_stock }} {{ p.unit }} en stock
+        </li>
+        {% empty %}
+        <li>Pas d'alerte stock !</li>
+        {% endfor %}
     </ul>
-    <br>
-    <br>
+
+    {% if use_subscriptions %}
+    <hr class="gestion-hr">
+
+    <h4>Liste des adhésions des foyers</h4>
+    <div class="gestion-btn">
+        <a class="btn btn-info" href="{% url 'base:subscriptionslist' %}">Evolution et liste détaillée des adhésions des
+            foyers</a>
+    </div>
+    {% endif %}
+
+    <hr class="gestion-hr">
+
+    <h4>Statistiques diverses</h4>
+    <div class="gestion-btn">
+        <a class="btn btn-info" href="{% url 'base:otherstats' %}">Autres statistiques</a>
+    </div>
+
+    <hr class="gestion-hr">
+
+    {% if save_mails %}
+    <h4>Liste des emails</h4>
+    <div class="gestion-btn">
+        <a class="btn btn-info" href="{% url 'base:mailslist' %}">Liste des emails envoyés ou en attente.</a>
+    </div>
+
+    <hr class="gestion-hr">
+
+    {% endif %}
 
     <h4>Astuces</h4>
     <ul>
-	<li>
-	    Pour annuler un achat erronné, une façon de faire est de refaire le même achat en
-	    mettant des quantités négatives à la place. Cela approvisionne le compte et les
-	    stocks correctement.
-	</li>
-	<li>
-	    Pour voir tous les produits d'un fournisseur il suffit de filtrer par son nom. Par ex: "Terra Libra".
-	</li>
-	<li>
-	    Quand on filtre, les majuscules et les accents ne comptent pas.
-	</li>
+        <li>
+            Pour annuler un achat erronné, une façon de faire est de refaire le même achat en
+            mettant des quantités négatives à la place. Cela approvisionne le compte et les
+            stocks correctement.
+        </li>
+        <li>
+            Pour voir tous les produits d'un fournisseur il suffit de filtrer par son nom. Par ex: "Terra Libra".
+        </li>
+        <li>
+            Quand on filtre, les majuscules et les accents ne comptent pas.
+        </li>
     </ul>
-    <br>
-    <br>
+
+    <hr class="gestion-hr">
 
     <h4>Des remarques, des suggestions ?</h4>
-    J'ai tenté de rendre ce logiciel pratique pour l'utilisation que j'en imaginais. Cela dit je suis preneur de retours !
-    N'hésitez pas à m'envoyer un petit mail avec vos questions, vos suggestions à : jojo144@girole.fr. &nbsp;&nbsp;&nbsp;Jojo
+    Nous tentons de rendre ce logiciel pratique pour l'utilisation que nous en avons. Ceci dit nous sommes preneurs de retours
+    !
+    N'hésitez pas à envoyer un petit mail avec vos questions, vos suggestions à : jojo144@girole.fr.
+    &nbsp;&nbsp;&nbsp;Jojo
+    <br>
+    <br>
+    <br>
 </div>
 {% endblock content %}

@@ -1,45 +1,28 @@
 {% extends "base/base.html" %}
 
 {% block content %}
-<div class="medium-content">
-    <h3>Foyers et membres</h3>
-    <div class="description">
-        Cette page sert à :
-        <div class="description-list">
-            <ul>
-                <li>créer un nouveau foyer ;</li>
-                <li>modifier les informations d'un foyer (adresse, email, membres, etc.) ;</li>
-                <li>voir l'évolution du nombre de foyers et de membres ;</li>
-                <li>obtenir des informations sur un foyer.</li>
-            </ul>
-        </div>
-	{% if use_subscription %}
-        Si un foyer a été clotûré et qu'il y a une demande de réouverture, en recréer un avec un numéro d'adhérent
-        différent.
-        <br>
-	{% endif %}
-        Il y a actuellement {{ txt_number_h | safe }} foyers actifs et {{ txt_number_m | safe }} membres enregistrés.
-    </div>
-</div>
-
-<div class="row justify-content-center">
-    <a class="btn btn-info" href="{% url 'base:create_household' %}">Créer un nouveau foyer</a>
-</div>
+<h4>Liste détaillées de la valeur du stock de l'épicerie</h4>
 
 <div id="vue-table">
 
-    <form>
-        <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
+    <div id="print-total"></div>
+    <div class="description">Ici, c'est le prix de vente qui est pris en compte. La valeur des achats de l'épicerie peut
+        être connue quant à elle dans la section correspondante.
+    </div>
+    <form class="form-inline">
+        <div class="text-right filter">
+            <input type="text" v-model="search" class="form-control" size="50"
+                   placeholder="Tapez pour filtrer par fournisseur, par produit ou par catégorie...">
+        </div>
     </form>
 
-    <table class="table table-striped">
+    <table id="table" class="table table-striped">
         <thead>
         <tr>
             <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
                 [[ _.capitalize(column) ]]
                 [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
             </th>
-            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -47,7 +30,6 @@
             <td v-for="column in columns">
                 [[ x[column] ]]
             </td>
-            <td><a :href="'membre/' + x.household_id">⌬ Détails du foyer</a></td>
         </tr>
         </tbody>
     </table>
@@ -55,16 +37,16 @@
 </div>
 
 <script>
-  new Vue({
+  var vue = new Vue({
       delimiters: ['[[', ']]'],
       el: '#vue-table',
       data: {
-      sortKey: 'nom',
+      sortKey: 'date',
       search: '',
       reverse: false,
       columns: {{ columns | safe }},
 
-      raw_data: {{ members | safe }}
+      raw_data: {{ stocks | safe }}
       },
 
       computed: {
@@ -87,19 +69,34 @@
       filter: function () {
           var filterKey = this.search.toLowerCase();
           var data = this.orderedData;
+
+          
+
           data = data.filter(function (row) {
           return Object.keys(row).some(function (key) {
               return String(row[key]).toLowerCase().indexOf(filterKey) > -1
           })
-              });
+          });
+
+          this.total = this.total_sum(data);
+
+          document.getElementById("print-total").innerHTML = "Total de la valeur des stocks de l'épicerie sélectionnés : <b>" + this.total + " €</b>";
+
           return data
+      },
+
+      total_sum: function(data){
+          let sum = 0;
+          data.forEach(function(element) {
+              sum += parseInt(element["valeur totale"].replace('€', ''));
+          });
+          console.log(sum);
+         return sum;
       }
       }
   })
 
-
-
-
+  vue.filter();
 
 
 

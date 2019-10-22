@@ -1,0 +1,288 @@
+{% extends "base/base.html" %}
+
+{% load static %}
+{% load my_tags %}
+
+{% block content %}
+<h4>Evolution des approvisionnements des foyers</h4>
+
+<div class="medium-content">
+<canvas id="myChart"></canvas>
+<button id="removeData">Zoomer</button>
+<button id="addData">Dézoomer</button>
+</div>
+</br>
+
+<script src="{% static 'base/moment-with-locales.js' %}"></script>
+<script src="{% static 'base/Chart.js' %}"></script>
+
+<script>
+ moment.locale('fr');
+ var style = getComputedStyle(document.body);
+ var chartCol1 = style.getPropertyValue('--chartColor1');
+ var chartCol2 = style.getPropertyValue('--chartColor2');
+ var chartColorText = style.getPropertyValue('--chartColorText');
+
+ Chart.defaults.global.defaultFontSize = 16;
+ Chart.defaults.global.defaultFontColor = chartColorText;
+
+ var ctx = document.getElementById('myChart').getContext('2d');
+ var init_date = new Date();
+ init_date.setMonth(init_date.getMonth() - 6);
+ var end_date = new Date();
+ end_date.setMonth(end_date.getMonth() + 1);
+ var chart = new Chart(ctx, {
+     type: 'line',
+
+     data: {
+         datasets: [{
+             label: 'Approvisionnement cumulé des foyers (en €)',
+             backgroundColor: chartCol1,
+             borderColor: chartCol1,
+         fill: false,
+         lineTension: 0,
+         data: [
+         {% for d in comptes_stats %}
+         { x: new Date('{{d.date}}'), y: {{d.value}}, label: '{{d.label}}' },
+         {% endfor %}
+         ]
+         },
+         ],
+     },
+
+     options: {
+     title: { text: 'Approvisionnement cumulé des foyers' },
+     scales: {
+             xAxes: [{
+                 type: 'time',
+         time: {min: init_date, max: end_date}
+             }],
+         yAxes: [{
+         scaleLabel: {
+             display: true,
+             labelString: 'Valeur en €'
+         },
+         ticks: {
+            suggestedMin: 0
+         }
+         }]
+     },
+         tooltips: {
+             callbacks: {
+                 label: function(tooltipItem, data) {
+             var o = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                     return o.label + ". Nombre: " + o.y;
+                 }
+             }
+     },
+     }
+ });
+
+ document.getElementById('addData').addEventListener('click', function() {
+     var date = new Date(chart.options.scales.xAxes[0].time.min);
+     date.setMonth(date.getMonth() - 1);
+     chart.options.scales.xAxes[0].time.min = date;
+     chart.update();
+ });
+
+ document.getElementById('removeData').addEventListener('click', function() {
+     var date = new Date(chart.options.scales.xAxes[0].time.min);
+     date.setMonth(date.getMonth() + 1);
+     chart.options.scales.xAxes[0].time.min = date;
+     chart.update();
+ });
+</script>
+
+<h4>Liste détaillée des approvisionnements des foyers</h4>
+
+<div id="vue-table">
+
+    <div id="print-total"></div>
+    <form class="form-inline">
+        <div class="text-right filter">
+            <select id="dayList" v-model="selected_day" class="form-control">
+                <option value="">Filtrer par jour</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30">30</option>
+                <option value="31">31</option>
+            </select>
+        </div>
+        <div class="text-right filter">
+            <select id="monthList" v-model="selected_month" class="form-control">
+                <option value="">Filtrer par mois</option>
+                <option value="1">Janvier</option>
+                <option value="2">Février</option>
+                <option value="3">Mars</option>
+                <option value="4">Avril</option>
+                <option value="5">Mai</option>
+                <option value="6">Juin</option>
+                <option value="7">Juillet</option>
+                <option value="8">Août</option>
+                <option value="9">Septembre</option>
+                <option value="10">Octobre</option>
+                <option value="11">Novembre</option>
+                <option value="12">Décembre</option>
+            </select>
+        </div>
+        <div class="text-right filter">
+            <select id="yearList" v-model="selected_year" class="form-control">
+                <option value="">Filtrer par année</option>
+                <option value="2019">2019</option>
+                <option value="2020">2020</option>
+                <option value="2020">2021</option>
+                <option value="2020">2022</option>
+                <option value="2020">2023</option>
+                <option value="2020">2024</option>
+                <option value="2020">2025</option>
+            </select>
+        </div>
+        <div class="text-right filter">
+            <input type="text" v-model="search" class="form-control" size="50"
+                   placeholder="Tapez pour filtrer par foyer ou par type de paiement...">
+        </div>
+    </form>
+
+    <table id="table" class="table table-striped">
+        <thead>
+        <tr>
+            <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
+                [[ _.capitalize(column) ]]
+                [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="x in filter()">
+            <td v-for="column in columns">
+                [[ x[column] ]]
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+  var vue = new Vue({
+      delimiters: ['[[', ']]'],
+      el: '#vue-table',
+      data: {
+      sortKey: 'date',
+      selected_year: '',
+      selected_month: '',
+      selected_day: '',
+      search: '',
+      reverse: false,
+      columns: {{ columns | safe }},
+
+      raw_data: {{ comptes | safe }}
+      },
+
+      computed: {
+      orderedData: function () {
+          var data = _.orderBy(this.raw_data, this.sortKey);
+          if (this.reverse) {
+          return _.reverse(data)
+          } else {
+          return data
+          }
+      }
+      },
+
+      methods: {
+      sortBy: function(sortKey) {
+          this.reverse = (this.sortKey == sortKey) ? ! this.reverse : false;
+          this.sortKey = sortKey
+      },
+
+      filter: function () {
+          var filterKey = this.search.toLowerCase();
+          var data = this.orderedData;
+
+          if (this.selected_year.length > 0 ){
+            var selected_year_int = parseInt(this.selected_year);
+
+            data = data.filter(function (row) {
+            return Object.keys(row).some(function (key) {
+                return row["année"] == selected_year_int
+            })
+            });
+          }
+
+          if (this.selected_month.length > 0 ){
+            var selected_month_int = parseInt(this.selected_month);
+
+            data = data.filter(function (row) {
+            return Object.keys(row).some(function (key) {
+                return row["mois"] == selected_month_int
+            })
+            });
+          }
+
+          if (this.selected_day.length > 0 ){
+            var selected_day_int = parseInt(this.selected_day);
+
+            data = data.filter(function (row) {
+            return Object.keys(row).some(function (key) {
+                return row["jour"] == selected_day_int
+            })
+            });
+          }
+
+          data = data.filter(function (row) {
+          return Object.keys(row).some(function (key) {
+              return String(row[key]).toLowerCase().indexOf(filterKey) > -1
+          })
+          });
+
+          this.total = this.total_sum(data);
+
+          document.getElementById("print-total").innerHTML = "Total des approvisionnements des foyers sélectionnés : <b>" + this.total.toFixed(0) + " €</b>";
+
+          return data
+      },
+
+      total_sum: function(data){
+          let sum = 0;
+          data.forEach(function(element) {
+              sum += parseFloat(element["approvisionnement"].replace('€', ''));
+          });
+          console.log(sum);
+         return sum;
+      }
+      }
+  })
+
+  vue.filter();
+
+
+</script>
+{% endblock %}

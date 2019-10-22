@@ -1,7 +1,22 @@
 {% extends "base/base.html" %}
 
+{% load staticfiles %}
+
 {% block content %}
-<div class="row justify-content-center">
-  {{ txt_home | safe }}
+<div class="index-part">
+    {{ txt_home | safe }}
 </div>
+
+{% if use_messages %}
+<div class="index-part">
+    {{ txt_message | safe }}
+</div>
+{% endif %}
+
+{% if use_logo %}
+<div class="index-part">
+    <img src="{% static "base\logo.png" %}" alt=" " class="index-logo">
+</div>
+{% endif %}
+
 {% endblock content %}

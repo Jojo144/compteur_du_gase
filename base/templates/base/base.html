@@ -2,59 +2,64 @@
 
 <!DOCTYPE html>
 <html lang="fr">
-    <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<script src="{% static 'base/lodash.js' %}"></script>
-	<script src="{% static 'base/vue.js' %}"></script>
-	<link rel="stylesheet" href="{% static 'base/bootstrap.css' %}">
-	<link rel="stylesheet" type="text/css" href="{% static 'base/base.css' %}">
-	<title>Le compteur du GASE</title>
-    </head>
-    <body>
-	<script>
-	 function removeAccents(str) {
-	     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-	 }
-	 
-	 function myContains(str, key) {
-	     return removeAccents(String(str).toLowerCase()).includes(removeAccents(String(key).toLowerCase()));
-	 }
-	</script>
-	<script src="{% static 'base/jquery-3.3.1.js' %}"></script>
-	<script src="{% static 'base/bootstrap.bundle.js' %}"></script>
+<head>
+    {% if use_favicon %} <link rel="shortcut icon" type="image/png" href="{% static 'base/favicon.ico' %}"/> {% endif %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="{% static 'base/lodash.js' %}"></script>
+    <script src="{% static 'base/vue.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'base/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'base/base.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'base/local.css' %}">
+    <title>Le compteur du GASE</title>
+</head>
+<body>
+<script>
+     function removeAccents(str) {
+         return str.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+     }
+     
+     function myContains(str, key) {
+         return removeAccents(String(str).toLowerCase()).includes(removeAccents(String(key).toLowerCase()));
+     }
+</script>
+<script src="{% static 'base/jquery-3.3.1.js' %}"></script>
+<script src="{% static 'base/bootstrap.bundle.js' %}"></script>
 
-	<div class="container">
-	    <div class="row justify-content-center">
-		<nav class="navbar navbar-expand-lg navbar-light justify-content-center">
-		    <ul class="navbar-nav">
-			<li><a class="nav-item nav-link" href="{% url 'base:index' %}">Accueil</a></li>
-			<li><a class="nav-item nav-link" href="{% url 'base:pre_achats' %}">Achats</a></li>
-			<li><a class="nav-item nav-link" href="{% url 'base:pre_compte' %}">Mon compte</a></li>
-			<li><a class="nav-item nav-link" href="{% url 'base:products' %}">Produits</a></li>
-			<li><a class="nav-item nav-link" href="{% url 'base:pre_appro' %}">Réception de commande</a></li>
-			<li><a class="nav-item nav-link" href="{% url 'base:members' %}">Membres</a></li>
-			<li><a class="nav-item nav-link" href="{% url 'base:gestion' %}">☭ Gestion</a></li>
-		    </ul>
-		</nav>
-	    </div>
+<div class="container">
+    <div class="row justify-content-center">
+        <nav class="navbar navbar-expand-lg navbar-light justify-content-center">
+            <ul class="nav nav-tabs">
+                <li><a class="nav-item nav-link" href="{% url 'base:index' %}">Accueil</a></li>
+                <li><a class="nav-item nav-link" href="{% url 'base:pre_achats' %}">Achats</a></li>
+                <li><a class="nav-item nav-link" href="{% url 'base:pre_compte' %}">Mon compte</a></li>
+                <li><a class="nav-item nav-link" href="{% url 'base:members' %}">Membres</a></li>
+                <li><a class="nav-item nav-link" href="{% url 'base:pre_appro' %}">Réception de commande</a></li>
+                <li><a class="nav-item nav-link" href="{% url 'base:products' %}">Produits</a></li>
+                <li><a class="nav-item nav-link" href="{% url 'base:providers' %}">Fournisseurs</a></li>
+                {% if use_messages %} <li><a class="nav-item nav-link" href="{% url 'base:notes' %}">Messages/Actions</a></li> {% endif %}
+                <li><a class="nav-item nav-link" href="{% url 'base:gestion' %}">☭ Gestion</a></li>
+            </ul>
+        </nav>
+    </div>
 
-	    <div class="row justify-content-center">
-		{% for message in messages %}
-		<span class="m-1 badge {{ message.tags }} message">{{ message }}</span>
-		    {% endfor %}
-		<script>
-		 $("span.message").delay(5000).fadeOut();
-		</script>
-	    </div>
+    <div class="row justify-content-center">
+        {% for message in messages %}
+        <span class="m-1 badge {{ message.tags }} message">{{ message | safe }}</span>
+        {% endfor %}
+        <script>
+         $("span.message").delay(5000).fadeOut();
+        </script>
+    </div>
 
-	    <br>
-	    <div class="row justify-content-center">
-		<div class ="col">
-		    {% block content %}{% endblock %}
-		</div>
-	    </div>
+    <br>
+    <div class="row justify-content-center">
+        <div class="col">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
 
-	</div>
-    </body>
+</div>
+
+</body>
 </html>

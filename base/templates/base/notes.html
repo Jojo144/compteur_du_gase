@@ -1,0 +1,116 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="medium-content">
+    <h3>Messages et actions</h3>
+    <div class="description">
+        Cette page sert à :
+        <div class="description-list">
+            <ul>
+                <li>créer un nouveau message comportant ou non une action à réaliser ;</li>
+                <li>signaler qu'un message a été lu ;</li>
+                <li>signaler qu'une action à été réalisée.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <a class="btn btn-info" href="{% url 'base:create_note' %}">Créer un nouveau message</a>
+</div>
+
+<div id="vue-table">
+
+    <div class="row">
+        <div class="text-right filter">
+            <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
+        </div>
+        <div class="text-right filter">
+            <button @click="changeRead" class="btn btn-secondary">[[ only_not_read ? "Montrer " : "Masquer "]] les
+                messages lus
+            </button>
+        </div>
+        <div class="text-right filter">
+            <button @click="changeDone" class="btn btn-secondary">[[ only_not_done ? "Montrer " : "Masquer "]] les
+                actions réalisées
+            </button>
+        </div>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
+                [[ _.capitalize(column) ]]
+                [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
+            </th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="x in filter()">
+            <td v-for="column in columns">
+                [[ x[column] ]]
+            </td>
+            <td><a :href="'note/' + x.id">⌬ Détails</a></td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+  new Vue({
+      delimiters: ['[[', ']]'],
+      el: '#vue-table',
+      data: {
+      sortKey: 'name',
+      only_not_read: false,
+      only_not_done: false,
+      search: '',
+      reverse: false,
+      columns: {{ columns | safe }},
+      raw_data: {{ notes | safe }}
+      },
+
+      computed: {
+      orderedData: function () {
+          var data = _.orderBy(this.raw_data, this.sortKey);
+          if (this.reverse) {
+          return _.reverse(data)
+          } else {
+          return data
+          }
+      }
+      },
+
+      methods: {
+      changeRead: function() {
+          this.only_not_read = !this.only_not_read
+      },
+      
+      changeDone: function() {
+          this.only_not_done = !this.only_not_done
+      },
+
+      sortBy: function(sortKey) {
+          this.reverse = (this.sortKey == sortKey) ? ! this.reverse : false;
+          this.sortKey = sortKey
+      },
+
+      filter: function () {
+          var search = this.search;
+          var only_not_read = !this.only_not_read;
+          var only_not_done = !this.only_not_done;
+          return _.pickBy(this.orderedData, (function (row) {
+          var b1 = (only_not_read) || (row["message lu ?"] == "✘");
+          var b2 = (only_not_done) || (row["action(s) réalisée(s) ?"] == "✘");
+          return b1 && b2 && (myContains(row.who, search) || myContains(row.message, search))
+          }))
+      }
+      }
+  })
+
+
+</script>
+{% endblock %}

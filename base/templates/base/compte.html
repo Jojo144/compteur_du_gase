@@ -5,45 +5,51 @@
 
 <div class="narrow-content">
     <div class="row">
-	<h2>{{ household }}</h2>
+        <h2>{{ household }}</h2>
     </div>
     <div class="row">
-	<h5>Solde : {{ household.account }} € </h5>
+        <h5>Numéro de foyer : {{ number }} </h5>
+    </div>
+    <div class="row">
+        <h5>Solde : {{ household.account }} € </h5>
     </div>
 
     <br>
     <br>
     <div class="row justify-content-center">
-	<form action="{% url 'base:compte' household.pk %}" method="post">
-	    {% csrf_token %}
-	    {{ form | crispy }}
-	    <div class="form-buttons">
-		<a class="btn btn-light" href="{% url 'base:index' %}">Annuler</a> &nbsp;
-		<input class="btn btn-info" type="submit" value="Approvisionner">
-	    </div>
-	</form>
+        <form action="{% url 'base:compte' household.pk %}" method="post">
+            {% csrf_token %}
+            {{ form | crispy }}
+            <div class="form-buttons">
+                <a class="btn btn-light" href="{% url 'base:index' %}">Annuler</a> &nbsp;
+                <input class="btn btn-info" type="submit" value="Approvisionner">
+            </div>
+        </form>
     </div>
 
     <br>
     <br>
     <br>
     <div class="row">
-	<h4>Historique des 5 derniers virements :</h4>
+        <h4>Historique des 5 derniers virements :</h4>
     </div>
     <div class="row">
-	<table class="table">
-	    <tbody>
-		{% for o in history %}
-		<tr>
-		    <td> {{ o.date | date:"D d M Y" | capfirst }}</td>
-		    <td> {{ o.date | date:"H \h i" }}</td>
-		    <td class="text-right"> {{ o.amount }} € </td>
-		</tr>
-		{% empty %}
-		<tr> <td> Pas d'approvisionnement précédent </td> </tr>
-		{% endfor %}
-	    </tbody>
-	</table>
+        <table class="table">
+            <tbody>
+            {% for o in history %}
+            <tr>
+                <td> {{ o.date | date:"D d M Y" | capfirst }}</td>
+                <td> {{ o.date | date:"H \h i" }}</td>
+                <td class="text-right"> {{ o.amount }} €</td>
+                {% if o.get_kind_display %}<td class="text-right"> {{ o.get_kind_display }}</td> {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td> Pas d'approvisionnement précédent</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
-
-    {% endblock content %}
+</div>
+{% endblock content %}

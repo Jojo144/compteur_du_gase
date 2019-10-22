@@ -6,42 +6,42 @@
 <h6>Intégrité des stocks</h6>
 La colonne de droite contient le stock enregistré, et la colonne de gauche le stock recalculé à partir de l'historique des opérations. Normalement, ça devrait être la même chose à un poil près, sinon c'est un bug !
 <table class="table table-striped">
-  <thead>
+    <thead>
     <tr>
-      <th>Produit</th>
-      <th>Stock enregistré</th>
-      <th>Stock calculé</th>
+        <th>Produit</th>
+        <th>Stock enregistré</th>
+        <th>Stock calculé</th>
     </tr>
-  </thead>
-  <tbody>
+    </thead>
+    <tbody>
     {% for pdt in pdts %}
     <tr>
-      <td>{{ pdt.name }}</td>
-      <td>{{ pdt.stock }}</td>
-      <td>{{ pdt.computed }}</td>
+        <td>{{ pdt.name }}</td>
+        <td>{{ pdt.stock }}</td>
+        <td>{{ pdt.computed }}</td>
     </tr>
     {% endfor %}
-  </tbody>
-</table>  
+    </tbody>
+</table>
 
 <h6>Intégrité des comptes</h6>
 Idem avec les soldes des comptes.
 <table class="table table-striped">
-  <thead>
+    <thead>
     <tr>
-      <th>Foyer</th>
-      <th>Solde enregistré</th>
-      <th>Solde calculé</th>
+        <th>Foyer</th>
+        <th>Solde enregistré</th>
+        <th>Solde calculé</th>
     </tr>
-  </thead>
-  <tbody>
+    </thead>
+    <tbody>
     {% for h in households %}
     <tr>
-      <td>{{ h.name }}</td>
-      <td>{{ h.account }}</td>
-      <td>{{ h.computed }}</td>
+        <td>{{ h.name }}</td>
+        <td>{{ h.account }}</td>
+        <td>{{ h.computed }}</td>
     </tr>
     {% endfor %}
-  </tbody>
-</table>  
+    </tbody>
+</table>
 {% endblock content %}

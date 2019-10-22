@@ -7,8 +7,9 @@ from django.contrib.auth.models import User, Group
 class MemberInline(admin.TabularInline):
     model = Member
 
+
 class HouseholdAdmin(admin.ModelAdmin):
-    inlines = [ MemberInline, ]
+    inlines = [MemberInline, ]
 
 
 admin.site.unregister(User)
@@ -20,10 +21,12 @@ admin.site.register(Provider)
 admin.site.register(Member)
 admin.site.register(Household, HouseholdAdmin)
 admin.site.register(Product)
+admin.site.register(Note)
 admin.site.register(LocalSettings)
+admin.site.register(Mail)
 
 # for debugging
-admin.site.register(Purchase)
-admin.site.register(PurchaseDetailOp)
-admin.site.register(ChangeStockOp)
-admin.site.register(ApproCompteOp)
+# admin.site.register(Purchase)
+# admin.site.register(PurchaseDetailOp)
+# admin.site.register(ChangeStockOp)
+# admin.site.register(ApproCompteOp)

@@ -1,37 +1,48 @@
-{% extends "base/base.html" %} 
+{% extends "base/base.html" %}
 
 {% block content %}
-<h4>Liste des fournisseurs du GASE</h4>
-<br>
+<div class="medium-content">
+    <h3>Fournisseurs</h3>
+    <div class="description">
+        Cette page sert à :
+        <div class="description-list">
+            <ul>
+            <li>créer un nouveau fournisseur ;</li>
+            <li>obtenir des informations sur un fournisseur.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
 <div class="row justify-content-center">
-  <a class="btn btn-info" href="{% url 'base:create_provider' %}">Créer un nouveau fournisseur</a>
+    <a class="btn btn-info" href="{% url 'base:create_provider' %}">Créer un nouveau fournisseur</a>
 </div>
 
 <div id="vue-table">
 
-  <form>
-      <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
-  </form>
+    <form>
+        <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
+    </form>
 
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
-	  [[ _.capitalize(column) ]]
-	  [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
-        </th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="x in filter()">
-        <td v-for="column in columns">
-	  [[ x[column] ]]
-	</td>
-        <td><a :href="'fournisseur/' + x.id">⌬ Détails</a></td>
-      </tr>
-    </tbody>
-  </table>  
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
+                [[ _.capitalize(column) ]]
+                [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
+            </th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="x in filter()">
+            <td v-for="column in columns">
+                [[ x[column] ]]
+            </td>
+            <td><a :href="'fournisseur/' + x.id">⌬ Détails</a></td>
+        </tr>
+        </tbody>
+    </table>
 
 </div>
 
@@ -40,42 +51,43 @@
       delimiters: ['[[', ']]'],
       el: '#vue-table',
       data: {
-	  sortKey: 'nom',
-	  search: '',
-	  reverse: false,
-	  columns: {{ columns | safe }},
-	  
-	  raw_data: {{ providers | safe }}
+      sortKey: 'nom',
+      search: '',
+      reverse: false,
+      columns: {{ columns | safe }},
+      
+      raw_data: {{ providers | safe }}
       },
 
       computed: {
-	  orderedData: function () {
-	      var data = _.orderBy(this.raw_data, this.sortKey);
-	      if (this.reverse) {
-		  return _.reverse(data)
-	      } else {
-		  return data
-	      }
-	  }
+      orderedData: function () {
+          var data = _.orderBy(this.raw_data, this.sortKey);
+          if (this.reverse) {
+          return _.reverse(data)
+          } else {
+          return data
+          }
+      }
       },
 
       methods: {
-	  sortBy: function(sortKey) {
-	      this.reverse = (this.sortKey == sortKey) ? ! this.reverse : false;
-	      this.sortKey = sortKey
-	  },
+      sortBy: function(sortKey) {
+          this.reverse = (this.sortKey == sortKey) ? ! this.reverse : false;
+          this.sortKey = sortKey
+      },
 
-	  filter: function () {
-	      var filterKey = this.search.toLowerCase();
-	      var data = this.orderedData;
-	      data = data.filter(function (row) {
-		  return Object.keys(row).some(function (key) {
-		      return String(row[key]).toLowerCase().indexOf(filterKey) > -1
-		  })
+      filter: function () {
+          var filterKey = this.search.toLowerCase();
+          var data = this.orderedData;
+          data = data.filter(function (row) {
+          return Object.keys(row).some(function (key) {
+              return String(row[key]).toLowerCase().indexOf(filterKey) > -1
+          })
               });
-	      return data
-	  }
+          return data
+      }
       }
   })
+
 </script>
 {% endblock %}

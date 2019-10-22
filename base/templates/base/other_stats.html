@@ -1,0 +1,37 @@
+{% extends 'base/base.html' %}
+{% load my_tags %}
+
+{% block content %}
+<div class="medium-content">
+
+    <h4>Valeur des approvisionnements des foyers</h4>
+    Valeur des approvisionnements des foyers : {{ value_appro | round0 }} €
+    <div class="gestion-btn">
+	<a class="btn btn-info" href="{% url 'base:compteslist' %}">Evolution et liste détaillée des approvisionnements des
+            foyers</a>
+    </div>
+
+    <h4>Valeur des approvisionnements du stock de l'épicerie</h4>
+    Valeur des approvisionnements du stock de l'épicerie : {{ value_purchase | round0 }} €
+    <div class="gestion-btn">
+	<a class="btn btn-info" href="{% url 'base:approslist' %}">Evolution et liste détaillée des approvisionnements du stock de
+            l'épicerie</a>
+    </div>
+
+    <h4>Valeur des achats des foyers</h4>
+    Valeur cumulée des achats des foyers : {{ value_purchase_household | round0 }} €
+    <div class="gestion-btn">
+	<a class="btn btn-info" href="{% url 'base:purchaseslist' %}">Evolution et liste détaillée des achats des foyers</a>
+    </div>
+
+    <h4>Fonctionnement de l'épicerie</h4>
+    <div class="gestion-btn">
+	<a class="btn btn-info" href="{% url 'base:valueslist' %}">Analyse des entrées/sorties et des achats.</a>
+    </div>
+
+    <h4>Nombre de foyers et de membres</h4>
+    <div class="gestion-btn">
+	<a class="btn btn-info" href="{% url 'base:membersstats' %}">Evolution du nombre de foyers et de membres.</a>
+    </div>
+</div>
+{% endblock content %}
