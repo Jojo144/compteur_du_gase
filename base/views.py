@@ -206,6 +206,7 @@ def achats(request, household_id):
                    'balance_amount': balance,
                    'pdts': pdts,
                    'history': history,
+                   'use_exports': local_settings.use_exports,
                    'alerte_balance': balance < alerte_balance_amount,
                    'alerte_balance_amount': '{0:.2f}'.format(alerte_balance_amount),
                    'on_the_flight': household.on_the_flight,
@@ -338,7 +339,8 @@ def detail_product(request, product_id):
 
 
 def products(request):
-    if get_local_settings().use_cost_of_purchase:
+    local_settings = get_local_settings()
+    if local_settings.use_cost_of_purchase:
         columns = ['nom', 'catégorie', 'fournisseur', "prix d'achat", 'prix de vente', 'vrac', 'visible', 'alerte stock', 'stock']
     else:
         columns = ['nom', 'catégorie', 'fournisseur', 'prix', 'vrac', 'visible', 'alerte stock', 'stock']
@@ -351,7 +353,9 @@ def products(request):
             for p in Product.objects.all()]
     columns = json.dumps(columns)
     pdts = json.dumps(pdts)
-    return render(request, 'base/products.html', {'columns': columns, 'pdts': pdts})
+    return render(request, 'base/products.html', {'columns': columns,
+                                                  'pdts': pdts,
+                                                  'use_exports': local_settings.use_exports})
 
 
 # ----------------------------------------------------------------------------------------------------------------------

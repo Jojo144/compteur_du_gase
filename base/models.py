@@ -34,6 +34,10 @@ class LocalSettings(models.Model):
                                                help_text="La fonction prix d'achat permet de spécifier un prix d'achat "
                                                          "différent du prix de vente.")
 
+    use_exports = models.BooleanField(verbose_name="Utiliser les exports ?", default=True,
+                                       help_text="Exports de l'historique d'achat et de la liste des produits.")
+
+
     use_logo = models.BooleanField(verbose_name="Affiche le logo dans la première page ?", default=True,
                                        help_text="Le fichier de logo doit être placé dans le répertoire base\static\base"
                                                  " et son nom de fichier doit etre logo.png.")

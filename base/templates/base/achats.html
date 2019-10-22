@@ -66,10 +66,12 @@
                     {% endfor %}
                 </ul>
             </div>
+	    {% if use_exports %}
             <div class="modal-footer">
                 <input type="submit" class="btn btn-info" name="tofile" id="tofile" value="Exporter l'historique"/>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
             </div>
+	    {% endif %}
         </div>
     </div>
 </div>

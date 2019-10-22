@@ -34,9 +34,11 @@
             <button @click="changeAlerte" class="btn btn-secondary">[[ only_alerte ? "Ne pas filter les alertes" : "Montrer uniquement les alertes"]]
             </button>
         </div>
+	{% if use_exports %}
         <div class="text-right filter">
             <input type="submit" class="btn btn-info" name="tofile" id="tofile" value="Exporter le tableau"/>
         </div>
+	{% endif %}
     </div>
 
     <table class="table table-striped" id="produits-table">
