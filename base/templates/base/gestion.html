@@ -4,12 +4,10 @@
 {% block content %}
 <div class="medium-content">
 
-    <hr class="gestion-hr">
-
     <h4>Interface d'administration</h4>
     <a class="btn btn-info" href="/admin">Accès à l'interface d'administration</a>
-    <br> Cette interface permet de bidouiller tout ce que gère le logiciel, <b>à utiliser avec beaucoup de
-    précautions</b>. En particulier on peut :
+    <br> Cette interface permet de bidouiller tout ce que gère le logiciel, <b>à utiliser avec
+    précaution</b>. En particulier on peut :
     <ul>
         <li> créer/modifier/supprimer des informations renseignées dans la base de données
             (une fois un objet supprimé on ne peut pas le retrouver, à utiliser avec modération donc.
@@ -47,33 +45,6 @@
         <a class="btn btn-info" href="{% url 'base:stockslist' %}">Liste détaillées de la valeur du stock</a>
     </div>
 
-    <h4>Valeur des approvisionnements des foyers</h4>
-    Valeur des approvisionnements des foyers : {{ value_appro | round0 }} €
-    <div class="gestion-btn">
-        <a class="btn btn-info" href="{% url 'base:compteslist' %}">Evolution et liste détaillée des approvisionnements des
-            foyers</a>
-    </div>
-
-    <h4>Valeur des approvisionnements du stock de l'épicerie</h4>
-    Valeur des approvisionnements du stock de l'épicerie : {{ value_purchase | round0 }} €
-    <div class="gestion-btn">
-        <a class="btn btn-info" href="{% url 'base:approslist' %}">Evolution et liste détaillée des approvisionnements du stock de
-            l'épicerie</a>
-    </div>
-
-    <h4>Valeur des achats des foyers</h4>
-    Valeur cumulée des achats des foyers : {{ value_purchase_household | round0 }} €
-    <div class="gestion-btn">
-        <a class="btn btn-info" href="{% url 'base:purchaseslist' %}">Evolution et liste détaillée des achats des foyers</a>
-    </div>
-
-    <hr class="gestion-hr">
-
-    <h4>Fonctionnement de l'épicerie</h4>
-    <div class="gestion-btn">
-        <a class="btn btn-info" href="{% url 'base:valueslist' %}">Analyse des entrées/sorties et des achats.</a>
-    </div>
-
     <hr class="gestion-hr">
 
     <h4>Liste des alertes stock</h4>
@@ -88,20 +59,22 @@
         {% endfor %}
     </ul>
 
+    {% if use_subscriptions_str == 'True' %}
     <hr class="gestion-hr">
 
-    <h4>Nombre de foyers et de membres</h4>
-    <div class="gestion-btn">
-        <a class="btn btn-info" href="{% url 'base:membersstats' %}">Evolution du nombre de foyers et de membres.</a>
-    </div>
-
-    {% if use_subscriptions_str == 'True' %}
     <h4>Liste des adhésions des foyers</h4>
     <div class="gestion-btn">
         <a class="btn btn-info" href="{% url 'base:subscriptionslist' %}">Evolution et liste détaillée des adhésions des
             foyers</a>
     </div>
     {% endif %}
+
+    <hr class="gestion-hr">
+
+    <h4>Statistiques diverses</h4>
+    <div class="gestion-btn">
+        <a class="btn btn-info" href="{% url 'base:otherstats' %}">Autres statistiques</a>
+    </div>
 
     <hr class="gestion-hr">
 
@@ -133,11 +106,12 @@
     <hr class="gestion-hr">
 
     <h4>Des remarques, des suggestions ?</h4>
-    J'ai tenté de rendre ce logiciel pratique pour l'utilisation que j'en imaginais. Cela dit je suis preneur de retours
+    Nous tentons de rendre ce logiciel pratique pour l'utilisation que nous en avons. Ceci dit nous sommes preneurs de retours
     !
-    N'hésitez pas à m'envoyer un petit mail avec vos questions, vos suggestions à : jojo144@girole.fr.
+    N'hésitez pas à envoyer un petit mail avec vos questions, vos suggestions à : jojo144@girole.fr.
     &nbsp;&nbsp;&nbsp;Jojo
-
-    <hr class="gestion-hr">
+    <br>
+    <br>
+    <br>
 </div>
 {% endblock content %}

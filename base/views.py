@@ -116,6 +116,16 @@ def gestion(request):
     value_accounts = sum([p.account for p in Household.objects.all()])
     alert_pdts = [p for p in Product.objects.filter(stock_alert__isnull=False, visible=True).order_by('name') if
                   p.stock < p.stock_alert]
+    return render(request, 'base/gestion.html',
+                  {'value_stock': value_stock,
+                   'value_accounts': value_accounts,
+                   'diff_values': value_accounts - value_stock,
+                   'alert_pdts': alert_pdts,
+                   'save_mails_str': str(get_local_settings().save_mail),
+                   'use_subscriptions_str': str(get_local_settings().use_subscription),
+                   })
+
+def otherstats(request):
     value_appro = sum([p.amount for p in ApproCompteOp.objects.all()])
     if get_local_settings().use_cost_of_purchase:
         value_purchase = sum([p.cost_of_purchase() for p in ChangeStockOp.objects.filter(label="ApproStock")])
@@ -124,15 +134,9 @@ def gestion(request):
 
     value_purchase_household = -sum([p.price for p in PurchaseDetailOp.objects.all()])
 
-    return render(request, 'base/gestion.html',
-                  {'value_stock': value_stock,
-                   'value_accounts': value_accounts,
-                   'diff_values': value_accounts - value_stock,
-                   'alert_pdts': alert_pdts,
-                   'value_appro': value_appro,
+    return render(request, 'base/other_stats.html',
+                  {'value_appro': value_appro,
                    'value_purchase': value_purchase,
-                   'save_mails_str': str(get_local_settings().save_mail),
-                   'use_subscriptions_str': str(get_local_settings().use_subscription),
                    'value_purchase_household': value_purchase_household
                    })
 
