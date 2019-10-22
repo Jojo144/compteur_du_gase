@@ -49,21 +49,21 @@
             <div class="modal-body" id="modal-html-content">
                 <ul>
                     {% for o in history %}
-                    ----------------------------------
-                    <li> Le {{ o.date | date:"D d M Y - H \h i" }} :
-                        <ul>
-                            {% for p in o.details %}
-                            <li> {{ p.product }} : {{ p | print_neg_quantity_op }} ({{ p.price | neg | round2 }} €)</li>
-                            {% empty %}
-                            <li>Achat vide</li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                    Total : <b> {{ o.total }} </b></br>
+		    <div style="margin-bottom:0.8em">
+			<li> Le {{ o.date | date:"D d M Y - H \h i" }} :
+                            <ul>
+				{% for p in o.details %}
+				<li> {{ p.product }} : {{ p | print_neg_quantity_op }} ({{ p.price | neg | round2 }} €)</li>
+				{% empty %}
+				<li>Achat vide</li>
+				{% endfor %}
+                            </ul>
+			</li>
+			Total : <b> {{ o.total }} </b></br>
+		    </div>
                     {% empty %}
                     <li>Pas d'achats précédents</li>
                     {% endfor %}
-                    ----------------------------------
                 </ul>
             </div>
             <div class="modal-footer">
