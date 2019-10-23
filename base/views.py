@@ -108,6 +108,7 @@ def gestion(request):
                    'use_subscriptions': local_settings.use_subscription,
                    })
 
+
 def otherstats(request):
     value_appro = sum([p.amount for p in ApproCompteOp.objects.all()])
     if get_local_settings().use_cost_of_purchase:
@@ -175,7 +176,8 @@ def achats(request, household_id):
 
         msg += "Ce qui nous donne un total de {} €.\n\nCiao!".format(s)
         balance = household.account
-        messages.success(request, '✔ Votre compte a été débité de {} €<br>Solde restant : {} €'.format(round2(s), round2(balance)))
+        messages.success(request, '✔ Votre compte a été débité de {} €<br>Solde restant : {} €'.format(round2(s),
+                                                                                                       round2(balance)))
         mails = household.get_emails_receipt()
         my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,
                      success_msg='Le ticket de caisse a été envoyé par mail',
@@ -233,7 +235,7 @@ def compte(request, household_id):
         form = ApproCompteFormKind(request.POST) if use_appro_kind else ApproCompteForm(request.POST)
         if form.is_valid():
             q = form.cleaned_data['amount']
-            k = form.cleaned_data.get('kind') # None if kinds are not used
+            k = form.cleaned_data.get('kind')  # None if kinds are not used
             op = ApproCompteOp(household=household, amount=q, kind=k)
             op.save()
             household.account += q
@@ -339,7 +341,8 @@ def detail_product(request, product_id):
 def products(request):
     local_settings = get_local_settings()
     if local_settings.use_cost_of_purchase:
-        columns = ['nom', 'catégorie', 'fournisseur', "prix d'achat", 'prix de vente', 'vrac', 'visible', 'alerte stock', 'stock']
+        columns = ['nom', 'catégorie', 'fournisseur', "prix d'achat", 'prix de vente', 'vrac', 'visible',
+                   'alerte stock', 'stock']
     else:
         columns = ['nom', 'catégorie', 'fournisseur', 'prix', 'vrac', 'visible', 'alerte stock', 'stock']
     pdts = [{"id": p.id, "nom": p.name, "catégorie": str(p.category), "fournisseur": str(p.provider),
@@ -586,7 +589,8 @@ def valueslist(request):
 def members(request):
     local_settings = get_local_settings()
     if local_settings.use_subscription:
-        columns = ['nom', "numéro d'adhérent", "date d'adhésion", "date de clotûre", "costisation d'adhésion du foyer", 'foyer', 'email', 'bigophone']
+        columns = ['nom', "numéro d'adhérent", "date d'adhésion", "date de clotûre", "costisation d'adhésion du foyer",
+                   'foyer', 'email', 'bigophone']
     else:
         columns = ['nom', "date d'adhésion", 'foyer', 'email', 'bigophone']
     members_data = [{"id": p.id, "nom": p.name, "numéro d'adhérent": p.household.get_formated_number(),
