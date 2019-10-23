@@ -8,9 +8,11 @@ class LocalSettings(models.Model):
     min_account = models.DecimalField(max_digits=10, decimal_places=2, default=0,
                                       verbose_name="seuil en dessous duquel on ne peut plus faire d'achat (en €)")
 
-    min_account_allow = models.BooleanField(verbose_name="Lorsque le solde n'est pas suffisant, autoriser quand même après demande de confirmation ?", default=False,
-                                            help_text="Lorsque cette option est activée, si le solde n'est pas suffisant, il y a une demande de confirmation"
-                                                      "lors de l'achat mais il est autorisé. Dans le cas contraire, l'achat est rendu impossible.")
+    min_account_allow = models.BooleanField(
+        verbose_name="Lorsque le solde n'est pas suffisant, autoriser quand même après demande de confirmation ?",
+        default=False,
+        help_text="Lorsque cette option est activée, si le solde n'est pas suffisant, il y a une demande de confirmation"
+                  "lors de l'achat mais il est autorisé. Dans le cas contraire, l'achat est rendu impossible.")
 
     min_balance = models.DecimalField(max_digits=10, decimal_places=2, default=10,
                                       verbose_name="seuil en dessous duquel une alerte est lancée au moment de commencer un achat (en €)")
@@ -26,7 +28,8 @@ class LocalSettings(models.Model):
                                          help_text="La fonction type de paiement permet de sauvegarder le moyen "
                                                    "de paiement utilisé.")
 
-    use_subscription = models.BooleanField(verbose_name="Utilisation de la fonction cotisation d'adhésion ?", default=True,
+    use_subscription = models.BooleanField(verbose_name="Utilisation de la fonction cotisation d'adhésion ?",
+                                           default=True,
                                            help_text="La fonction adhésion permet de renseigner la cotisation d'adhésion"
                                                      "d'adhésion du foyer.")
 
@@ -35,12 +38,11 @@ class LocalSettings(models.Model):
                                                          "différent du prix de vente.")
 
     use_exports = models.BooleanField(verbose_name="Utiliser les exports ?", default=True,
-                                       help_text="Exports de l'historique d'achat et de la liste des produits.")
-
+                                      help_text="Exports de l'historique d'achat et de la liste des produits.")
 
     use_logo = models.BooleanField(verbose_name="Affiche le logo dans la première page ?", default=True,
-                                       help_text="Le fichier de logo doit être placé dans le répertoire base\static\base"
-                                                 " et son nom de fichier doit etre logo.png.")
+                                   help_text="Le fichier de logo doit être placé dans le répertoire base\static\base"
+                                             " et son nom de fichier doit etre logo.png.")
 
     use_mail = models.BooleanField(verbose_name="Utilisation de la fonction envoi d'email ?", default=True,
                                    help_text="Cette fonction permet d'envoyer les tickets de caisse ou "
@@ -49,24 +51,27 @@ class LocalSettings(models.Model):
     save_mail = models.BooleanField(verbose_name="Utilisation de la fonction de sauvegarde des emails ?", default=True,
                                     help_text="Cette fonction permet de sauvegarder les emails envoyés ou en attente.")
 
-    prefix_object_mail = models.CharField(blank=True, verbose_name="Prefix dans l'objet des emails.", default="", max_length=15,
+    prefix_object_mail = models.CharField(blank=True, verbose_name="Prefix dans l'objet des emails.", default="",
+                                          max_length=15,
                                           help_text="Un prefix est souvent encadré par des crochers, exemples : [GASE].")
 
-    debug_mail = models.CharField(blank=True, verbose_name="Si ce champ est renseigné, tous les emails lui seront envoyés.",
+    debug_mail = models.CharField(blank=True,
+                                  verbose_name="Si ce champ est renseigné, tous les emails lui seront envoyés.",
                                   default="", max_length=50,
                                   help_text="Ce champ permet de tester la fonction email sans envoyer de mails intempestifs.")
 
     mail_host = models.CharField(blank=False, verbose_name="Hebergeur pour l'envoi des mails.",
-                                  default="xxx", max_length=50,
-                                  help_text="Exemple : smtp.titi.com.")
+                                 default="xxx", max_length=50,
+                                 help_text="Exemple : smtp.titi.com.")
 
     mail_port = models.IntegerField(verbose_name="Port smtp pour l'envoi des mails.",
                                     default=465,
                                     help_text="Exemple : 25 (sans chiffrement), 465 (chiffrement implicite, SSL), 587 (chiffrement explicite, TLS).")
 
-    mail_protocole = models.CharField(choices=[('no', 'Pas de chiffrement'), ('tls', 'Utiliser TLS'), ('ssl', 'Utiliser SSL')],
-                                        verbose_name="Protocole utilisé pour l'envoie de mails.",
-                                        default="no", max_length=100)
+    mail_protocole = models.CharField(
+        choices=[('no', 'Pas de chiffrement'), ('tls', 'Utiliser TLS'), ('ssl', 'Utiliser SSL')],
+        verbose_name="Protocole utilisé pour l'envoie de mails.",
+        default="no", max_length=100)
 
     mail_timeout = models.IntegerField(default=4, verbose_name="Timeout pour l'envoi de mail.")
 
@@ -84,6 +89,7 @@ class LocalSettings(models.Model):
     class Meta:
         verbose_name = "Réglages divers"
         verbose_name_plural = "Réglages divers"
+
 
 def get_local_settings():
     localsettings = LocalSettings.objects.first()
@@ -153,7 +159,7 @@ def get_advised_household_number():
 
 
 def validate_household_number(value):
-    return # cette verification empeche de modifier un foyer, a corriger
+    return  # cette verification empeche de modifier un foyer, a corriger
     if value in [getattr(p, 'number') for p in Household.objects.all()]:
         advised_value = get_advised_household_number()
         raise ValidationError(
@@ -179,9 +185,10 @@ class Household(models.Model):
     subscription = models.DecimalField(default=0, max_digits=10, decimal_places=2,
                                        verbose_name="montant de la cotisation d'adhésion (en €)")
 
-    on_the_flight = models.BooleanField(verbose_name="Realise un approvisionnement automatique du montant du panier avant de payer.", default=False,
-                                        help_text="Cette fonction peut être utilise si l'on autorise le payement à la volée, c'est-à-dire lorsque "
-                                                  "le client n'a pas besoin d'approvisionner son compte mais paye la juste somme.")
+    on_the_flight = models.BooleanField(
+        verbose_name="Realise un approvisionnement automatique du montant du panier avant de payer.", default=False,
+        help_text="Cette fonction peut être utilise si l'on autorise le payement à la volée, c'est-à-dire lorsque "
+                  "le client n'a pas besoin d'approvisionner son compte mais paye la juste somme.")
 
     def __str__(self):
         return self.name
@@ -288,7 +295,8 @@ class ChangeStockOp(Operation):
     quantity = models.DecimalField(max_digits=15,
                                    decimal_places=3)  # positif for an appro, negative for a normal buying
     price = models.DecimalField(max_digits=15, decimal_places=3)  # product.price * quantity
-    purchase_cost = models.DecimalField(max_digits=15, decimal_places=3, default=0)  # product.cost_of_purchase * quantity
+    purchase_cost = models.DecimalField(max_digits=15, decimal_places=3,
+                                        default=0)  # product.cost_of_purchase * quantity
     stock = models.DecimalField(max_digits=15, decimal_places=3)  # stock after the operation
     label = models.CharField(max_length=20)
 
@@ -297,7 +305,8 @@ class ChangeStockOp(Operation):
         price = product.price * quantity
         purchase_cost = product.cost_of_purchase * quantity
         newstock = product.stock + quantity
-        return cls(product=product, quantity=quantity, price=price, purchase_cost=purchase_cost, stock=newstock, **kwargs)
+        return cls(product=product, quantity=quantity, price=price, purchase_cost=purchase_cost, stock=newstock,
+                   **kwargs)
 
     @classmethod
     def create_appro_stock(cls, **kwargs):
@@ -366,6 +375,7 @@ class Note(models.Model):
     action = models.BooleanField(verbose_name="Action(s) réalisée(s) ?", default=False,
                                  help_text="Si aucune action n'est nécessaire, côcher cette case.")
 
+
 # mails
 class Mail(models.Model):
     date = models.DateTimeField(auto_now_add=True)
@@ -381,5 +391,3 @@ class Mail(models.Model):
         (RECEIPT, 'Ticket de caisse'),
     ]
     kind = models.CharField(max_length=8, choices=KIND_CHOICES, default=REFERENT)
-
-
