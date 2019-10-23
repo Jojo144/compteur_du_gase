@@ -16,10 +16,10 @@ from .forms import *
 from .templatetags.my_tags import *
 
 
-
 def add_prefix_subject(subject):
     prefix = get_local_settings().prefix_object_mail
     return ' '.join([prefix, subject])
+
 
 def my_send_mail(request, subject, message, recipient_list, success_msg, error_msg, kind, save=True):
     local_settings = get_local_settings()

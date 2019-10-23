@@ -21,6 +21,7 @@ class ApproCompteForm(forms.Form):
                                 help_text="♥ Merci de ne pas oublier d'encaisser l'argent !",
                                 decimal_places=2)
 
+
 class ApproCompteFormKind(ApproCompteForm):
     kind = forms.ChoiceField(label="Type d'approvisionnement", choices=ApproCompteOp.KIND_CHOICES,
                              help_text="Chèque ou espèces pour un approvisionnement normal (valeur positive)."
@@ -28,7 +29,6 @@ class ApproCompteFormKind(ApproCompteForm):
                                        "de saisie (valeur positive ou négative)."
                                        "</br>Remboursement pour un remboursement ou "
                                        "lorsque le foyer clotûre son compte (valeur négative).")
-
 
 
 # utilisé pour inventaire ET appro stock
