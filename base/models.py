@@ -350,7 +350,7 @@ class ApproCompteOp(Operation):
         (REPAYMENT, 'Remboursement'),
         (ONTHEFLIGHT, 'A la volée'),
     ]
-    kind = models.CharField(max_length=6, choices=KIND_CHOICES, default=CASH, null=True)
+    kind = models.CharField(max_length=12, choices=KIND_CHOICES, default=CASH, null=True)
 
     def __str__(self):
         return 'ApproCompteOp {} - {} - {}'.format(self.household, self.amount, self.get_kind_display())
