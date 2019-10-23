@@ -553,19 +553,29 @@ def valueslist(request):
             diff_dates.append(date)
     diff_dates.sort()
 
+    values_p = [0] * len(diff_dates)
+    values_n = [0] * len(diff_dates)
     values = [0] * len(diff_dates)
     labels = [0] * len(diff_dates)
     for a in comptes_stats:
         value = float(a['value'])
         date = a['date']
         i = diff_dates.index(date)
-        values[i] += value
+        values_p[i] = value
+    for i in range(1, len(values_p)):
+        if values_p[i] == 0:
+            values_p[i] = values_p[i - 1]
 
     for a in appros_stats:
         value = float(a['value'])
         date = a['date']
         i = diff_dates.index(date)
-        values[i] -= value
+        values_n[i] = value
+    for i in range(1, len(values_n)):
+        if values_n[i] == 0:
+            values_n[i] = values_n[i - 1]
+
+    values = [values_p[i] - values_n[i] for i in range(len(values))]
 
     labels[0] = values[0]
     for i in range(1, len(values)):

@@ -52,7 +52,7 @@
  init_date.setMonth(init_date.getMonth() - 6);
  var end_date = new Date();
  end_date.setMonth(end_date.getMonth() + 1);
- var chart = new Chart(ctx, {
+ var chart1 = new Chart(ctx, {
      type: 'line',
 
      data: {
@@ -132,17 +132,17 @@
  });
 
  document.getElementById('addData1').addEventListener('click', function() {
-     var date = new Date(chart.options.scales.xAxes[0].time.min);
+     var date = new Date(chart1.options.scales.xAxes[0].time.min);
      date.setMonth(date.getMonth() - 1);
-     chart.options.scales.xAxes[0].time.min = date;
-     chart.update();
+     chart1.options.scales.xAxes[0].time.min = date;
+     chart1.update();
  });
 
  document.getElementById('removeData1').addEventListener('click', function() {
-     var date = new Date(chart.options.scales.xAxes[0].time.min);
+     var date = new Date(chart1.options.scales.xAxes[0].time.min);
      date.setMonth(date.getMonth() + 1);
-     chart.options.scales.xAxes[0].time.min = date;
-     chart.update();
+     chart1.options.scales.xAxes[0].time.min = date;
+     chart1.update();
  });
 </script>
 
@@ -165,7 +165,7 @@
  init_date.setMonth(init_date.getMonth() - 6);
  var end_date = new Date();
  end_date.setMonth(end_date.getMonth() + 1);
- var chart = new Chart(ctx, {
+ var chart2 = new Chart(ctx, {
      type: 'line',
 
      data: {
@@ -219,17 +219,17 @@
  });
 
  document.getElementById('addData2').addEventListener('click', function() {
-     var date = new Date(chart.options.scales.xAxes[0].time.min);
+     var date = new Date(chart2.options.scales.xAxes[0].time.min);
      date.setMonth(date.getMonth() - 1);
-     chart.options.scales.xAxes[0].time.min = date;
-     chart.update();
+     chart2.options.scales.xAxes[0].time.min = date;
+     chart2.update();
  });
 
  document.getElementById('removeData2').addEventListener('click', function() {
-     var date = new Date(chart.options.scales.xAxes[0].time.min);
+     var date = new Date(chart2.options.scales.xAxes[0].time.min);
      date.setMonth(date.getMonth() + 1);
-     chart.options.scales.xAxes[0].time.min = date;
-     chart.update();
+     chart2.options.scales.xAxes[0].time.min = date;
+     chart2.update();
  });
 </script>
 {% endblock %}
