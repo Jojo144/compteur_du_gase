@@ -129,6 +129,7 @@ class Unit(models.Model):
 
     class Meta:
         verbose_name = 'Unité'
+        ordering = ["name"]
 
 
 class Provider(models.Model):
@@ -146,6 +147,7 @@ class Provider(models.Model):
     class Meta:
         verbose_name = 'Fournisseur'
         ordering = ['name']
+
 
 # foyer
 def get_advised_household_number():
