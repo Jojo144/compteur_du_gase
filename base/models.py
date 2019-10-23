@@ -129,6 +129,7 @@ class Unit(models.Model):
 
     class Meta:
         verbose_name = 'Unité'
+        ordering = ["name"]
 
 
 class Provider(models.Model):
@@ -141,11 +142,12 @@ class Provider(models.Model):
         return self.name
 
     def get_products(self):
-        return Product.objects.filter(provider=self.pk)
+        return Product.objects.filter(provider=self.pk).order_by('name')
 
     class Meta:
         verbose_name = 'Fournisseur'
         ordering = ['name']
+
 
 # foyer
 def get_advised_household_number():
