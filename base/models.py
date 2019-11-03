@@ -279,6 +279,9 @@ class Product(models.Model):
         else:
             return None
 
+    def get_appros(self, nb=5):
+        return ChangeStockOp.objects.filter(label="ApproStock").filter(product=self.pk).order_by('-date')[:nb]
+
     class Meta:
         verbose_name = 'Produit'
         ordering = ['name']
@@ -327,6 +330,20 @@ class ChangeStockOp(Operation):
         if self.label != "ApproStock":
             raise TypeError("Operation must be filter with label==ApproStock")
         return self.price
+
+    def modify_quantity(self, new_quantity):
+        if abs(new_quantity) > 1e-6:  # more than 0
+            # calcul des prix de vente et d'achat a la date de creation et non pas la date actuelle
+            price = self.price / self.quantity
+            purchase_cost = self.purchase_cost / self.quantity
+
+            self.price = price * new_quantity
+            self.purchase_cost = purchase_cost * new_quantity
+            self.stock = self.stock - self.quantity + new_quantity
+            self.quantity = new_quantity
+            return True
+        else:
+            return False  # operation must be deleted
 
     def __str__(self):
         return '{} : {} - {}'.format(self.label, self.product, self.quantity)

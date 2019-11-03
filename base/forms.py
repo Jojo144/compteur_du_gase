@@ -45,6 +45,11 @@ class ProductList(forms.Form):
             self.fields[str(p.pk)] = forms.DecimalField(label=p.name, help_text=mark_safe(help_text), required=False)
 
 
+class ProductListSimple(forms.Form):
+    product = forms.ModelChoiceField(label='Sélectionnez un produit : ',
+                                     queryset=Product.objects.order_by('name'))
+
+
 # used for details AND creation
 class ProductForm(forms.ModelForm):
     stock = forms.DecimalField(disabled=True, required=False)
@@ -76,3 +81,17 @@ class NoteForm(forms.ModelForm):
 # used for details AND creation
 MemberFormSet = inlineformset_factory(Household, Member, fields=('name', 'email', 'tel', 'receipt', 'stock_alert'),
                                       min_num=1, validate_min=True, extra=0)
+
+
+class ApprosList(forms.Form):
+    def __init__(self, appros, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for a in appros:
+            help_text = "date : {} <br />" \
+                        "quantité réceptionnée : {} {} <br />" \
+                        "stock après réception : {} {}".format(a.date.strftime("%d/%m/%Y"),
+                                                                 a.quantity, a.product.unit,
+                                                                 a.stock, a.product.unit)
+            self.fields[str(a.pk)] = forms.DecimalField(
+                label="Quantité réceptionnée à la date du {} ?".format(a.date.strftime("%d/%m/%Y")),
+                help_text=mark_safe(help_text), required=False)
