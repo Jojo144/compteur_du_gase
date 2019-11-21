@@ -166,7 +166,7 @@ class Household(models.Model):
     comment = models.TextField(blank=True, verbose_name="commentaire")
     account = models.DecimalField(default=0, max_digits=10, decimal_places=2, editable=False,
                                   verbose_name="solde du compte")  # INVARIANT : account should be sum of operations
-    date = models.DateField(auto_now=True)  # date d'inscription
+    date = models.DateField(auto_now_add=True)  # date d'inscription
     date_closed = models.DateField(blank=True, null=True, verbose_name="Date de clôture",
                                    help_text="Remplir seulement si le foyer souhaite arrêter.")  # date de cloture
     subscription = models.DecimalField(default=0, max_digits=10, decimal_places=2,
@@ -266,7 +266,7 @@ class Product(models.Model):
 
 
 class Operation(models.Model):
-    date = models.DateTimeField(auto_now=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         abstract = True
@@ -348,7 +348,7 @@ class ApproCompteOp(Operation):
 
 # message
 class Note(models.Model):
-    date = models.DateTimeField(auto_now=True)
+    date = models.DateTimeField(auto_now_add=True)
     who = models.ForeignKey(Member, null=True, on_delete=models.SET_NULL,
                             verbose_name="Auteur")  # null if the product was deleted and no longer exists
     message = models.TextField(blank=False, verbose_name="Message")
@@ -358,7 +358,7 @@ class Note(models.Model):
 
 # mails
 class Mail(models.Model):
-    date = models.DateTimeField(auto_now=True)
+    date = models.DateTimeField(auto_now_add=True)
     message = models.TextField(blank=False, verbose_name="Message")
     subject = models.TextField(blank=False, verbose_name="Sujet")
     recipients = models.TextField(blank=False, verbose_name="Destinataires")
