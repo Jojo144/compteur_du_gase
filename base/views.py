@@ -41,18 +41,15 @@ def my_send_mail(request, subject, message, recipient_list, success_msg, error_m
             recipient_list_cleaned = recipient_list
         from_email = str(local_settings.mail_username)
         try:
-            connection = get_connection(host=local_settings.mail_host,
-                                        port=local_settings.mail_port,
-                                        username=local_settings.mail_username,
-                                        password=local_settings.mail_passwd,
-                                        use_tls=(local_settings.mail_protocole == 'tls'),
-                                        use_ssl=(local_settings.mail_protocole == 'ssl'),
-                                        timeout=local_settings.mail_timeout)
-
-            connection.open()
-            send_mail(subject_mail, message, from_email, recipient_list_cleaned, fail_silently=False,
-                      connection=connection)
-            connection.close()
+            with get_connection(host=local_settings.mail_host,
+                                port=local_settings.mail_port,
+                                username=local_settings.mail_username,
+                                password=local_settings.mail_passwd,
+                                use_tls=(local_settings.mail_protocole == 'tls'),
+                                use_ssl=(local_settings.mail_protocole == 'ssl'),
+                                timeout=local_settings.mail_timeout) as connection:
+                send_mail(subject_mail, message, from_email, recipient_list_cleaned, fail_silently=False,
+                          connection=connection)
             if save_mail:
                 mail.send = True
                 mail.save()
