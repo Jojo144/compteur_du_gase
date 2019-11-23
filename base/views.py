@@ -227,7 +227,8 @@ def pre_compte(request):
 def compte(request, household_id):
     household = Household.objects.get(pk=household_id)
     history = ApproCompteOp.objects.filter(household_id=household_id).order_by('-date')[:5]
-    use_appro_kind = get_local_settings().use_appro_kind
+    local_settings = get_local_settings()
+    use_appro_kind = local_settings.use_appro_kind
     if request.method == 'POST':
         form = ApproCompteFormKind(request.POST) if use_appro_kind else ApproCompteForm(request.POST)
         if form.is_valid():
@@ -250,6 +251,7 @@ def compte(request, household_id):
     context = {'household': household,
                'form': form,
                'history': history,
+               'use_subscription': local_settings.use_subscription,
                'number': household.get_formated_number()
                }
     return render(request, 'base/compte.html', context)

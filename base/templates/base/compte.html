@@ -7,9 +7,11 @@
     <div class="row">
         <h2>{{ household }}</h2>
     </div>
+    {% if use_subscription %}
     <div class="row">
         <h5>Numéro de foyer : {{ number }} </h5>
     </div>
+    {% endif %}
     <div class="row">
         <h5>Solde : {{ household.account }} € </h5>
     </div>
