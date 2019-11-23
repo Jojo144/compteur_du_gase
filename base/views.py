@@ -227,8 +227,9 @@ def pre_compte(request):
 def compte(request, household_id):
     household = Household.objects.get(pk=household_id)
     history = ApproCompteOp.objects.filter(household_id=household_id).order_by('-date')[:5]
+    use_appro_kind = get_local_settings().use_appro_kind
     if request.method == 'POST':
-        form = ApproCompteForm(request.POST)
+        form = ApproCompteFormKind(request.POST) if use_appro_kind else ApproCompteForm(request.POST)
         if form.is_valid():
             q = form.cleaned_data['amount']
             k = form.cleaned_data.get('kind') # None if kinds are not used
@@ -245,7 +246,7 @@ def compte(request, household_id):
                          kind=Mail.RECEIPT)
             return HttpResponseRedirect(reverse('base:index'))
     else:
-        form = ApproCompteForm()
+        form = ApproCompteFormKind() if use_appro_kind else ApproCompteForm()
     context = {'household': household,
                'form': form,
                'history': history,

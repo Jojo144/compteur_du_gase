@@ -21,10 +21,9 @@ class ApproCompteForm(forms.Form):
                                 help_text="♥ Merci de ne pas oublier d'encaisser l'argent !",
                                 decimal_places=2)
 
-    if (get_local_settings().use_appro_kind):
-        kind = forms.ChoiceField(label="Type d'approvisionnement", choices=ApproCompteOp.KIND_CHOICES,
-                                 widget = Select() if (get_local_settings().use_appro_kind) else HiddenInput(), 
-                                 help_text="Chèque ou espèces pour un approvisionnement normal (valeur positive)."
+class ApproCompteFormKind(ApproCompteForm):
+    kind = forms.ChoiceField(label="Type d'approvisionnement", choices=ApproCompteOp.KIND_CHOICES,
+                             help_text="Chèque ou espèces pour un approvisionnement normal (valeur positive)."
                                        "</br>Annulation/correction pour corriger une erreur "
                                        "de saisie (valeur positive ou négative)."
                                        "</br>Remboursement pour un remboursement ou "
