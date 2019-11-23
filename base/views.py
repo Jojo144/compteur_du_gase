@@ -17,11 +17,9 @@ from .templatetags.my_tags import *
 
 
 
-def add_prefix_subject(subject, prefix=get_local_settings().prefix_object_mail):
-    if prefix:
-        return ' '.join([prefix, subject])
-    else:
-        return subject
+def add_prefix_subject(subject):
+    prefix = get_local_settings().prefix_object_mail
+    return ' '.join([prefix, subject])
 
 def my_send_mail(request, subject, message, recipient_list, success_msg, error_msg, kind, save=True):
     local_settings = get_local_settings()
@@ -32,7 +30,7 @@ def my_send_mail(request, subject, message, recipient_list, success_msg, error_m
         if save_mail:
             mail = Mail(recipients=', '.join(recipient_list), subject=subject, message=message, kind=kind)
             mail.save()
-        subject_mail = add_prefix_subject(subject, prefix=local_settings.prefix_object_mail)
+        subject_mail = add_prefix_subject(subject)
         debug_mail = local_settings.debug_mail
         if debug_mail:
             print("* Mode de test pour les mails qui sont automatiquement envoyés à {}.".format(debug_mail))
