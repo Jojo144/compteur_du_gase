@@ -48,6 +48,9 @@
 - [x] une liste des alertes stock
 - [x] un formulaire de suggestion ? -> pas tout de suite
 
+- [ ] découpler use_subscription et use_member_number
+- [ ] trier les listes de fournisseurs et catégories dasn détail pdt
+
 ## Cosmétique
 - [ ] Abandonner et revenir à l'accueil -> mettre un logo
 - [ ] Page produits -> non visible interrupteur sur même ligne que filtre
