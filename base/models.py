@@ -112,8 +112,14 @@ class Unit(models.Model):
     pluralize = models.BooleanField(verbose_name="Plurieliser ?", default=False,
                                     help_text="Ajouter un 's' au pluriel (par ex. 4 sachets mais 4 kg)")
 
+    def plural_name(self):
+        if (self.pluralize):
+            return (self.name + 's')
+        else:
+            return (self.name)
+
     def __str__(self):
-        return self.name
+        return (self.name + (' (vrac)' if self.vrac else ' (non vrac)'))
 
     class Meta:
         verbose_name = 'Unité'
