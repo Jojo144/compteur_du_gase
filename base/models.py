@@ -103,6 +103,7 @@ class Category(models.Model):
 
     class Meta:
         verbose_name = 'Catégorie'
+        ordering = ['name']
 
 
 class Unit(models.Model):
@@ -132,7 +133,7 @@ class Provider(models.Model):
 
     class Meta:
         verbose_name = 'Fournisseur'
-
+        ordering = ['name']
 
 # foyer
 def get_advised_household_number():
@@ -187,6 +188,7 @@ class Household(models.Model):
 
     class Meta:
         verbose_name = 'Foyer'
+        ordering = ['name']
 
     def get_formated_number(self):
         return '{0:03d}'.format(self.number)
@@ -215,6 +217,7 @@ class Member(models.Model):
 
     class Meta:
         verbose_name = 'Membre'
+        ordering = ['name']
 
 
 class Product(models.Model):
@@ -263,6 +266,7 @@ class Product(models.Model):
 
     class Meta:
         verbose_name = 'Produit'
+        ordering = ['name']
 
 
 class Operation(models.Model):

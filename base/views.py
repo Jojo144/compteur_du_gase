@@ -97,7 +97,7 @@ def gestion(request):
     # todo : use aggregate ?
     value_stock = sum([p.value_stock() for p in Product.objects.all()])
     value_accounts = sum([p.account for p in Household.objects.all()])
-    alert_pdts = [p for p in Product.objects.filter(stock_alert__isnull=False, visible=True).order_by('name') if
+    alert_pdts = [p for p in Product.objects.filter(stock_alert__isnull=False, visible=True) if
                   p.stock < p.stock_alert]
     return render(request, 'base/gestion.html',
                   {'value_stock': value_stock,

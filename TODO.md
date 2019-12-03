@@ -49,7 +49,7 @@
 - [x] un formulaire de suggestion ? -> pas tout de suite
 
 - [ ] découpler use_subscription et use_member_number
-- [ ] trier les listes de fournisseurs et catégories dasn détail pdt
+- [x] trier les listes de fournisseurs et catégories dasn détail pdt
 
 ## Cosmétique
 - [ ] Abandonner et revenir à l'accueil -> mettre un logo
