@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import inlineformset_factory
+from django.forms import inlineformset_factory, Textarea
 from django.utils.safestring import mark_safe
 
 from .models import *
@@ -54,6 +54,9 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         exclude = ['cost_of_purchase']
+        widgets = {
+            'comment': Textarea(attrs={'rows': 4}),
+        }
 
 
 # used for details AND creation
