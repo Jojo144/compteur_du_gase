@@ -744,7 +744,7 @@ def create_provider(request):
         form = ProviderForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, '✔ Produit créé !')
+            messages.success(request, '✔ Fournisseur créé !')
             return HttpResponseRedirect(reverse('base:providers'))
     else:
         form = ProviderForm()
