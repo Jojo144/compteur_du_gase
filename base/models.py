@@ -11,7 +11,7 @@ class LocalSettings(models.Model):
     min_account_allow = models.BooleanField(
         verbose_name="Lorsque le solde n'est pas suffisant, autoriser quand même après demande de confirmation ?",
         default=False,
-        help_text="Lorsque cette option est activée, si le solde n'est pas suffisant, il y a une demande de confirmation"
+        help_text="Lorsque cette option est activée, si le solde n'est pas suffisant, il y a une demande de confirmation "
                   "lors de l'achat mais il est autorisé. Dans le cas contraire, l'achat est rendu impossible.")
 
     min_balance = models.DecimalField(max_digits=10, decimal_places=2, default=10,
@@ -21,7 +21,7 @@ class LocalSettings(models.Model):
                                 verbose_name="texte de la page d'accueil (doit être donnée en code html)")
 
     use_messages = models.BooleanField(verbose_name="Utilisation de la fonction messages/actions ?", default=True,
-                                       help_text="La fonction messages/actions sert à laisser des messages"
+                                       help_text="La fonction messages/actions sert à laisser des messages "
                                                  "entre les différentes permanences ou lister des actions à faire.")
 
     use_appro_kind = models.BooleanField(verbose_name="Utilisation de la fonction type de paiement ?", default=True,
@@ -30,7 +30,7 @@ class LocalSettings(models.Model):
 
     use_subscription = models.BooleanField(verbose_name="Utilisation de la fonction cotisation d'adhésion ?",
                                            default=True,
-                                           help_text="La fonction adhésion permet de renseigner la cotisation d'adhésion"
+                                           help_text="La fonction adhésion permet de renseigner la cotisation "
                                                      "d'adhésion du foyer.")
 
     use_cost_of_purchase = models.BooleanField(verbose_name="Utilisation de la fonction prix d'achat ?", default=True,
@@ -58,7 +58,8 @@ class LocalSettings(models.Model):
     debug_mail = models.CharField(blank=True,
                                   verbose_name="Si ce champ est renseigné, tous les emails lui seront envoyés.",
                                   default="", max_length=50,
-                                  help_text="Ce champ permet de tester la fonction email sans envoyer de mails intempestifs.")
+                                  help_text="Ce champ permet de tester la fonction email "
+                                            "sans envoyer de mails intempestifs.")
 
     mail_host = models.CharField(blank=False, verbose_name="Hebergeur pour l'envoi des mails.",
                                  default="xxx", max_length=50,
@@ -66,7 +67,9 @@ class LocalSettings(models.Model):
 
     mail_port = models.IntegerField(verbose_name="Port smtp pour l'envoi des mails.",
                                     default=465,
-                                    help_text="Exemple : 25 (sans chiffrement), 465 (chiffrement implicite, SSL), 587 (chiffrement explicite, TLS).")
+                                    help_text="Exemple : 25 (sans chiffrement), "
+                                              "465 (chiffrement implicite, SSL), "
+                                              "587 (chiffrement explicite, TLS).")
 
     mail_protocole = models.CharField(
         choices=[('no', 'Pas de chiffrement'), ('tls', 'Utiliser TLS'), ('ssl', 'Utiliser SSL')],
