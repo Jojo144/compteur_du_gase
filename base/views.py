@@ -2,7 +2,7 @@ import json
 import datetime
 from decimal import Decimal
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
@@ -852,7 +852,7 @@ def mails_action(request, mails, action):
         else:
             raise NotImplementedError("Action inconnue : " + str(action))
 
-    return mailslist(request)
+    return redirect('base:mailslist') #mailslist(request)
 
 
 def mails_send_all(request):
@@ -896,6 +896,17 @@ def mails_del_receipts(request):
 
     return mails_action(request, mails, action="del")
 
+
+def mail_del(request, mail_id):
+    mails = Mail.objects.filter(pk=mail_id)
+
+    return mails_action(request, mails, action="del")
+
+
+def mail_send(request, mail_id):
+    mails = Mail.objects.filter(pk=mail_id)
+
+    return mails_action(request, mails, action="send")
 
 # ----------------------------------------------------------------------------------------------------------------------
 # inventaire
