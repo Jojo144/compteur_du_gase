@@ -52,6 +52,8 @@
             <td v-for="column in columns">
                 [[ x[column] ]]
             </td>
+            <td><a :href="'mail_send/' + x.id">✉ Envoyer</a></td>
+            <td><a :href="'mail_del/' + x.id">❌ Supprimer</a></td>
         </tr>
         </tbody>
     </table>
