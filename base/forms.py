@@ -53,10 +53,16 @@ class ProductForm(forms.ModelForm):
 
     class Meta:
         model = Product
-        exclude = ['cost_of_purchase']
+        exclude = []
+
         widgets = {
             'comment': Textarea(attrs={'rows': 4}),
         }
+
+
+class ProductFormWithoutPurchase(ProductForm):
+    class Meta:
+        exclude = ['cost_of_purchase']
 
 
 # used for details AND creation
