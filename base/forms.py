@@ -58,7 +58,11 @@ class ProductForm(forms.ModelForm):
 
     class Meta:
         model = Product
-        exclude = ['cost_of_purchase']
+        if (get_local_settings().use_cost_of_purchase):
+            exclude = []
+        else:
+            exclude = ['cost_of_purchase']
+
         widgets = {
             'comment': Textarea(attrs={'rows': 4}),
         }
