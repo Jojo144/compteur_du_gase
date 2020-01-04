@@ -74,9 +74,13 @@ class LocalSettings(models.Model):
 
     mail_timeout = models.IntegerField(default=4, verbose_name="Timeout pour l'envoi de mail.")
 
-    mail_username = models.CharField(blank=False, verbose_name="Nom d'utilisateur pour l'envoi des mails.",
+    mail_from = models.CharField(blank=False, verbose_name="Expéditeur pour l'envoi des mails.",
                                      default="tata@titi.com", max_length=100,
                                      help_text="Exemple : tata@titi.com.")
+
+    mail_username = models.CharField(blank=False, verbose_name="Nom d'utilisateur pour l'envoi des mails.",
+                                     default="tata", max_length=100,
+                                     help_text="Exemple : tata.")
 
     mail_passwd = models.CharField(blank=False, verbose_name="Mot de passe pour l'envoi des mails.",
                                    default="xxx", max_length=100)
