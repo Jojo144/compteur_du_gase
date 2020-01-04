@@ -97,3 +97,7 @@ Puis `./manage.py shell` et dans ce shell Django :
 ```
 %run migration.py
 ```
+
+## Credits
+
+Favicon made by Freepik from www.flaticon.com

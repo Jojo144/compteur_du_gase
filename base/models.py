@@ -42,10 +42,6 @@ class LocalSettings(models.Model):
                                        help_text="Le fichier de logo doit être placé dans le répertoire base\static\base"
                                                  " et son nom de fichier doit etre logo.png.")
 
-    use_favicon = models.BooleanField(verbose_name="Affiche une favicon ?", default=True,
-                                       help_text="Le fichier favicon doit être placé dans le répertoire base\static\base"
-                                                 " et son nom de fichier doit etre favicon.ico.")
-
     use_mail = models.BooleanField(verbose_name="Utilisation de la fonction envoi d'email ?", default=True,
                                    help_text="Cette fonction permet d'envoyer les tickets de caisse ou "
                                              "des alertes stocks aux référents des produits.")
