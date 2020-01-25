@@ -343,9 +343,9 @@ def products(request):
     else:
         columns = ['nom', 'catégorie', 'fournisseur', 'prix', 'vrac', 'visible', 'alerte stock', 'stock']
     pdts = [{"id": p.id, "nom": p.name, "catégorie": str(p.category), "fournisseur": str(p.provider),
-             "prix d'achat": '{} € / {}'.format(p.cost_of_purchase, p.unit),
-             "prix de vente": '{} € / {}'.format(p.price, p.unit), "vrac": bool_to_utf8(p.unit.vrac),
-             "visible": bool_to_utf8(p.visible),
+             "prix d'achat": '{} € / {}'.format(p.cost_of_purchase, p.unit.name),
+             "prix de vente": '{} € / {}'.format(p.price, p.unit.name), "prix": '{} € / {}'.format(p.price, p.unit.name),
+             "visible": bool_to_utf8(p.visible), "vrac": bool_to_utf8(p.unit.vrac),
              "alerte stock": '{} [{}]'.format(bool_to_utf8(p.stock < p.stock_alert), round_stock(p.stock_alert)) if (p.stock_alert) else '',
              "stock": round_stock(p.stock)}
             for p in Product.objects.all()]
