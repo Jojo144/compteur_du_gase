@@ -84,9 +84,8 @@
 
             <div class="row">
                 <div class="col">
-                    <form>
-                        <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
-                    </form>
+		    <!-- pas dans un form pour ne pas que ça recharge la page quand on fait Entrée -->
+                    <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
                 </div>
 
                 <div class="col text-right">
