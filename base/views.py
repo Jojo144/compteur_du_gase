@@ -897,7 +897,7 @@ def inventory(request):
         if form.is_valid():
             for p, q in form.cleaned_data.items():
                 pdt = Product.objects.get(pk=p)
-                if q:
+                if q is not None:
                     diff = q - pdt.stock
                     if diff != 0:  # todo check
                         op = ChangeStockOp.create_inventory(product=pdt, quantity=diff)
@@ -913,8 +913,6 @@ def inventory(request):
 
 def ecarts(request):
     ope = ChangeStockOp.objects.filter(label='Inventaire')
-    for o in list(ope):
-        print(o.date, o.price)
     dates = {o.date.date() for o in ope}  # on regroupe par jour
     dates = sorted(dates, reverse=True)[:10]  # on garde les 10 derniers
     ecarts_data = [{'date': d,
