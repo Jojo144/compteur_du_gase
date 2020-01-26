@@ -315,26 +315,38 @@ def subscriptionslist(request):
 
 def create_product(request):
     if request.method == 'POST':
-        form = ProductForm(request.POST)
+        if get_local_settings().use_cost_of_purchase:
+            form = ProductForm(request.POST)
+        else:
+            form = ProductFormWithoutPurchase(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, '✔ Produit créé !')
             return HttpResponseRedirect(reverse('base:products'))
     else:
-        form = ProductForm()
+        if get_local_settings().use_cost_of_purchase:
+            form = ProductForm()
+        else:
+            form = ProductFormWithoutPurchase()
     return render(request, 'base/product.html', {'form': form})
 
 
 def detail_product(request, product_id):
     pdt = Product.objects.get(pk=product_id)
     if request.method == 'POST':
-        form = ProductForm(request.POST, instance=pdt)
+        if get_local_settings().use_cost_of_purchase:
+            form = ProductForm(request.POST, instance=pdt)
+        else:
+            form = ProductFormWithoutPurchase(request.POST, instance=pdt)
         if form.is_valid():
             form.save()
             messages.success(request, '✔ Produit mis à jour !')
             return HttpResponseRedirect(reverse('base:products'))
     else:
-        form = ProductForm(instance=pdt, initial={'stock': pdt.stock, 'value': pdt.value_stock()})
+        if get_local_settings().use_cost_of_purchase:
+            form = ProductForm(instance=pdt, initial={'stock': pdt.stock, 'value': pdt.value_stock()})
+        else:
+            form = ProductFormWithoutPurchase(instance=pdt, initial={'stock': pdt.stock, 'value': pdt.value_stock()})
     return render(request, 'base/product.html', {'form': form})
 
 

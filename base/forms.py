@@ -58,14 +58,16 @@ class ProductForm(forms.ModelForm):
 
     class Meta:
         model = Product
-        if (get_local_settings().use_cost_of_purchase):
-            exclude = []
-        else:
-            exclude = ['cost_of_purchase']
+        exclude = []
 
         widgets = {
             'comment': Textarea(attrs={'rows': 4}),
         }
+
+
+class ProductFormWithoutPurchase(ProductForm):
+    class Meta:
+        exclude = ['cost_of_purchase']
 
 
 # used for details AND creation
@@ -94,8 +96,8 @@ class ApprosList(forms.Form):
             help_text = "date : {} <br />" \
                         "quantité réceptionnée : {} {} <br />" \
                         "stock après réception : {} {}".format(a.date.strftime("%d/%m/%Y"),
-                                                                 a.quantity, a.product.unit,
-                                                                 a.stock, a.product.unit)
+                                                               a.quantity, a.product.unit,
+                                                               a.stock, a.product.unit)
             self.fields[str(a.pk)] = forms.DecimalField(
                 label="Quantité réceptionnée à la date du {} ?".format(a.date.strftime("%d/%m/%Y")),
                 help_text=mark_safe(help_text), required=False)
