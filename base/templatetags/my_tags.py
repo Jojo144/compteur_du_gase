@@ -46,6 +46,7 @@ def bool_to_utf8(b):
     else:
         return "✘"
 
+@register.filter
 def print_quantity(quantity, unit):
     q = round_stock(quantity)
     if q == '1' or q == '-1' or q == '0':

@@ -6,8 +6,8 @@
 {% block content %}
 <h4>{{ pdt }}</h4>
 Fournisseur : {{ pdt.provider }}<br>
-Stock actuel : {{ pdt.stock | round_stock }} {{ pdt.unit }}<br>
-Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
+Stock actuel : {{ pdt.stock | print_quantity:pdt.unit }}<br>
+Prix : {{ pdt.price }} € / {{ pdt.unit.name }}<br>
 
 <canvas id="myChart"></canvas>
 <br>
@@ -23,6 +23,10 @@ Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
  var style = getComputedStyle(document.body);
  var chartCol1 = style.getPropertyValue('--chartColor1');
  var chartColorText = style.getPropertyValue('--chartColorText');
+
+ var AchatColor = chartCol1;
+ var ApproStockColor = 'Black';
+ var InventaireColor = 'Red';
 
  Chart.defaults.global.defaultFontSize = 16;
  Chart.defaults.global.defaultFontColor = chartColorText;
@@ -46,12 +50,16 @@ Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
          {% for d in data %}
          { x: new Date('{{d.date}}'), y: {{d.stock}}, label: '{{d.label}}' },
          {% endfor %}
-         ]
+         ],
+	 pointBackgroundColor: [
+         {% for d in data %}
+	     {{d.label}}Color,
+         {% endfor %}
+         ],
          }]
      },
 
      options: {
-     title: { text: 'Bla bla' },
      scales: {
              xAxes: [{
                  type: 'time',
@@ -60,7 +68,7 @@ Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
          yAxes: [{
          scaleLabel: {
              display: true,
-             labelString: 'Stock ({{ pdt.unit }})'
+             labelString: 'Stock ({{ pdt.unit.name }})'
          },
          ticks: {
             suggestedMin: 0
@@ -93,4 +101,9 @@ Prix : {{ pdt.price }} € / {{ pdt.unit }}<br>
  });
 
 </script>
+<br>
+<br>
+<p>
+    Les points bleus sont les achats, les noirs les approvisionnements et les rouges les inventaires.
+</p>
 {% endblock content %}
