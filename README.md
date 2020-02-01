@@ -1,8 +1,9 @@
 # Le Compteur du Gase (CdG)
-Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en Service Épicerie, une épicerie autogérée).
+*Logiciel pour gérer une épicerie autogéreé !*
 
 ## Présentation
 
+Le Compteur du Gase Gestion permet de gérer les comptes et stocks d'un GASE (Groupement d'Achat en Service Épicerie, une épicerie autogérée).
 Le logiciel est pensé pour les groupements d’achats / épiceries fonctionnant de la façon suivante :
     • Chaque adhérent a un compte qu’il crédite.
     • Quand on fait des courses, on entre dans le logiciel ce que l’on achète (à la manière d’un logiciel de caisse) et cela débite notre compte en conséquence.
@@ -28,7 +29,7 @@ Ce logiciel peut être utilié tel quel.
 
 Néanmoins, pour personnaliser l'interface graphique, il faut créer un fichier local.css dans le répertoire contenant le fichier base.css.
 
-Différentes options sont également disponibles dans l'interface graphique dans Gestion>Interface d'administration>Réglages divers.  
+Différentes options sont également disponibles dans l'interface graphique dans Gestion>Interface d'administration>Réglages divers.
 
 ## Contributions
 
