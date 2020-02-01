@@ -1,0 +1,31 @@
+{% extends 'base/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="medium-content">
+    <h3> Modification de l'approvisionnement d'un produit </h3>
+    <div class="description">
+        Cette page sert à :
+        <div class="description-list">
+            <ul>
+                <li>modifier les quantités d'une précédente réception (correction).</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="narrow-content">
+    <div class="row">
+        <h2>{{ product }}</h2>
+    </div>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form | crispy }}
+        <div class="form-buttons">
+            <a class="btn btn-light" href="{% url 'base:index' %}">Annuler</a> &nbsp;
+            <input class="btn btn-info" type="submit" value="Valider">
+        </div>
+    </form>
+</div>
+
+{% endblock content %}

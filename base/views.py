@@ -377,12 +377,16 @@ def products(request):
 
 def pre_appro(request):
     if request.method == 'POST':
-        form = ProviderList(request.POST)
-        if form.is_valid():
+        form_providers = ProviderList(request.POST)
+        form_products = ProductListSimple(request.POST)
+        if form_providers.is_valid():
             return HttpResponseRedirect(reverse('base:appro', args=(request.POST['provider'],)))
+        if form_products.is_valid():
+            return HttpResponseRedirect(reverse('base:pre_appro_cor', args=(request.POST['product'],)))
     else:
-        form = ProviderList()
-    return render(request, 'base/pre_appro.html', {'form': form})
+        form_providers = ProviderList()
+        form_products = ProductListSimple()
+    return render(request, 'base/pre_appro.html', {'form_providers': form_providers, 'form_products': form_products})
 
 
 def appro(request, provider_id):
@@ -415,6 +419,57 @@ def appro(request, provider_id):
                'form': form,
                }
     return render(request, 'base/appro.html', context)
+
+
+def pre_appro_cor(request, product_id):
+    pdt = Product.objects.get(pk=product_id)
+    appros = pdt.get_appros()
+    if request.method == 'POST':
+        form = ApprosList(appros, request.POST)
+        if form.is_valid():
+            msgs = {}
+            for p, q in form.cleaned_data.items():
+                if q is not None:
+                    # modify operation
+                    ope = ChangeStockOp.objects.get(pk=p)
+                    ope_date = ope.date
+                    q_old = ope.quantity
+                    q_diff = q - q_old
+
+                    if ope.modify_quantity(q):  # normal case
+                        ope.save()
+                    else:
+                        ope.delete()  # q =0 case
+
+                    # modify stocks (operations)
+                    opes = ChangeStockOp.objects.filter(product=pdt).filter(date__gt=ope_date)
+                    for ope_i in opes:
+                        ope_i.stock = ope_i.stock + q_diff
+                        ope_i.save()
+
+                    # modify stocks (product)
+                    pdt.stock = pdt.stock + q_diff
+                    pdt.save()
+
+                    # mail
+                    ref = pdt.get_email_stock_alert()
+                    if ref:
+                        msgs[ref] = msgs.get(ref, '') + 'L\'approvisionnement de {} a été modifié ' \
+                                                        'et fixé à {} unités ' \
+                                                        'au lieu de {} unités\n'.format(pdt, q,q_old)
+            messages.success(request, '✔ Approvisionnement modifié')
+            for (key, value) in msgs.items():
+                my_send_mail(request, subject='Approvisionnement', message=value, recipient_list=[key],
+                             success_msg='Mail de confirmation envoyé au référent',
+                             error_msg='Erreur : le mail de confirmation n\'a pas été envoyé',
+                             kind=Mail.REFERENT)
+            return HttpResponseRedirect(reverse('base:index'))
+    else:
+        form = ApprosList(appros)
+    context = {'product': pdt,
+               'form': form,
+               }
+    return render(request, 'base/pre_appro_cor.html', context)
 
 
 def approslist(request):

@@ -46,17 +46,26 @@ def bool_to_utf8(b):
     else:
         return "✘"
 
-def print_quantity(quantity, unit):
+def print_quantity(quantity, unit=None):
     q = round_stock(quantity)
-    if q == '1' or q == '-1' or q == '0':
-        return q + ' ' + unit.name
+    if unit is not None:
+        if q == '1' or q == '-1' or q == '0':
+            return q + ' ' + unit.name
+        else:
+            return q + ' ' + unit.plural_name()
     else:
-        return q + ' ' + unit.plural_name()
+        return q
 
 @register.filter
 def print_quantity_op(op):
-    return print_quantity(op.quantity, op.product.unit)
+    if op.product is not None:
+        return print_quantity(op.quantity, op.product.unit)
+    else:
+        return print_quantity(op.quantity)
 
 @register.filter
 def print_neg_quantity_op(op):
-    return print_quantity(-op.quantity, op.product.unit)
+    if op.product is not None:
+        return print_quantity(-op.quantity, op.product.unit)
+    else:
+        return print_quantity(-op.quantity)

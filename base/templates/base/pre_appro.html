@@ -3,12 +3,13 @@
 
 {% block content %}
 <div class="medium-content">
-    <h3> Réception d'une commande d'un fournisseur </h3>
+    <h3> Réception/Modification d'une commande d'un fournisseur </h3>
     <div class="description">
         Cette page sert à :
         <div class="description-list">
             <ul>
-                <li>approvisionner les stocks à la réception d'une commande d'un fournisseur.</li>
+                <li>approvisionner les stocks à la réception d'une commande d'un fournisseur ;</li>
+                <li>modifier les quantités d'une précédente réception (correction).</li>
             </ul>
         </div>
         Pour pouvoir réceptionner une commande d'un ou plusieurs produits d'un fournisseur, il faut au préalable que le
@@ -16,14 +17,34 @@
     </div>
 </div>
 
+<div class="medium-content">
+    <h3> Réception d'une commande d'un fournisseur </h3>
+</div>
 <div class="narrow-content">
     <form action="" method="post">
         {% csrf_token %}
-        {{ form | crispy }}
+        {{ form_providers | crispy }}
         <div class="form-buttons">
             <a class="btn btn-light" href="{% url 'base:index' %}">Annuler</a> &nbsp;
             <input class="btn btn-info" type="submit" value="Valider">
         </div>
     </form>
 </div>
+
+<hr class="gestion-hr">
+
+<div class="medium-content">
+    <h3> Modification des quantités d'une précédente réception</h3>
+</div>
+<div class="narrow-content">
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form_products | crispy }}
+        <div class="form-buttons">
+            <a class="btn btn-light" href="{% url 'base:index' %}">Annuler</a> &nbsp;
+            <input class="btn btn-info" type="submit" value="Valider">
+        </div>
+    </form>
+</div>
+
 {% endblock content %}

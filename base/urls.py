@@ -22,6 +22,7 @@ urlpatterns = [
     path('fournisseur', views.create_provider, name='create_provider'),
     path('appro', views.pre_appro, name='pre_appro'),
     path('appro/<int:provider_id>', views.appro, name='appro'),
+    path('pre_appro_cor/<int:product_id>', views.pre_appro_cor, name='pre_appro_cor'),
     path('approslist', views.approslist, name='approslist'),
     path('compte', views.pre_compte, name='pre_compte'),
     path('compte/<int:household_id>', views.compte, name='compte'),
