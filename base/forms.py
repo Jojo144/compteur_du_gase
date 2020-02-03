@@ -61,7 +61,7 @@ class ProductForm(forms.ModelForm):
 
 
 class ProductFormWithoutPurchase(ProductForm):
-    class Meta:
+    class Meta(ProductForm.Meta):
         exclude = ['cost_of_purchase']
 
 
