@@ -24,12 +24,8 @@
 </div>
 
 <div class="row" id="household">
-    <h2>{{ household }}</h2>
+    <h2>{{ household }} - <small>Solde : {{ household.account }} € </small></h2>
 </div>
-<div class="row">
-    <h5>Solde : {{ household.account }} € </h5>
-</div>
-
 <div class="row">
     <button type="button" class="btn btn-info" data-toggle="modal" data-target="#historyModal">
         Historique de vos achats
@@ -282,6 +278,7 @@
      }
  })
 
+{% if use_exports %}
  $(function(){
     var textFile = null;
     var makeTextFile = function (text) {
@@ -328,6 +325,7 @@
           document.body.removeChild(link);
         });}, false);
 })();
+{% endif %}
 
 </script>
 {% endblock content %}
