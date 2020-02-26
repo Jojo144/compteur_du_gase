@@ -8,18 +8,22 @@ Le logiciel est pensé pour les groupements d’achats / épiceries fonctionnant
     • Chaque adhérent a un compte qu’il crédite.
     • Quand on fait des courses, on entre dans le logiciel ce que l’on achète (à la manière d’un logiciel de caisse) et cela débite notre compte en conséquence.
     • Le logicel met aussi à jour les stocks et propose un suivi de ceux-ci.
+Il permet de gérer les stocks, les comptes des adhérents et la liste des adhérents.
 
 ## Historique
 
-Il y a trois GASEs (des épiceries autogérées) à Nantes. Depuis quelques années, on
-y utilise un logiciel ([MoneyCoop](https://github.com/barchstien/gase-web)) pour gérer les stocks / les comptes des adhérents
-/ la liste des adhérents. Ce logiciel est très pratique mais un peu vieillot et
-difficile à faire évoluer.
+Depuis quelques années, les trois GASEs (des épiceries autogérées) de Nantes utilisent le logiciel ([MoneyCoop](https://github.com/barchstien/gase-web)).
+Le Compteur du GASE est une réécriture du logiciel MoneyCoop pour en refaire une version plus moderne, plus pratique, avec de
+superbes statistiques et avec un meilleur nom !
 
-Le projet est d'en refaire une version plus moderne, plus pratique, avec de
-superbes statistiques et avec un meilleur nom : Le Compteur du GASE ! Il reste
-encore beaucoup à améliorer mais une première version est néanmoins déjà
-utilisable.
+MoneyCoop a été écrit en ~ 2012 par Pascal L. pour l'épicerie l'indépendante à Paris 18ème.
+Cette épicerie consistait deux gros placards au fond d'une salle de réunion et une permanence par semaine.
+Au début, les comptes étaient fait avec une feuille Excel mais ça c'est rapidement révélé ingérable.
+Comme ils avaient peu de temps le logiciel était en ligne et chacun enregistrait ses achats chez soi, de sorte de consacrer tout le temps des permanences à l'échange, et à l'organisation (commandes).
+L'indépendante a été influencée par le GASE de Rochefort en Terre. Puis d'autres groupement on demandé les sources de MoneyCoop pour l'utiliser, notamment à Nantes via une personne qui était à l'indépendante avant, à Champigny...
+Deux principes ont guidé l'écriture du logiciel : "tout le monde doit pouvoir tout faire" (même mot de passe pour tous), "simple et robuste" (par exemple pas possible de supprimer des choses pour éviter les erreurs).
+
+Il n'y avait pas de statistiques dans la version de base, cela a probablement été rajouté par les Nantais.
 
 Version de démo ici : https://test-compteur.girole.fr
 
