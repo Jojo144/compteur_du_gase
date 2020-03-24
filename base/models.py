@@ -187,12 +187,13 @@ class Household(models.Model):
     date = models.DateField(auto_now_add=True)  # date d'inscription
     date_closed = models.DateField(blank=True, null=True, verbose_name="Date de clôture",
                                    help_text="Remplir seulement si le foyer souhaite arrêter.")  # date de cloture
-    subscription = models.DecimalField(default=0, max_digits=10, decimal_places=2,
-                                       verbose_name="montant de la cotisation d'adhésion (en €)")
+    subscription = models.DecimalField(default=0, max_digits=10, decimal_places=2, verbose_name="cotisation",
+                                       help_text="Montant de la cotisation d'adhésion (en €)")
 
     on_the_flight = models.BooleanField(
-        verbose_name="Realise un approvisionnement automatique du montant du panier avant de payer.", default=False,
-        help_text="Cette fonction peut être utilise si l'on autorise le payement à la volée, c'est-à-dire lorsque "
+        verbose_name="Paie à la volée", default=False,
+        help_text="Réalise un approvisionnement automatique du montant du panier avant de payer."
+                  "Cette fonction peut être utilise si l'on autorise le payement à la volée, c'est-à-dire lorsque "
                   "le client n'a pas besoin d'approvisionner son compte mais paye la juste somme.")
 
     def __str__(self):
@@ -248,11 +249,11 @@ class Product(models.Model):
     category = models.ForeignKey(Category, verbose_name="catégorie", on_delete=models.CASCADE)
     unit = models.ForeignKey(Unit, verbose_name="unité", on_delete=models.CASCADE)
     # current price, can vary in the time ...
-    price = models.DecimalField(max_digits=10, decimal_places=2,
-                                verbose_name="prix de vente (en €) à l'unité (kg/L/...)")
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="prix de vente",
+                                help_text="Prix de vente (en €) à l'unité (kg/L/...)")
     # current price, can vary in the time ...
-    cost_of_purchase = models.DecimalField(default=0.0, max_digits=10, decimal_places=2,
-                                           verbose_name="prix d'achat (en €) à l'unité (kg/L/...)")
+    cost_of_purchase = models.DecimalField(default=0.0, max_digits=10, decimal_places=2, verbose_name="prix d'achat",
+                                           help_text="Prix d'achat (en €) à l'unité (kg/L/...)")
     pwyw = models.BooleanField(default=False, verbose_name="prix libre",
                                help_text="Pas encore géré par le logiciel ...")  # PWYW = Pay what you want
     visible = models.BooleanField(default=True,
@@ -301,6 +302,7 @@ class Operation(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        ordering = ['-date']
         abstract = True
 
 
@@ -344,6 +346,9 @@ class ChangeStockOp(Operation):
     def __str__(self):
         return '{} : {} - {}'.format(self.label, self.product, self.quantity)
 
+    class Meta:
+        verbose_name = 'Opération sur le stock'
+
 
 class Purchase(Operation):
     household = models.ForeignKey(Household, null=True,
@@ -372,12 +377,15 @@ class ApproCompteOp(Operation):
         (CHEQUE, 'Chèque'),
         (CANCELLATION, 'Annulation/Correction'),
         (REPAYMENT, 'Remboursement'),
-        (ONTHEFLIGHT, 'A la volée'),
+        (ONTHEFLIGHT, 'À la volée'),
     ]
     kind = models.CharField(max_length=12, choices=KIND_CHOICES, default=CASH, null=True)
 
     def __str__(self):
         return 'ApproCompteOp {} - {} - {}'.format(self.household, self.amount, self.get_kind_display())
+
+    class Meta:
+        verbose_name = "Opération d'appro de compte"
 
 
 # message
