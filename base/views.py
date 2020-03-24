@@ -347,7 +347,17 @@ def detail_product(request, product_id):
             form = ProductForm(instance=pdt, initial={'stock': pdt.stock, 'value': pdt.value_stock()})
         else:
             form = ProductFormWithoutPurchase(instance=pdt, initial={'stock': pdt.stock, 'value': pdt.value_stock()})
-    return render(request, 'base/product.html', {'form': form})
+    return render(request, 'base/product.html', {'product_id': pdt.pk, 'form': form})
+
+def archive_product(request, product_id):
+    if request.method == 'POST':
+        pdt = Product.objects.get(pk=product_id)
+        pdt.activated = False
+        pdt.save()
+        messages.success(request, '✔ {} archivé !'.format(pdt.name))
+        return HttpResponseRedirect(reverse('base:products'))
+    else:
+        return HttpResponseRedirect(reverse('base:products'))
 
 
 def products(request):

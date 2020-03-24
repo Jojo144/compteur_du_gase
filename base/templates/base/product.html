@@ -10,4 +10,22 @@
         <input class="btn btn-info" type="submit" value="Enregister">
     </div>
 </form>
+
+<!-- Archivage -->
+<form id="archiveForm" class="narrow-content" action="{% url 'base:archive_product' product_id %}" method="post">
+  {% csrf_token %}
+  <br><br>
+  <p>Pour archiver ce produit, cliquez ici : </p>
+  <input class="confirm-archive btn btn-outline-danger btn-sm" value="Archiver">
+  <br><br>
+</form>
+<script>
+ $(document).on("click", ".confirm-archive", function(e) {
+     bootbox.confirm({
+	 locale: "fr",
+	 message: '<p>Voulez-vous archiver ce produit ?</p>\
+                      <p>Il ne sera plus affiché dans le logiciel. Cette opération peut être annulée via l\'interface de gestion.</p>',
+	 callback: function(result){ if (result) { $("#archiveForm").submit(); } }
+ })});
+</script>
 {% endblock content %}

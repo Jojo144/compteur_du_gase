@@ -11,6 +11,9 @@ class MemberInline(admin.TabularInline):
 class HouseholdAdmin(admin.ModelAdmin):
     inlines = [MemberInline, ]
 
+class ProductAdmin(admin.ModelAdmin):
+    def get_queryset(self, request):
+        return Product.all_objects.all()
 
 admin.site.unregister(User)
 admin.site.unregister(Group)
@@ -20,7 +23,7 @@ admin.site.register(Unit)
 admin.site.register(Provider)
 admin.site.register(Member)
 admin.site.register(Household, HouseholdAdmin)
-admin.site.register(Product)
+admin.site.register(Product, ProductAdmin)
 admin.site.register(Note)
 admin.site.register(LocalSettings)
 admin.site.register(Mail)

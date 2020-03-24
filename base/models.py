@@ -237,6 +237,10 @@ class Member(models.Model):
         verbose_name = 'Membre'
         ordering = ['name']
 
+class ProductManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(activated=True)
+
 
 class Product(models.Model):
     name = models.CharField(max_length=200, verbose_name="nom")
@@ -266,6 +270,12 @@ class Product(models.Model):
     comment = models.TextField(blank=True, verbose_name="commentaire")
     stock = models.DecimalField(default=0, max_digits=15, decimal_places=3, editable=False,
                                 verbose_name="stock")  # INVARIANT : stock should be sum of operations
+    activated = models.BooleanField(default=True,
+                                    help_text="Une référence non activée n'apparaît pas dans le logiciel. Utilisé pour archiver les produits",
+                                    verbose_name="activé")
+
+    objects = ProductManager()
+    all_objects = models.Manager()
 
     def __str__(self):
         return self.name
