@@ -344,10 +344,10 @@ def detail_product(request, product_id):
             return HttpResponseRedirect(reverse('base:products'))
     else:
         if get_local_settings().use_cost_of_purchase:
-            form = ProductForm(instance=pdt, initial={'stock': pdt.stock, 'value': pdt.value_stock()})
+            form = ProductForm(instance=pdt)
         else:
-            form = ProductFormWithoutPurchase(instance=pdt, initial={'stock': pdt.stock, 'value': pdt.value_stock()})
-    return render(request, 'base/product.html', {'product_id': pdt.pk, 'form': form})
+            form = ProductFormWithoutPurchase(instance=pdt)
+    return render(request, 'base/product.html', {'pdt': pdt, 'stock_value': pdt.value_stock(), 'form': form})
 
 def archive_product(request, product_id):
     if request.method == 'POST':

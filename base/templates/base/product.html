@@ -1,8 +1,10 @@
 {% extends 'base/base.html' %}
 {% load crispy_forms_tags %}
+{% load my_tags %}
 
 {% block content %}
-<form class="narrow-content" action="" method="post">
+<div class="narrow-content">
+<form action="" method="post">
     {% csrf_token %}
     {{ form | crispy }}
     <div class="form-buttons">
@@ -11,14 +13,25 @@
     </div>
 </form>
 
+<!-- Stock et valeur du stock -->
+<br><br>
+<h5>État des stock</h5>
+<div>
+  <p class="col-form-label">Stock :</p>
+  <input class="form-control" type="text" placeholder="{{ pdt.stock | print_quantity:pdt.unit }}" readonly>
+  <p class="col-form-label">Valeur du stock :</p>
+  <input class="form-control" type="text" placeholder="{{ stock_value | round2 }} €" readonly>
+</div>
+
 <!-- Archivage -->
-<form id="archiveForm" class="narrow-content" action="{% url 'base:archive_product' product_id %}" method="post">
+<br><br>
+<h5>Archivage</h5>
+<form id="archiveForm" action="{% url 'base:archive_product' pdt.pk %}" method="post">
   {% csrf_token %}
-  <br><br>
   <p>Pour archiver ce produit, cliquez ici : </p>
   <input class="confirm-archive btn btn-outline-danger btn-sm" value="Archiver">
-  <br><br>
 </form>
+<br><br>
 <script>
  $(document).on("click", ".confirm-archive", function(e) {
      bootbox.confirm({
@@ -28,4 +41,5 @@
 	 callback: function(result){ if (result) { $("#archiveForm").submit(); } }
  })});
 </script>
+</div>
 {% endblock content %}

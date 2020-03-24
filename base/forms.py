@@ -47,10 +47,6 @@ class ProductList(forms.Form):
 
 # used for details AND creation
 class ProductForm(forms.ModelForm):
-    stock = forms.DecimalField(disabled=True, required=False)
-    value = forms.DecimalField(disabled=True, required=False, decimal_places=2,
-                               label="Valeur du stock (en €)")
-
     class Meta:
         model = Product
         exclude = ['activated']
