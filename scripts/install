@@ -45,7 +45,7 @@ ynh_webpath_available $domain $path
 ynh_install_app_dependencies $pkg_dependencies
 
 sudo mkdir -p $final_path
-cp -r ../. $final_path
+git clone https://github.com/Jojo144/compteur_du_gase $final_path
 
 python3 -m venv $final_path/venv
 venv_python=$final_path/venv/bin/python3
@@ -107,7 +107,7 @@ sudo cp ../conf/gunicorn_config.py $final_path
 sudo service nginx reload
 sudo systemctl start $app
 sudo systemctl enable $app
-sudo yunohost service add $app -l /var/log/gunicorn/$app.log
+sudo yunohost service add $app -l /var/log/$app/error.log /var/log/$app/access.log
 
 
 # C'est public ! (pas de SSO ynh)
