@@ -5,17 +5,30 @@ source /usr/share/yunohost/helpers
 
 
 app=$YNH_APP_INSTANCE_NAME
-domain=$(ynh_app_setting_get "$app" domain)
+domain=$(ynh_app_setting_get --app=$app --key=domain)
 
-# ynh_backup_before_upgrade
-# ynh_clean_setup () {
-# 	# restore it if the upgrade fails
-# 	ynh_restore_upgradebackup
-# }
-# # Exit if an error occurs during the execution of the script
-# ynh_abort_if_errors
+
+ynh_script_progression --message="Backing up the app before upgrading (may take a while)..." --time --weight=1
+
+# Backup the current version of the app
+ynh_backup_before_upgrade
+ynh_clean_setup () {
+	# restore it if the upgrade fails
+	ynh_restore_upgradebackup
+}
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
+
+
+ynh_script_progression --message="Upgrading..." --time --weight=1
 
 final_path=/opt/$app
+venv_python=$final_path/venv/bin/python3
 
 cd $final_path && git pull
+sudo -u $app $venv_python $final_path/manage.py migrate --noinput
+
+
+ynh_script_progression --message="Restarting GUnicorn..." --time --weight=1
+
 sudo systemctl restart $app
