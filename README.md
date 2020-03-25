@@ -81,9 +81,12 @@ Paquet Yunohost.
 ```
 sudo yunohost app install https://github.com/Jojo144/compteur_du_gase
 ```
-Pour le moment seuls les scripts `install` et `remove` fonctionne.
+Pour le moment seuls les scripts `install`, `upgrade` `remove` fonctionne.
 
-Pour mettre à jour sauvegarder la base, désinstallez et réinstallez.
+Pour mettre à jour :
+```
+sudo yunohost app upgrade compteur_gase -u https://github.com/Jojo144/compteur_du_gase
+```
 
 ## Sauvegarde de la base de donnée
 

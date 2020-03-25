@@ -328,7 +328,7 @@ def create_product(request):
             form = ProductForm()
         else:
             form = ProductFormWithoutPurchase()
-    return render(request, 'base/product.html', {'form': form})
+    return render(request, 'base/create_product.html', {'form': form})
 
 
 def detail_product(request, product_id):
@@ -347,7 +347,7 @@ def detail_product(request, product_id):
             form = ProductForm(instance=pdt)
         else:
             form = ProductFormWithoutPurchase(instance=pdt)
-    return render(request, 'base/product.html', {'pdt': pdt, 'stock_value': pdt.value_stock(), 'form': form})
+    return render(request, 'base/detail_product.html', {'pdt': pdt, 'stock_value': pdt.value_stock(), 'form': form})
 
 def archive_product(request, product_id):
     if request.method == 'POST':
