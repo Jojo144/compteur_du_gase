@@ -9,12 +9,90 @@ Pour chaque produit pesé/compté, entrer la quantité correspondante puis cliqu
 Ne pas oublier de bien tarer la balance et de faire attention aux unités. Bon courage !
 <br>
 <br>
-<form class="narrow-content" action="" method="post">
+<div id="vue-table">
+  <form id="inventoryForm" class="" action="" method="post">
     {% csrf_token %}
-    {{ form | crispy }}
-    <div class="form-buttons">
-        <a class="btn btn-light" href="{% url 'base:gestion' %}">Annuler</a> &nbsp;
-        <input class="btn btn-info" type="submit" value="Mettre les stocks à jour">
+
+    <div class="text-right filter">
+      <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
     </div>
-</form>
+
+    <div class="form-buttons">
+      <a class="btn btn-light" href="{% url 'base:gestion' %}">Annuler</a> &nbsp;
+      <input class="btn btn-info" @click="confirmSubmit" value="Mettre les stocks à jour">
+    </div>
+
+    <table class="table table-striped">
+      <thead>
+	<tr>
+	  <th>Produit</th>
+	  <th>Détails</th>
+	  <th>Stock constaté</th>
+	</tr>
+      </thead>
+      <tbody>
+        <tr v-for="field in raw_data" v-bind:style="{display: visible(field) }">
+	  <td>[[ field.label ]]</td>
+	  <td><small class="form-text text-muted" v-html="field.help_text"></small></td>
+	  <td>[[ field.errors ]]
+	    <input type="number" :name="field.name" step="any" :id="field.id" class="numberinput form-control">
+	  </td>
+	</tr>
+      </tbody>
+    </table>
+  </form>
+</div>
+
+<script>
+ $(function(){
+   $('a').click(function(event){
+     if ( ! confirm("Voulez-vous vraiment abandonner l'inventaire en cours ?")) {
+       event.preventDefault();
+     }
+   });
+ });
+
+ new Vue({
+   delimiters: ['[[', ']]'],
+   el: '#vue-table',
+   data: {
+     search: '',
+     raw_data: [
+       {% for field in form %}
+       {label:  `{{ field.label | safe }}`,
+	name:  `{{ field.name }}`,
+	help_text: `{{ field.help_text }}`,
+	id: `{{ field.id_for_label }}`,
+	errors: `{{ field.errors }}` },
+       {% endfor %}
+     ]
+   },
+
+   methods: {
+
+     visible: function(f) {
+       var search = this.search;
+       if (myContains(f.label, search)) {return "table-row"} else {return "none"};
+     },
+
+     confirmSubmit: function(){
+       var txt = "<ul>";
+       for (const f of this.raw_data) {
+	 var input = document.getElementById(f.id);
+	 if (input.value) {
+       	   txt += "<li>" + f.label + " : " + input.value + "</li>";
+	 };
+       };
+       txt += "</ul>";
+       bootbox.confirm({
+	 locale: "fr",
+	 message: `<p>Voulez-vous enregistrer l'inventaire suivant ?</p>`
+		+ txt,
+	 callback: function(result){ if (result) { $("#inventoryForm").submit(); } }
+       });
+     },
+
+   }
+ });
+</script>
 {% endblock content %}
