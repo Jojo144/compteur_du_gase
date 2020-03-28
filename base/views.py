@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.core.mail import send_mail, get_connection
 from django.views.generic.edit import CreateView, UpdateView
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Q, Sum
 
 from .models import *
 from .forms import *
@@ -935,7 +935,7 @@ def mail_send(request, mail_id):
 # ----------------------------------------------------------------------------------------------------------------------
 
 def inventory(request):
-    pdts = Product.objects.all().order_by('visible', 'name')
+    pdts = Product.objects.filter(Q(visible__exact=True) | ~Q(stock__exact=0))
     if request.method == 'POST':
         form = ProductList(pdts, request.POST)
         if form.is_valid():

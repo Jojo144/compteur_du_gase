@@ -37,11 +37,11 @@ class ProductList(forms.Form):
         super().__init__(*args, **kwargs)
         for p in pdts:
             if (get_local_settings().use_cost_of_purchase):
-                help_text = "prix d'achat : {} € / {} <br /> prix de vente : {} € / {} <br /> stock actuel théorique : {} {}".format(
-                    p.cost_of_purchase, p.unit, p.price, p.unit, round_stock(p.stock), p.unit)
+                help_text = "fournisseur : {} <br> prix d'achat : {} € / {} <br> prix de vente : {} € / {} <br> stock actuel théorique : {} {}".format(
+                    p.provider, p.cost_of_purchase, p.unit, p.price, p.unit, round_stock(p.stock), p.unit)
             else:
-                help_text = "prix : {} € / {} <br /> stock actuel théorique : {} {}".format(
-                    p.price, p.unit, round_stock(p.stock), p.unit)
+                help_text = "fournisseur : {} <br> prix : {} € / {} <br> stock actuel théorique : {} {}".format(
+                    p.provider, p.price, p.unit, round_stock(p.stock), p.unit)
             self.fields[str(p.pk)] = forms.DecimalField(label=p.name, help_text=mark_safe(help_text), required=False)
 
 
