@@ -44,8 +44,8 @@ Prix : {{ pdt.price }} € / {{ pdt.unit.name }}<br>
       <tr v-for="x in filter()">
 	<td> [[ x['label'] ]] </td>
 	<td> [[ x['date'] ]] </td>
-	<td> [[ x['quantity'] ]] {{ unit }} </td>
-	<td> [[ x['price'] ]] € </td>
+	<td> [[ _.round(x['quantity'], 3) ]] {{ unit }} </td>
+	<td> [[ _.round(x['price'], 2) ]] € </td>
       </tr>
     </tbody>
   </table>
@@ -53,10 +53,6 @@ Prix : {{ pdt.price }} € / {{ pdt.unit.name }}<br>
 </div>
 
 <script>
- function precision(number, prec) {
-   return parseFloat(number.toPrecision(prec));
- }
-
  var vue = new Vue({
    delimiters: ['[[', ']]'],
    el: '#vue-table',
@@ -82,8 +78,8 @@ Prix : {{ pdt.price }} € / {{ pdt.unit.name }}<br>
          total_price += parseFloat(element['price']);
        });
 
-       document.getElementById("total-quantity").innerHTML = precision(total_quantity, 3);
-       document.getElementById("total-price").innerHTML = precision(total_price, 2);
+       document.getElementById("total-quantity").innerHTML = _.round(total_quantity, 3);
+       document.getElementById("total-price").innerHTML = _.round(total_price, 2);
 
        return data
      },
