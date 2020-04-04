@@ -5,294 +5,289 @@
 {% block content %}
 
 <div class="row" id="household">
-    <h2>{{ household }} - <small>Solde : {{ household.account }} € </small></h2>
+  <h2>{{ household }} - <small>Solde : {{ household.account }} € </small></h2>
 </div>
 <div class="row">
-    <button type="button" class="show-history btn btn-info">
-        Historique de vos achats
-    </button>
+  <button type="button" class="show-history btn btn-info">
+    Historique de vos achats
+  </button>
 </div>
 
 
-<div id="vue-table">
+<div id="vue-table" class="row">
+  <div class="col col-6">
+
     <div class="row">
-        <div class="col col-6">
+      <div class="col">
+	<!-- pas dans un form pour ne pas que ça recharge la page quand on fait Entrée -->
+        <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
+      </div>
 
-
-            <div class="row">
-                <div class="col">
-		    <!-- pas dans un form pour ne pas que ça recharge la page quand on fait Entrée -->
-                    <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
-                </div>
-
-                <div class="col text-right">
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
-                                data-toggle="dropdown">
-                            [[ category ]]
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <button class="dropdown-item" @click="category='Toutes catégories'">Toutes catégories
-                            </button>
-                            {% for cat in cats %}
-                            <button class="dropdown-item" @click="category='{{ cat | escapejs }}'">{{ cat.name | escape }}</button>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Prix unitaire</th>
-                    <th>Quantité</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="(pdt, id) in filter()">
-                    <td>[[ pdt.name ]]</td>
-                    <td>[[ pdt.price ]] €</td>
-                    <td>
-                        <!-- todo: better input type ?? -->
-                        <div class="input-group">
-                            <input type="text" class="form-control" @keyup.enter="inBasket" :id="'input_pdt_' + id">
-                            <div class="input-group-append">
-                                <span class="input-group-text"> [[ pdt.unit ]] </span>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            <div class="text-right">
-                <button class="btn btn-info" @click="inBasket">Dans panier ⇒</button>
-            </div>
+      <div class="col text-right">
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                  data-toggle="dropdown">
+            [[ category ]]
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <button class="dropdown-item" @click="category='Toutes catégories'">Toutes catégories
+            </button>
+            {% for cat in cats %}
+            <button class="dropdown-item" @click="category='{{ cat | escapejs }}'">{{ cat.name | escape }}</button>
+            {% endfor %}
+          </div>
         </div>
-
-        <div class="col col-6">
-            <form action="" @submit="validateForm" method="post">
-                {% csrf_token %}
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Quantité</th>
-                        <th>Prix</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="(qtity, id) in basket">
-                        <td>[[ pdts[id].name ]]</td>
-                        <td>[[ qtity ]] [[ pdts[id].unit ]]</td>
-                        <td>[[ _.round(pdts[id].price * qtity, 2) ]] €</td>
-                        <td><a @click="removeBasket(id)">🗑</a></td>
-                        <input type="hidden" :value="qtity" :name="'basket_' + id" :id="'basket_' + id">
-                    </tr>
-                    </tbody>
-                </table>
-                <div class="row">
-                    <div class="col">
-                        <strong>Montant total : [[ _.round(totalAmount(), 2) ]] €</strong>
-                    </div>
-                    <div class="col text-right">
-                        <input class="btn btn-info" type="submit" value="Payer">
-                    </div>
-                </div>
-            </form>
-        </div>
+      </div>
     </div>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Prix unitaire</th>
+          <th>Quantité</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(pdt, id) in filter()">
+          <td>[[ pdt.name ]]</td>
+          <td>[[ pdt.price ]] €</td>
+          <td>
+            <div class="input-group">
+              <input type="text" class="form-control" @keyup.enter="inBasket" :id="'input_pdt_' + id">
+              <div class="input-group-append">
+                <span class="input-group-text"> [[ pdt.unit ]] </span>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="text-right">
+      <button class="btn btn-info" @click="inBasket">Dans panier ⇒</button>
+    </div>
+  </div>
+
+  <div class="col col-6">
+    <form action="" @submit="validateForm" method="post">
+      {% csrf_token %}
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Quantité</th>
+            <th>Prix</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(qtity, id) in basket">
+            <td>[[ pdts[id].name ]]</td>
+            <td>[[ qtity ]] [[ pdts[id].unit ]]</td>
+            <td>[[ _.round(pdts[id].price * qtity, 2) ]] €</td>
+            <td><a @click="removeBasket(id)">🗑</a></td>
+            <input type="hidden" :value="qtity" :name="'basket_' + id" :id="'basket_' + id">
+          </tr>
+        </tbody>
+      </table>
+      <div class="row">
+        <div class="col">
+          <strong>Montant total : [[ _.round(totalAmount(), 2) ]] €</strong>
+        </div>
+        <div class="col text-right">
+          <input class="btn btn-info" type="submit" value="Payer">
+        </div>
+      </div>
+    </form>
+  </div>
 </div>
+
 
 <script>
 
-  {% if alerte_balance %}
-  $(window).on('load',function(){
-    bootbox.alert('<p>Votre solde est inférieur a {{ alerte_balance_amount }} €.</p>')
-  });
-  {% endif %}
+ {% if alerte_balance %}
+ $(window).on('load',function(){
+   bootbox.alert('<p>Votre solde est inférieur a {{ alerte_balance_amount }} €.</p>')
+ });
+ {% endif %}
 
-  var history_content =
-      `<ul>
-         {% for o in history %}
-           <div style="margin-bottom:0.8em">
-             <li> Le {{ o.date | date:"D d M Y - H \h i" }} :
-               <ul>
-                 {% for p in o.details %}
-                   <li> {{ p.product }} : {{ p | print_neg_quantity_op }} ({{ p.price | neg | round2 }} €)</li>
-                 {% empty %}
-                   <li>Achat vide</li>
-                 {% endfor %}
-               </ul>
-             </li>
-             Total : <b> {{ o.total }} </b></br>
-           </div>
-         {% empty %}
-           <li>Pas d'achats précédents</li>
-         {% endfor %}
-       </ul>`;
+ var history_content =`
+    <ul>
+      {% for o in history %}
+      <div style="margin-bottom:0.8em">
+        <li> Le {{ o.date | date:"D d M Y - H \h i" }} :
+          <ul>
+            {% for p in o.details %}
+            <li> {{ p.product }} : {{ p | print_neg_quantity_op }} ({{ p.price | neg | round2 }} €)</li>
+            {% empty %}
+            <li>Achat vide</li>
+            {% endfor %}
+          </ul>
+        </li>
+        Total : <b> {{ o.total }} </b></br>
+      </div>
+      {% empty %}
+      <li>Pas d'achats précédents</li>
+      {% endfor %}
+    </ul>`;
 
-  $(document).on("click", ".show-history", function(e) {
-      bootbox.dialog({
-  	 title: "Historique de vos 10 derniers achats",
-  	 onEscape: true,
-  	 message: history_content,
-      buttons: {
-         {% if use_exports %}
-         noclose: {
-             label: "Exporter l'historique",
-             className: 'btn-info',
-             callback: function(){
-                 var textFile = null;
-                 var makeTextFile = function (text) {
-                     var data = new Blob([text], {type: 'text/html'});
+ $(document).on("click", ".show-history", function(e) {
+   bootbox.dialog({
+     title: "Historique de vos 10 derniers achats",
+     onEscape: true,
+     message: history_content,
+     buttons: {
+       ok: {
+         label: "Fermer",
+         className: 'btn-secondary'
+       },
+       {% if use_exports %}
+       noclose: {
+         label: "Exporter l'historique",
+         className: 'btn-info',
+         callback: function(){
+           var textFile = null;
+           var makeTextFile = function (text) {
+             var data = new Blob([text], {type: 'text/html'});
 
-                     // If we are replacing a previously generated file we need to
-                     // manually revoke the object URL to avoid memory leaks.
-                     if (textFile !== null) {
-                       window.URL.revokeObjectURL(textFile);
-                     }
-
-                     textFile = window.URL.createObjectURL(data);
-
-                     return textFile;
-                 };
-
-                 var link = document.createElement('a');
-                 link.setAttribute('download', 'HistoriqueAchats_{{ household }}.html');
-
-                 var content = "<!DOCTYPE html>\n";
-                 content += "<html>\n";
-                 content += "<head>\n";
-                 content += "   <title>Ticket de caisse</title>\n";
-                 content += "</head>\n";
-                 content += "<body>\n";
-
-                 content += history_content;
-
-                 content += "</body>\n";
-                 content += "</html>\n";
-
-                 link.href = makeTextFile(content);
-                 document.body.appendChild(link);
-                 link.click();
-                 document.body.removeChild(link);
+             // If we are replacing a previously generated file we need to
+             // manually revoke the object URL to avoid memory leaks.
+             if (textFile !== null) {
+               window.URL.revokeObjectURL(textFile);
              }
-         },
-         {% endif %}
-         ok: {
-             label: "Fermer",
-             className: 'btn-secondary'
+
+             textFile = window.URL.createObjectURL(data);
+
+             return textFile;
+           };
+
+           var link = document.createElement('a');
+           link.setAttribute('download', 'HistoriqueAchats_{{ household }}.html');
+
+           var content = "<!DOCTYPE html>\n";
+           content += "<html>\n";
+           content += "<head>\n";
+           content += "   <title>Ticket de caisse</title>\n";
+           content += "</head>\n";
+           content += "<body>";
+           content += history_content;
+           content += "\n</body>\n";
+           content += "</html>\n";
+
+           link.href = makeTextFile(content);
+           document.body.appendChild(link);
+           link.click();
+           document.body.removeChild(link);
          }
-      }
-      })
-  });
+       },
+       {% endif %}
+     }
+   })
+ });
 
-  $('nav a').click(function(event){
-      if ( ! confirm('Voulez-vous vraiment abandonner vos achats ? (Vous n\'avez pas payé)')) {
-      event.preventDefault();
-      }
-  })
+ $('nav a').click(function(event){
+   if ( ! confirm('Voulez-vous vraiment abandonner vos achats ? (Vous n\'avez pas payé)')) {
+     event.preventDefault();
+   }
+ })
 
-  new Vue({
-      delimiters: ['[[', ']]'],
-      el: '#vue-table',
-      data: {
-      search: '',
-      category: 'Toutes catégories',
-      pdts: {{ pdts | safe }},
-      basket: {}
-      },
+ new Vue({
+   delimiters: ['[[', ']]'],
+   el: '#vue-table',
+   data: {
+     search: '',
+     category: 'Toutes catégories',
+     pdts: {{ pdts | safe }},
+     basket: {}
+   },
 
-      methods: {
-      filter: function () {
-          var search = this.search; // important de faire ça sinon this.truc réfère à je sais pas quoi qui est undefined
-          var category = this.category;
-          return _.pickBy(this.pdts, (function (row) {
-          var cat_ok = (category == 'Toutes catégories') || (row.category == category);
-          var filter_ok = myContains(row.name, search);
-          return cat_ok && filter_ok;
-          }))
-      },
+   methods: {
+     filter: function () {
+       var search = this.search; // important de faire ça sinon this.truc réfère à je sais pas quoi qui est undefined
+       var category = this.category;
+       return _.pickBy(this.pdts, (function (row) {
+         var cat_ok = (category == 'Toutes catégories') || (row.category == category);
+         var filter_ok = myContains(row.name, search);
+         return cat_ok && filter_ok;
+       }))
+     },
 
-      inBasket: function () {
-          var filtered = this.filter();
-          for (var id in filtered) {
-          var input = document.getElementById("input_pdt_" + id);
-          if (input.value) {
-              var value = Number(_.replace(input.value, ",", "."));
-              if (value == 0) {
-              input.value = '';
-              } else {
-              if (Number.isFinite(value)) {
-                  if (value < 0) {
-                  alert("Vous avez rentré une quantité négative. Cela peut être pratique pour rattraper une erreur dans un achat précédent. Mais si vous vous êtes trompé, supprimez la référence de votre panier.");
-                  }
-                  if(!this.pdts[id].vrac && !Number.isInteger(value)) {
-                  alert("Veuillez utiliser un nombre entier pour : " + this.pdts[id].name);
-                  } else {
-                  var before = (this.basket[id]) ? (this.basket[id]) : 0;
-                  Vue.set(this.basket, id, before + value);
-                  input.value = '';
-                  }
-              }
-              else {
-                  alert("Veuillez entrer un nombre pour : " + this.pdts[id].name)
-              }
-              }
-          }
-          }
-      },
-
-      removeBasket: function(id) {
-          Vue.delete(this.basket, id)
-      },
-
-      totalAmount: function () {
-          var s = 0;
-          for (var id in this.basket) {
-          s += this.pdts[id].price * this.basket[id];
-          }
-          return s
-      },
-
-      validateForm: function(e) {
-          if (Object.keys(this.basket).length == 0) {
-          alert ("Votre panier est vide");
-          e.preventDefault()
-          }
-          if (! {{ on_the_flight | yesno:"true,false" }}){
-              var account_diff = {{ max_amount | comma_to_dot }} - this.totalAmount();
-              if (account_diff < 0) {
-                 if ( {{ min_account_allow | yesno:"true,false" }}) {
-                     if (! confirm("Vous n'avez pas assez de sous sur votre compte ! Il manque " + -account_diff.toFixed(2) + " €. Voulez-vous quand même effectuer l'achat ?") ) {
-                         e.preventDefault()
-                     }
-                 }
-                 else{
-                     alert ("Vous n'avez pas assez de sous sur votre compte ! Il manque " + -account_diff.toFixed(2) + " €.");
-                     e.preventDefault()
-                 }
+     inBasket: function () {
+       var filtered = this.filter();
+       for (var id in filtered) {
+         var input = document.getElementById("input_pdt_" + id);
+         if (input.value) {
+           var value = Number(_.replace(input.value, ",", "."));
+           if (value == 0) {
+             input.value = '';
+           } else {
+             if (Number.isFinite(value)) {
+               if (value < 0) {
+                 alert("Vous avez rentré une quantité négative. Cela peut être pratique pour rattraper une erreur dans un achat précédent. Mais si vous vous êtes trompé, supprimez la référence de votre panier.");
+               }
+               if(!this.pdts[id].vrac && !Number.isInteger(value)) {
+                 alert("Veuillez utiliser un nombre entier pour : " + this.pdts[id].name);
+               } else {
+                 var before = (this.basket[id]) ? (this.basket[id]) : 0;
+                 Vue.set(this.basket, id, before + value);
+                 input.value = '';
+               }
              }
-             else
-             {
-                 var balance_end = {{ balance_amount | comma_to_dot }} - this.totalAmount();
-                 if (balance_end < 0) {
-                     if (! confirm("Ce compte sera en négatif de " + -balance_end.toFixed(2) + " € à la fin la transaction ! Voulez-vous quand même effectuer l'achat ?")) {
-                         e.preventDefault()
-                     }
-                 }
+             else {
+               alert("Veuillez entrer un nombre pour : " + this.pdts[id].name)
              }
-          }
-          else {
-             if (! confirm("Ce compte est configuré pour que le client paye la somme exacte après un achat sans approvisionner son compte. Voulez-vous quand même effectuer l'achat ? Si vous acceptez, vous devez encaisser la somme du ticket de caisse qui est de " + this.totalAmount().toFixed(2) + " €")) {
-                 e.preventDefault()
+           }
+         }
+       }
+     },
+
+     removeBasket: function(id) {
+       Vue.delete(this.basket, id)
+     },
+
+     totalAmount: function () {
+       var s = 0;
+       for (var id in this.basket) {
+         s += this.pdts[id].price * this.basket[id];
+       }
+       return s
+     },
+
+     validateForm: function(e) {
+       if (Object.keys(this.basket).length == 0) {
+         alert ("Votre panier est vide");
+         e.preventDefault()
+       }
+       if (! {{ on_the_flight | yesno:"true,false" }}){
+         var account_diff = {{ max_amount | comma_to_dot }} - this.totalAmount();
+         if (account_diff < 0) {
+           if ( {{ min_account_allow | yesno:"true,false" }}) {
+             if (! confirm("Vous n'avez pas assez de sous sur votre compte ! Il manque " + -account_diff.toFixed(2) + " €. Voulez-vous quand même effectuer l'achat ?") ) {
+               e.preventDefault()
              }
-          }
-      }
-      }
-  })
+           }
+           else{
+             alert ("Vous n'avez pas assez de sous sur votre compte ! Il manque " + -account_diff.toFixed(2) + " €.");
+             e.preventDefault()
+           }
+         }
+         else
+         {
+           var balance_end = {{ balance_amount | comma_to_dot }} - this.totalAmount();
+           if (balance_end < 0) {
+             if (! confirm("Ce compte sera en négatif de " + -balance_end.toFixed(2) + " € à la fin la transaction ! Voulez-vous quand même effectuer l'achat ?")) {
+               e.preventDefault()
+             }
+           }
+         }
+       }
+       else {
+         if (! confirm("Ce compte est configuré pour que le client paye la somme exacte après un achat sans approvisionner son compte. Voulez-vous quand même effectuer l'achat ? Si vous acceptez, vous devez encaisser la somme du ticket de caisse qui est de " + this.totalAmount().toFixed(2) + " €")) {
+           e.preventDefault()
+         }
+       }
+     }
+   }
+ })
 </script>
 {% endblock content %}
