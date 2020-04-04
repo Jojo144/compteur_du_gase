@@ -359,6 +359,14 @@ def archive_product(request, product_id):
     else:
         return HttpResponseRedirect(reverse('base:products'))
 
+def product_history(request, product_id):
+    operations = [{"label": str(p.label), "date": str(p.date), "quantity": str(p.quantity), "price": str(p.price)}
+                  for p in ChangeStockOp.objects.filter(product_id=product_id).order_by('-date')]
+    operations = json.dumps(operations)
+    pdt = Product.objects.get(id=product_id)
+    plural_unit = pdt.unit.plural_name()
+    return render(request, 'base/product_history.html', {'operations': operations, 'pdt': pdt, 'unit': plural_unit})
+
 
 def products(request):
     local_settings = get_local_settings()

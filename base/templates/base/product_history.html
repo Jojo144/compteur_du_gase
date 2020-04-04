@@ -1,0 +1,97 @@
+{% extends "base/base.html" %}
+
+{% load my_tags %}
+
+{% block content %}
+<h4>Historique - {{ pdt }}</h4>
+Fournisseur : {{ pdt.provider }}<br>
+Stock actuel : {{ pdt.stock | print_quantity:pdt.unit }}<br>
+Prix : {{ pdt.price }} € / {{ pdt.unit.name }}<br>
+
+<div id="vue-table">
+  <p>
+    Total des opérations sélectionnées : <b><span id="total-quantity"></span> {{ unit }}</b>
+    et <b><span id="total-price"></span> €</b>
+  </p>
+
+  <form>
+    <div class="form-row">
+      <div class="col-4">
+	<input type="checkbox" id="Achat" value="Achat" v-model="checkedOps">
+	<label for="Achat">Achat</label>
+	<input type="checkbox" id="Inventaire" value="Inventaire" v-model="checkedOps">
+	<label for="Inventaire">Inventaire</label>
+	<input type="checkbox" id="ApproStock" value="ApproStock" v-model="checkedOps">
+	<label for="ApproStock">ApproStock</label>
+      </div>
+      <div class="col-auto">
+	<label for="start">Début de la sélection :</label>
+	<input type="date" id="start" name="history-start" v-model="historyStart">
+      </div>
+    </div>
+  </form>
+
+  <table id="table" class="table table-striped">
+    <thead>
+      <tr>
+        <th> Opération </th>
+        <th> Date </th>
+        <th> Quantité </th>
+        <th> Montant </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="x in filter()">
+	<td> [[ x['label'] ]] </td>
+	<td> [[ x['date'] ]] </td>
+	<td> [[ x['quantity'] ]] {{ unit }} </td>
+	<td> [[ x['price'] ]] € </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<script>
+ function precision(number, prec) {
+   return parseFloat(number.toPrecision(prec));
+ }
+
+ var vue = new Vue({
+   delimiters: ['[[', ']]'],
+   el: '#vue-table',
+   data: {
+     checkedOps: ["Achat", "Inventaire", "ApproStock"],
+     historyStart: '',
+     raw_data: {{ operations | safe }}
+   },
+
+   methods: {
+     filter: function () {
+       var checkedOps = this.checkedOps;
+       var data = this.raw_data;
+       var historyStart = Date.parse(this.historyStart);
+       data = data.filter(function (row) {
+	 var date = Date.parse(row['date']);
+	 return checkedOps.includes(row['label']) && (isNaN(historyStart) || date >= historyStart) });
+
+       let total_quantity = 0;
+       let total_price = 0;
+       data.forEach(function(element) {
+         total_quantity += parseFloat(element['quantity']);
+         total_price += parseFloat(element['price']);
+       });
+
+       document.getElementById("total-quantity").innerHTML = precision(total_quantity, 3);
+       document.getElementById("total-price").innerHTML = precision(total_price, 2);
+
+       return data
+     },
+
+   }
+ });
+
+ vue.filter();
+
+</script>
+{% endblock %}

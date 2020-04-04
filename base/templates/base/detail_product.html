@@ -15,12 +15,17 @@
 
 <!-- Stock et valeur du stock -->
 <br><br>
-<h5>État des stock</h5>
+<h5>État des stock et historique</h5>
 <div>
   <p class="col-form-label">Stock :</p>
   <input class="form-control" type="text" placeholder="{{ pdt.stock | print_quantity:pdt.unit }}" readonly>
   <p class="col-form-label">Valeur du stock :</p>
   <input class="form-control" type="text" placeholder="{{ stock_value | round2 }} €" readonly>
+
+  <p class="col-form-label">Historique des dernières opérations :</p>
+  <a type="button" class="show-history btn btn-info" href="{% url 'base:product_history' pdt.pk %}" >
+    Historique
+  </a>
 </div>
 
 <!-- Archivage -->
@@ -41,5 +46,6 @@
 	 callback: function(result){ if (result) { $("#archiveForm").submit(); } }
  })});
 </script>
+
 </div>
 {% endblock content %}
