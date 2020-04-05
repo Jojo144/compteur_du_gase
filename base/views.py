@@ -147,10 +147,11 @@ def achats(request, household_id):
         purchase = Purchase(household=household)
         purchase.save()
         for p, q in request.POST.items():
-            if p.startswith('basket_'):
-                pdt = Product.objects.get(pk=int(p[7:]))
+            if p.startswith('basket_qtity_'):
+                pdt = Product.objects.get(pk=int(p[13:]))
                 q = Decimal(q)
-                op = PurchaseDetailOp.create(product=pdt, purchase=purchase, quantity=-q)
+                pwyw = -Decimal(request.POST['basket_price_' + p[13:]]) if pdt.pwyw else None
+                op = PurchaseDetailOp.create(product=pdt, purchase=purchase, quantity=-q, pwyw=pwyw)
                 op.save()
                 household.account += op.price
                 household.save()
@@ -190,8 +191,8 @@ def achats(request, household_id):
         history = [{'date': p.date, 'details': PurchaseDetailOp.objects.filter(purchase=p),
                     'total': '{0:.2f} €'.format(sum([-q.price for q in PurchaseDetailOp.objects.filter(purchase=p)]))}
                    for p in purchases_history]
-        pdts = {str(p.id): {"name": p.name, "category": p.category.name,
-                            "price": str(p.price), "unit": p.unit.name, "vrac": p.unit.vrac}
+        pdts = {str(p.id): {"name": p.name, "category": p.category.name, "pwyw": p.pwyw,
+                            "price": str(p.price), "unit": p.unit.plural_name(), "vrac": p.unit.vrac}
                 for p in Product.objects.filter(visible=True)}
         pdts = json.dumps(pdts)
         balance = household.account

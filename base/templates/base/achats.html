@@ -51,7 +51,7 @@
       <tbody>
         <tr v-for="(pdt, id) in filter()">
           <td>[[ pdt.name ]]</td>
-          <td>[[ pdt.price ]] €</td>
+          <td>[[ pdt.pwyw ? "prix libre !" : pdt.price + " €" ]]</td>
           <td>
             <div class="input-group">
               <input type="text" class="form-control" @keyup.enter="inBasket" :id="'input_pdt_' + id">
@@ -81,12 +81,13 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(qtity, id) in basket">
+          <tr v-for="(x, id) in basket">
             <td>[[ pdts[id].name ]]</td>
-            <td>[[ qtity ]] [[ pdts[id].unit ]]</td>
-            <td>[[ _.round(pdts[id].price * qtity, 2) ]] €</td>
+            <td>[[ x.qtity ]] [[ pdts[id].unit ]]</td>
+            <td>[[ _.round(x.price, 2) ]] €</td>
             <td><a @click="removeBasket(id)">🗑</a></td>
-            <input type="hidden" :value="qtity" :name="'basket_' + id" :id="'basket_' + id">
+            <input type="hidden" :value="x.qtity" :name="'basket_qtity_' + id" :id="'basket_qtity_' + id">
+            <input type="hidden" :value="x.price" :name="'basket_price_' + id" :id="'basket_price_' + id">
           </tr>
         </tbody>
       </table>
@@ -217,6 +218,7 @@
        for (var id in filtered) {
          var input = document.getElementById("input_pdt_" + id);
          if (input.value) {
+	   var pdt = this.pdts[id];
            var value = Number(_.replace(input.value, ",", "."));
            if (value == 0) {
              input.value = '';
@@ -225,16 +227,27 @@
                if (value < 0) {
                  alert("Vous avez rentré une quantité négative. Cela peut être pratique pour rattraper une erreur dans un achat précédent. Mais si vous vous êtes trompé, supprimez la référence de votre panier.");
                }
-               if(!this.pdts[id].vrac && !Number.isInteger(value)) {
+               if(!pdt.vrac && !Number.isInteger(value)) {
                  alert("Veuillez utiliser un nombre entier pour : " + this.pdts[id].name);
                } else {
-                 var before = (this.basket[id]) ? (this.basket[id]) : 0;
-                 Vue.set(this.basket, id, before + value);
+                 var before = (this.basket[id]) ? (this.basket[id]) : {qtity: 0, price: 0};
+		 var price;
+		 if (pdt.pwyw) {
+		   do {
+		     price = prompt('Le produit ' + pdt.name + ' est à prix libre.\nCombien voulez vous payer pour la quantité que vous avez prise ? ('
+				  + value + ' ' + pdt.unit + ')');
+		     if (price === null) { return; }
+		     price = parseFloat(_.replace(price, ",", "."));
+		   } while (isNaN(price));
+		 } else {
+		   price = pdt.price * value;
+		 };
+                 Vue.set(this.basket, id, {qtity: before.qtity + value, price: before.price + price});
                  input.value = '';
                }
              }
              else {
-               alert("Veuillez entrer un nombre pour : " + this.pdts[id].name)
+               alert("Veuillez entrer un nombre pour : " + pdt.name)
              }
            }
          }
@@ -248,7 +261,7 @@
      totalAmount: function () {
        var s = 0;
        for (var id in this.basket) {
-         s += this.pdts[id].price * this.basket[id];
+         s += this.basket[id].price;
        }
        return s
      },

@@ -255,7 +255,8 @@ class Product(models.Model):
     cost_of_purchase = models.DecimalField(default=0.0, max_digits=10, decimal_places=2, verbose_name="prix d'achat",
                                            help_text="Prix d'achat (en €) à l'unité (kg/L/...)")
     pwyw = models.BooleanField(default=False, verbose_name="prix libre",
-                               help_text="Pas encore géré par le logiciel ...")  # PWYW = Pay what you want
+                               help_text="Une référence à prix libre peut être achetée au prix que le consommateur le souhaite."
+                                         " Dans ce cas, indiquer un prix indicatif ou 0 dans le Prix de vente.")  # PWYW = Pay what you want
     visible = models.BooleanField(default=True,
                                   help_text="Une référence non visible n'apparait pas dans les produits que l'on peut"
                                             " acheter, on l'utilise généralement pour les produits en rupture de stock",
@@ -318,8 +319,8 @@ class ChangeStockOp(Operation):
     label = models.CharField(max_length=20)
 
     @classmethod  # constructor computing price and cost_of_purchase
-    def create(cls, product=product, quantity=quantity, **kwargs):
-        price = product.price * quantity
+    def create(cls, product=product, quantity=quantity, pwyw=None, **kwargs):
+        price = pwyw if (pwyw is not None) else (product.price * quantity)
         purchase_cost = product.cost_of_purchase * quantity
         newstock = product.stock + quantity
         return cls(product=product, quantity=quantity, price=price, purchase_cost=purchase_cost, stock=newstock,
