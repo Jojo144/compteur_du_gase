@@ -1,6 +1,7 @@
 {% extends 'base/base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load my_tags %}
 
 {% block content %}
 <div class="medium-content">
@@ -64,8 +65,18 @@
 </script>
 
 
-<!-- Archivage -->
 {% if household %}
+<!-- Stock et valeur du stock -->
+<br><br>
+<h5>Solde</h5>
+<div>
+  <p class="col-form-label">Solde du compte :</p>
+  <input class="form-control" type="text" placeholder="{{ household.account | round2 }} €" readonly>
+
+  <!-- todo : historique ici -->
+</div>
+
+<!-- Archivage -->
 <br><br>
 <h5>Archivage</h5>
 <form id="archiveForm" action="{% url 'base:archive_household' household.pk %}" method="post">
