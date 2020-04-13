@@ -93,3 +93,40 @@ def generate_export_providers(filename):
         ws.row_dimensions[i+1].height=35
 
     wb.save(filename)
+
+
+def generate_ecarts_data():
+    ope = ChangeStockOp.objects.filter(label='Inventaire')
+    dates = {o.date.date() for o in ope}  # on regroupe par jour
+    dates = sorted(dates, reverse=True)[:10]  # on garde les 10 derniers
+    ecarts_data = [{'date': d,
+                    'details': ope.filter(date__date=d),
+                    'result': sum([o.price for o in ope.filter(date__date=d)])}
+                   for d in dates]
+    return ecarts_data
+
+def generate_export_inventory(filename):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Bilan des 10 derniers inventaires"
+    ws['A1'] = "Date"
+    ws['B1'] = "Produit"
+    ws['C1'] = "Quantité"
+    ws['D1'] = "Valeur (en €)"
+    ws.row_dimensions[1].font = Font(bold=True)
+    ws.column_dimensions['A'].width = 15
+    ws.column_dimensions['B'].width = 40
+    ws.column_dimensions['C'].width = 15
+    ws.column_dimensions['D'].width = 15
+
+    for d in generate_ecarts_data():
+        ws.append((d['date'],))
+        for op in d['details']:
+            ws.append((None, str(op.product), print_quantity_op(op), op.price))
+        ws.append((None, 'Total', None, d['result']))
+
+    # moche
+    for i,_ in enumerate(ws.rows):
+        ws.row_dimensions[i+1].height=20
+
+    wb.save(filename)

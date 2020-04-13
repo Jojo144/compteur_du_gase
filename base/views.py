@@ -964,17 +964,6 @@ def inventory(request):
     return render(request, 'base/inventory.html', {'form': form})
 
 
-def ecarts(request):
-    ope = ChangeStockOp.objects.filter(label='Inventaire')
-    dates = {o.date.date() for o in ope}  # on regroupe par jour
-    dates = sorted(dates, reverse=True)[:10]  # on garde les 10 derniers
-    ecarts_data = [{'date': d,
-                    'details': ope.filter(date__date=d),
-                    'result': sum([o.price for o in ope.filter(date__date=d)])}
-                   for d in dates]
-    return render(request, 'base/ecarts.html', {'ecarts': ecarts_data})
-
-
 def stats(request, product_id):
     # opes = ChangeStockOp.objects.filter(product=product_id, date__date__gt=datetime.date(2018, 1, 1))
     opes = ChangeStockOp.objects.filter(product=product_id).order_by('date')
@@ -1026,3 +1015,14 @@ def export_providers(request):
         response = HttpResponse(tmp.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = 'attachment; filename=export_fournisseurs.xlsx'
         return response
+
+def export_inventory(request):
+    with NamedTemporaryFile() as tmp:
+        generate_export_inventory(tmp.name)
+        tmp.seek(0)
+        response = HttpResponse(tmp.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=bilan_inventaires.xlsx'
+        return response
+
+def ecarts(request):
+    return render(request, 'base/ecarts.html', {'ecarts': generate_ecarts_data()})

@@ -3,8 +3,11 @@
 
 {% block content %}
 <div class="medium-content">
-    <h5>Bilan des 10 derniers inventaires (regroupés par jour) :</h5>
+    <h5>Bilan des 10 derniers inventaires (regroupés par jour)</h5>
     Si c'est positif c'est que le GASE gagne de l'argent, si c'est négatif ce sont des pertes à se répartir !
+    <br>
+    <br>
+    <a class="btn btn-info" href="{% url 'base:export_inventory' %}">Exporter le tableau</a>
     <br>
     <br>
 
