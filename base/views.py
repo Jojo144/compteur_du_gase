@@ -351,14 +351,11 @@ def detail_product(request, product_id):
     return render(request, 'base/detail_product.html', {'pdt': pdt, 'stock_value': pdt.value_stock(), 'form': form})
 
 def archive_product(request, product_id):
-    if request.method == 'POST':
-        pdt = Product.objects.get(pk=product_id)
-        pdt.activated = False
-        pdt.save()
-        messages.success(request, '✔ {} archivé !'.format(pdt.name))
-        return HttpResponseRedirect(reverse('base:products'))
-    else:
-        return HttpResponseRedirect(reverse('base:products'))
+    pdt = Product.objects.get(pk=product_id)
+    pdt.activated = False
+    pdt.save()
+    messages.success(request, '✔ {} archivé !'.format(pdt.name))
+    return HttpResponseRedirect(reverse('base:products'))
 
 def product_history(request, product_id):
     operations = [{"label": str(p.label), "date": str(p.date), "quantity": str(p.quantity), "price": str(p.price)}
@@ -765,6 +762,14 @@ class HouseholdUpdate(UpdateView):
             else:
                 return self.form_invalid(form)
         return super(HouseholdUpdate, self).form_valid(form)
+
+
+def archive_household(request, household_id):
+    h = Household.objects.get(pk=household_id)
+    h.activated = False
+    h.save()
+    messages.success(request, '✔ {} archivé !'.format(h.name))
+    return HttpResponseRedirect(reverse('base:members'))
 
 
 # ----------------------------------------------------------------------------------------------------------------------

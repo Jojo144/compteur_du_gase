@@ -10,13 +10,16 @@ class MemberInline(admin.TabularInline):
 
 
 class HouseholdAdmin(admin.ModelAdmin):
-    list_display = ('id', 'number', 'name', 'members', 'address', 'date', 'date_closed', 'subscription', 'on_the_flight')
+    list_display = ('activated', 'id', 'number', 'name', 'members', 'address', 'date', 'date_closed', 'subscription', 'on_the_flight')
     list_display_links = ('name',)
 
     inlines = [MemberInline, ]
 
     def members(self, obj):
         return ', '.join([str(m) for m in Member.objects.filter(household=obj.pk)])
+
+    def get_queryset(self, request):
+        return Household.all_objects.all()
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -47,6 +50,9 @@ class UnitAdmin(admin.ModelAdmin):
 class MemberAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'email', 'household', 'receipt', 'stock_alert')
     list_display_links = ('name',)
+
+    def get_queryset(self, request):
+        return Member.all_objects.all()
 
 
 class MemberAdmin(admin.ModelAdmin):

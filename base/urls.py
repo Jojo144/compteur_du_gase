@@ -21,6 +21,7 @@ urlpatterns = [
     path('membresstats', views.menbersstats, name='membersstats'),
     path('membre/<int:pk>', views.HouseholdUpdate.as_view(), name='detail_member'),
     path('membre', views.HouseholdCreate.as_view(), name='create_household'),
+    path('archiver_foyer/<int:household_id>', views.archive_household, name='archive_household'),
     path('fournisseurs', views.providers, name='providers'),
     path('export/fournisseurs', views.export_providers, name='export_providers'),
     path('fournisseur/<int:provider_id>', views.detail_provider, name='detail_provider'),

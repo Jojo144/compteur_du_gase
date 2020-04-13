@@ -3,7 +3,8 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<form class="medium-content" action="" method="post">
+<div class="medium-content">
+<form action="" method="post">
     {% csrf_token %}
     {{ form | crispy }}
 
@@ -60,7 +61,31 @@
      deleteText: '🗑',
      prefix: 'has_household'
  });
-
-
 </script>
+
+
+<!-- Archivage -->
+{% if household %}
+<br><br>
+<h5>Archivage</h5>
+<form id="archiveForm" action="{% url 'base:archive_household' household.pk %}" method="post">
+  {% csrf_token %}
+  <p>Pour "supprimer" ce foyer du logiciel, cliquez sur Archiver : </p>
+  <input class="confirm-archive btn btn-outline-danger btn-sm" value="Archiver">
+</form>
+<br><br>
+<script>
+ $(document).on("click", ".confirm-archive", function(e) {
+     bootbox.confirm({
+	 locale: "fr",
+	 message: '<p>Voulez-vous archiver ce foyer ?</p>\
+                   <p>Il ne sera plus affiché dans le logiciel. Cette opération peut être annulée via l\'interface de gestion.</p>\
+	           <small>Pour respecter la vie privée des gasier·ères, nous vous recommandons de régulièrement supprimer les comptes qui ne sont plus utilisés.\
+                          Cela se fait via l\'interface de gestion.</small>',
+	 callback: function(result){ if (result) { $("#archiveForm").submit(); } }
+ })});
+</script>
+{% endif %}
+
+</div>
 {% endblock content %}

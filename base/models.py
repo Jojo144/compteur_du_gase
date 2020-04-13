@@ -172,6 +172,10 @@ def validate_household_number(value):
                                                                                                      advised_value))
 
 
+class ActivatedManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(activated=True)
+
 class Household(models.Model):
     name = models.CharField(max_length=200,
                             help_text="Nom qui apparaitra dans la liste des comptes pour faire ses achats.",
@@ -196,6 +200,13 @@ class Household(models.Model):
                   "Cette fonction peut être utilise si l'on autorise le payement à la volée, c'est-à-dire lorsque "
                   "le client n'a pas besoin d'approvisionner son compte mais paye la juste somme.")
 
+    activated = models.BooleanField(default=True,
+                                    help_text="Un foyer non activé n'apparaît pas dans le logiciel. Utilisé pour archiver les foyers et ses membres",
+                                    verbose_name="activé")
+
+    objects = ActivatedManager()
+    all_objects = models.Manager()
+
     def __str__(self):
         return self.name
 
@@ -219,6 +230,10 @@ class Household(models.Model):
             return '-'
 
 
+class MemberManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(household__activated=True)
+
 class Member(models.Model):
     name = models.CharField(max_length=200, verbose_name="nom")
     email = models.EmailField(blank=True, null=True, verbose_name="email")
@@ -231,16 +246,15 @@ class Member(models.Model):
                                       verbose_name="recevoir les approvisionnements et les alertes stock par mail ? "
                                                    "(uniquement pour les référents produit)")
 
+    objects = MemberManager()
+    all_objects = models.Manager()
+
     def __str__(self):
         return self.name
 
     class Meta:
         verbose_name = 'Membre'
         ordering = ['name']
-
-class ProductManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(activated=True)
 
 
 class Product(models.Model):
@@ -276,7 +290,7 @@ class Product(models.Model):
                                     help_text="Une référence non activée n'apparaît pas dans le logiciel. Utilisé pour archiver les produits",
                                     verbose_name="activé")
 
-    objects = ProductManager()
+    objects = ActivatedManager()
     all_objects = models.Manager()
 
     def __str__(self):
