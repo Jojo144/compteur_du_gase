@@ -33,7 +33,7 @@
 <h5>Archivage</h5>
 <form id="archiveForm" action="{% url 'base:archive_product' pdt.pk %}" method="post">
   {% csrf_token %}
-  <p>Pour archiver ce produit, cliquez ici : </p>
+  <p>Pour "supprimer" ce produit du logiciel, cliquez sur Archiver : </p>
   <input class="confirm-archive btn btn-outline-danger btn-sm" value="Archiver">
 </form>
 <br><br>
