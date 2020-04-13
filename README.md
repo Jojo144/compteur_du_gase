@@ -106,6 +106,15 @@ Puis `./manage.py shell` et dans ce shell Django :
 %run migration.py
 ```
 
+## Export de certaines tables
+
+Il est possibles d'exporter certaines tables :
+```
+manage.py export_products /path/to/filename.xlsx
+manage.py export_providers /path/to/filename.xlsx
+manage.py export_households /path/to/filename.xlsx
+```
+
 ## Credits
 
 Favicon made by Freepik from www.flaticon.com

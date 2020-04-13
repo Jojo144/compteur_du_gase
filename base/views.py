@@ -3,7 +3,7 @@ import datetime
 from decimal import Decimal
 
 from django.shortcuts import render, redirect
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.core.mail import send_mail, get_connection
@@ -999,3 +999,30 @@ def database_info(request):
     households = [{'name': h.pk, 'account': h.account,
                    'computed': f1(h) + f2(h)} for h in Household.objects.all()]
     return render(request, 'base/database_info.html', {'pdts': pdts, 'households': households, })
+
+
+from .exports import *
+
+def export_households(request):
+    with NamedTemporaryFile() as tmp:
+        generate_export_households(tmp.name)
+        tmp.seek(0)
+        response = HttpResponse(tmp.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=export_foyers.xlsx'
+        return response
+
+def export_products(request):
+    with NamedTemporaryFile() as tmp:
+        generate_export_products(tmp.name)
+        tmp.seek(0)
+        response = HttpResponse(tmp.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=export_produits.xlsx'
+        return response
+
+def export_providers(request):
+    with NamedTemporaryFile() as tmp:
+        generate_export_providers(tmp.name)
+        tmp.seek(0)
+        response = HttpResponse(tmp.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=export_fournisseurs.xlsx'
+        return response
