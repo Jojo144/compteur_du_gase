@@ -65,16 +65,6 @@ Tester aussi de redémarrer pour voir si les services se lancent bien tous seuls
 Vous pouvez choisir un autre répertoire que `/opt/compteur_gase` ça devrait marcher.
 Il y a des *warnings* à propos du cache pip, je les ai ignoré pour le moment.
 
-### Après l'installation
-
-À la première utilisation il faut aller dans l'interface administration pour créer des unités
-(en général : kg, L, bouteille, sachet, pot) et des catégories (par ex :
-Légumineuses, Conserves, Non alimentaire, ...).
-
-Puis c'est parti !
-
-Pensez ensuite à mettre en place une sauvegarde.
-
 ### Installation en ligne
 
 Paquet Yunohost.
@@ -87,6 +77,19 @@ Pour mettre à jour :
 ```
 sudo yunohost app upgrade compteur_gase -u https://github.com/Jojo144/compteur_du_gase
 ```
+
+### Après l'installation (quel que soit le mode d'installation)
+
+À la première utilisation il faut aller dans l'interface administration pour 
+
+- créer des unités (en général : kg, L, bouteille, sachet, pot) et des catégories (par ex :
+Légumineuses, Conserves, Non alimentaire, ...).
+- réaliser divers paramétrages (désactiver les fonctionalités non utilisées, paramétrer l'envoi d'email… etc).
+
+Puis c'est parti !
+
+Pensez ensuite à mettre en place une sauvegarde.
+
 
 ## Sauvegarde de la base de donnée
 
