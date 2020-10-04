@@ -82,12 +82,13 @@ class LocalSettings(models.Model):
                                      default="tata@titi.com", max_length=100,
                                      help_text="Exemple : tata@titi.com.")
 
-    mail_username = models.CharField(blank=False, verbose_name="Nom d'utilisateur pour l'envoi des mails.",
-                                     default="tata", max_length=100,
-                                     help_text="Exemple : tata.")
+    mail_username = models.CharField(blank=True, verbose_name="Nom d'utilisateur pour l'envoi des mails.",
+                                     default="", max_length=100,
+                                     help_text="Utilisateur SMTP, exemple : tata. Si vide : n'utilisera pas d'authentification")
 
-    mail_passwd = models.CharField(blank=False, verbose_name="Mot de passe pour l'envoi des mails.",
-                                   default="xxx", max_length=100)
+    mail_passwd = models.CharField(blank=True, verbose_name="Mot de passe pour l'envoi des mails.",
+                                   default="", max_length=100,
+                                   help_text="Mot de passe SMTP. Si vide : n'utilisera pas d'authentification")
 
     class Meta:
         verbose_name = "Réglages divers"
