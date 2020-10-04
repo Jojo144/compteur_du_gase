@@ -1,3 +1,4 @@
-django
-django-crispy-forms
-openpyxl
+django>=2.2,<3.0  # LTS version
+django-crispy-forms>=1.9.2,<1.10
+# We can bump to openpyxl 3.x once we drop Debian Strech (Py3.5) support
+openpyxl>=2.6.4,<3.0
