@@ -1,8 +1,8 @@
 import json
-import datetime
+from datetime import date
 from decimal import Decimal
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
@@ -69,7 +69,6 @@ def my_send_mail(request, subject, message, recipient_list, success_msg, error_m
 
 def index(request):
     local_settings = get_local_settings()
-    txt_home = local_settings.txt_home
 
     note_not_read = len([p for p in Note.objects.all() if not p.read])
     if note_not_read > 1:
@@ -86,9 +85,14 @@ def index(request):
     txt_message = "Il y a actuellement {0:d} message{1:s} non lu{1:s} et {2:d} action{3:s} non réalisée{3:s}.".format(
         note_not_read, note_pluralize, action_not_done, action_pluralize)
 
+    activity_list = Activity.objects.filter(date__gte=date.today()).order_by('date')
+
     return render(request, 'base/index.html',
-                  {'txt_home': txt_home,
+                  {'txt_home': local_settings.txt_home,
+                   'txt_home2': local_settings.txt_home2,
                    'txt_message': txt_message,
+                   'activity_board': local_settings.activity_board,
+                   'activity_list': activity_list,
                    'use_logo': local_settings.use_logo})
 
 
@@ -276,7 +280,7 @@ def compteslist(request):
 
 def get_comptes_stats():
     # dates
-    dates = [datetime.date.today()]
+    dates = [date.today()]
     for a in ApproCompteOp.objects.all():
         if a.date.date() not in dates:
             dates.append(a.date.date())
@@ -455,7 +459,7 @@ def get_appros_stats():
     purchase = get_local_settings().use_cost_of_purchase
 
     # dates
-    dates = [datetime.date.today()]
+    dates = [date.today()]
     for p in ChangeStockOp.objects.filter(label="ApproStock"):
         if p.date.date() not in dates:
             dates.append(p.date.date())
@@ -535,7 +539,7 @@ def purchaseslist(request):
 
 def get_purchases_stats():
     # dates
-    dates = [datetime.date.today()]
+    dates = [date.today()]
     for a in PurchaseDetailOp.objects.all():
         if a.date.date() not in dates:
             dates.append(a.date.date())
@@ -652,7 +656,7 @@ def members(request):
 
 def menbersstats(request):
     # dates
-    dates = [datetime.date.today()]
+    dates = [date.today()]
     for h in Household.objects.all():
         if h.date not in dates:
             dates.append(h.date)
@@ -970,7 +974,7 @@ def inventory(request):
 
 
 def stats(request, product_id):
-    # opes = ChangeStockOp.objects.filter(product=product_id, date__date__gt=datetime.date(2018, 1, 1))
+    # opes = ChangeStockOp.objects.filter(product=product_id, date__date__gt=date(2018, 1, 1))
     opes = ChangeStockOp.objects.filter(product=product_id).order_by('date')
     data = [{'stock': str(a.stock), 'date': a.date.isoformat(), 'label': a.label} for a in opes]
     pdt = Product.objects.get(pk=product_id)
@@ -1031,3 +1035,15 @@ def export_inventory(request):
 
 def ecarts(request):
     return render(request, 'base/ecarts.html', {'ecarts': generate_ecarts_data()})
+
+
+def activity_details(request, perm_id):
+    activity = get_object_or_404(Activity, pk=perm_id)
+    if request.method == "POST":
+        form = ActivityForm(request.POST, instance=activity)
+        if form.is_valid():
+            form.save()
+            return redirect('base:index')
+    else:
+        form = ActivityForm(instance=activity)
+    return render(request, 'base/details_activity.html', {'form': form})

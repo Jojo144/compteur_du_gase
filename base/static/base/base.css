@@ -133,3 +133,12 @@ hr.gestion-hr {
     background-color: #dedede; /* Modern Browsers */
 }
 
+.tableau-perms thead th, .tableau-perms th, .tableau-perms td {
+    vertical-align: middle;
+    border: 0px
+}
+
+.tableau-perms {
+    width: 100%;
+    table-layout: fixed;
+}

@@ -17,8 +17,15 @@ class LocalSettings(models.Model):
     min_balance = models.DecimalField(max_digits=10, decimal_places=2, default=10,
                                       verbose_name="seuil en dessous duquel une alerte est lancée au moment de commencer un achat (en €)")
 
-    txt_home = models.TextField(blank=True, default="<i>Bienvenu·e au GASE</i>",
-                                verbose_name="texte de la page d'accueil (doit être donnée en code html)")
+    txt_home = models.TextField(blank=True, default="<i>Bienvenu·e au GASE</i><br><br>",
+                                verbose_name="texte en haut de la page d'accueil (doit être donnée en code html)")
+
+    txt_home2 = models.TextField(blank=True, default="Infos utiles genre :\nlocalisation des clés du GASE\nhoraires des permanences\n...\n(ou rien)",
+                                 verbose_name="texte en base de la page d'accueil (doit être donnée en texte pur et sera centré)")
+
+    activity_board = models.BooleanField(verbose_name="Utiliser le tableau des permanences ?", default=True,
+                                         help_text="Le tableau des permanences permet de gérer l'inscription des membres pour tenir "
+                                                   "les permanences. Il s'affiche sur la page d'accueil.")
 
     use_messages = models.BooleanField(verbose_name="Utilisation de la fonction messages/actions ?", default=False,
                                        help_text="La fonction messages/actions sert à laisser des messages "
@@ -429,3 +436,16 @@ class Mail(models.Model):
         (RECEIPT, 'Ticket de caisse'),
     ]
     kind = models.CharField(max_length=8, choices=KIND_CHOICES, default=REFERENT)
+
+
+# activité/permanence pour le tableau des permanences
+class Activity(models.Model):
+    class Meta:
+        verbose_name = "Activité"
+    description = models.CharField(max_length=200)
+    date = models.DateField()
+    volunteer1 = models.ForeignKey(Member, null=True, blank=True, verbose_name='Permanencier 1', on_delete=models.SET_NULL, related_name='volunteer1')
+    volunteer2 = models.ForeignKey(Member, null=True, blank=True, verbose_name='Permanencier 2', on_delete=models.SET_NULL, related_name='volunteer2')
+    comment = models.TextField(verbose_name='Commentaire', max_length=1000, blank=True)
+    def __str__(self):
+        return self.description
