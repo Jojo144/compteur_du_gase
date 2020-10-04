@@ -20,27 +20,27 @@ class LocalSettings(models.Model):
     txt_home = models.TextField(blank=True, default="<i>Bienvenu·e au GASE</i>",
                                 verbose_name="texte de la page d'accueil (doit être donnée en code html)")
 
-    use_messages = models.BooleanField(verbose_name="Utilisation de la fonction messages/actions ?", default=True,
+    use_messages = models.BooleanField(verbose_name="Utilisation de la fonction messages/actions ?", default=False,
                                        help_text="La fonction messages/actions sert à laisser des messages "
                                                  "entre les différentes permanences ou lister des actions à faire.")
 
-    use_appro_kind = models.BooleanField(verbose_name="Utilisation de la fonction type de paiement ?", default=True,
+    use_appro_kind = models.BooleanField(verbose_name="Utilisation de la fonction type de paiement ?", default=False,
                                          help_text="La fonction type de paiement permet de sauvegarder le moyen "
                                                    "de paiement utilisé.")
 
     use_subscription = models.BooleanField(verbose_name="Utilisation de la fonction cotisation d'adhésion ?",
-                                           default=True,
+                                           default=False,
                                            help_text="La fonction adhésion permet de renseigner la cotisation "
                                                      "d'adhésion du foyer.")
 
-    use_cost_of_purchase = models.BooleanField(verbose_name="Utilisation de la fonction prix d'achat ?", default=True,
+    use_cost_of_purchase = models.BooleanField(verbose_name="Utilisation de la fonction prix d'achat ?", default=False,
                                                help_text="La fonction prix d'achat permet de spécifier un prix d'achat "
                                                          "différent du prix de vente.")
 
-    use_exports = models.BooleanField(verbose_name="Utiliser les exports ?", default=True,
+    use_exports = models.BooleanField(verbose_name="Utiliser les exports ?", default=False,
                                       help_text="Exports de l'historique d'achat et de la liste des produits.")
 
-    use_logo = models.BooleanField(verbose_name="Affiche le logo dans la première page ?", default=True,
+    use_logo = models.BooleanField(verbose_name="Affiche le logo dans la première page ?", default=False,
                                    help_text="Le fichier de logo doit être placé dans le répertoire base\static\base"
                                              " et son nom de fichier doit etre logo.png.")
 
@@ -48,7 +48,7 @@ class LocalSettings(models.Model):
                                    help_text="Cette fonction permet d'envoyer les tickets de caisse ou "
                                              "des alertes stocks aux référents des produits.")
 
-    save_mail = models.BooleanField(verbose_name="Utilisation de la fonction de sauvegarde des emails ?", default=True,
+    save_mail = models.BooleanField(verbose_name="Utilisation de la fonction de sauvegarde des emails ?", default=False,
                                     help_text="Cette fonction permet de sauvegarder les emails envoyés ou en attente.")
 
     prefix_object_mail = models.CharField(blank=True, verbose_name="Prefix dans l'objet des emails.", default="",
