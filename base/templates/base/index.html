@@ -3,9 +3,13 @@
 {% load staticfiles %}
 
 {% block content %}
-<div class="index-part">
+<div class="index-part lead">
     {{ txt_home | safe }}
 </div>
+
+{% if activity_board %}
+{% include "base/activity_board.html" %}
+{% endif %}
 
 {% if use_messages %}
 <div class="index-part">
@@ -18,5 +22,9 @@
     <img src="{% static "base\logo.png" %}" alt=" " class="index-logo">
 </div>
 {% endif %}
+
+<p class="index-part lead">
+  {{ txt_home2 | linebreaksbr }}
+</p>
 
 {% endblock content %}

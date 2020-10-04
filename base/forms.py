@@ -50,10 +50,7 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         exclude = ['activated']
-
-        widgets = {
-            'comment': Textarea(attrs={'rows': 4}),
-        }
+        widgets = { 'comment': Textarea(attrs={'rows': 4}) }
 
 
 class ProductFormWithoutPurchase(ProductForm):
@@ -78,3 +75,14 @@ class NoteForm(forms.ModelForm):
 # used for details AND creation
 MemberFormSet = inlineformset_factory(Household, Member, fields=('name', 'email', 'tel', 'receipt', 'stock_alert'),
                                       min_num=1, validate_min=True, extra=0)
+
+
+class ActivityForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['description'].widget.attrs['readonly'] = True
+        self.fields['date'].widget.attrs['readonly'] = True
+    class Meta:
+        model = Activity
+        exclude = []
+        widgets = { 'comment': Textarea(attrs={'rows': 3}) }

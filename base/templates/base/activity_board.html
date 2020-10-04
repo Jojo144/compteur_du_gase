@@ -1,0 +1,42 @@
+<br>
+<div class="container">
+  {% if activity_list %}
+  <table class="table table-striped tableau-perms">
+    <thead><tr>
+      <th scope="col" style="width:210px;"></th>
+      <th scope="col"><div>Permanencier 1 </br></div></th>
+      <th scope="col">Permanencier 2</th>
+      <th scope="col">Commentaire</th>
+      <th scope="col" style="width:115px;"></th>
+    </tr></thead>
+    <tbody>
+      {% for activity in activity_list|slice:":6" %}
+      <tr>
+	<th scope="row">{{ activity.description }} {{ activity.date|date:"D d M" }}</th>
+	<td>{{ activity.volunteer1|default_if_none:"" }}</td>
+	<td>{{ activity.volunteer2|default_if_none:"" }}</td>
+	<td><div style="width:100%; overflow:scroll">{{ activity.comment }}</div></td>
+	<td><a class="btn btn-success" href="{% url 'base:activity_details' activity.id %}" role="button">S'inscrire</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tbody class="collapse" id="collapseExample">
+      {% for activity in activity_list|slice:"6:20" %}
+      <tr>
+	<th scope="row">{{ activity.description }} {{ activity.date|date:"D d M" }}</th>
+	<td>{{ activity.volunteer1|default_if_none:"" }}</td>
+	<td>{{ activity.volunteer2|default_if_none:"" }}</td>
+	<td><div style="width:100%; overflow:scroll">{{ activity.comment }}</div></td>
+	<td><a class="btn btn-success" href="{% url 'base:activity_details' activity.id %}" role="button">S'inscrire</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p><button class="btn btn-info collapsed" type="button" data-toggle="collapse" data-target="#collapseExample">
+    Voir plus/moins de permanences
+  </button></p>
+
+  {% else %}
+  <p>Pas de prochaine permanence enregistrée.</p>
+  {% endif %}
+</div>

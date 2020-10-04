@@ -54,4 +54,6 @@ urlpatterns = [
     path('subscriptionslist', views.subscriptionslist, name='subscriptionslist'),
     path('purchaseslist', views.purchaseslist, name='purchaseslist'),
     path('valueslist', views.valueslist, name='valueslist'),
+    path('activité/<int:perm_id>', views.activity_details, name='activity_details'),
+
 ]
