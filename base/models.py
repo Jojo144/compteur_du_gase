@@ -51,9 +51,9 @@ class LocalSettings(models.Model):
     save_mail = models.BooleanField(verbose_name="Utilisation de la fonction de sauvegarde des emails ?", default=False,
                                     help_text="Cette fonction permet de sauvegarder les emails envoyés ou en attente.")
 
-    prefix_object_mail = models.CharField(blank=True, verbose_name="Prefix dans l'objet des emails.", default="",
+    prefix_object_mail = models.CharField(blank=True, verbose_name="Préfixe dans l'objet des emails.", default="",
                                           max_length=15,
-                                          help_text="Un prefix est souvent encadré par des crochers, exemples : [GASE].")
+                                          help_text="Un préfixe est souvent encadré par des crochers, exemples : [GASE].")
 
     debug_mail = models.CharField(blank=True,
                                   verbose_name="Si ce champ est renseigné, tous les emails lui seront envoyés.",
@@ -73,7 +73,7 @@ class LocalSettings(models.Model):
 
     mail_protocole = models.CharField(
         choices=[('no', 'Pas de chiffrement'), ('tls', 'Utiliser TLS'), ('ssl', 'Utiliser SSL')],
-        verbose_name="Protocole utilisé pour l'envoie de mails.",
+        verbose_name="Chiffrement utilisé pour l'envoi de mails.",
         default="no", max_length=100)
 
     mail_timeout = models.IntegerField(default=4, verbose_name="Timeout pour l'envoi de mail.")
