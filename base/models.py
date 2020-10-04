@@ -61,12 +61,12 @@ class LocalSettings(models.Model):
                                   help_text="Ce champ permet de tester la fonction email "
                                             "sans envoyer de mails intempestifs.")
 
-    mail_host = models.CharField(blank=False, verbose_name="Hebergeur pour l'envoi des mails.",
-                                 default="xxx", max_length=50,
+    mail_host = models.CharField(blank=False, verbose_name="Serveur pour l'envoi des mails. « localhost » pour utiliser le serveur du compteur comme serveur d'envoi.",
+                                 default="localhost", max_length=50,
                                  help_text="Exemple : smtp.titi.com.")
 
     mail_port = models.IntegerField(verbose_name="Port smtp pour l'envoi des mails.",
-                                    default=465,
+                                    default=25,
                                     help_text="Exemple : 25 (sans chiffrement), "
                                               "465 (chiffrement implicite, SSL), "
                                               "587 (chiffrement explicite, TLS).")
