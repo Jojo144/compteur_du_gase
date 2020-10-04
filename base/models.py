@@ -90,17 +90,16 @@ class LocalSettings(models.Model):
                                    default="", max_length=100,
                                    help_text="Mot de passe SMTP. Si vide : n'utilisera pas d'authentification")
 
+    def __str__(self):
+        return "Réglages divers"
+
     class Meta:
         verbose_name = "Réglages divers"
         verbose_name_plural = "Réglages divers"
 
 
 def get_local_settings():
-    localsettings = LocalSettings.objects.first()
-    if localsettings is None:
-        localsettings = LocalSettings.objects.create()
-    return localsettings
-
+    return LocalSettings.objects.first()
 
 class Category(models.Model):
     name = models.CharField(max_length=200, verbose_name="Nom")
