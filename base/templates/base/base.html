@@ -6,27 +6,28 @@
     <link rel="shortcut icon" type="image/png" href="{% static 'base/favicon.png' %}"/>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Le compteur du GASE</title>
     <script src="{% static 'base/lodash.js' %}"></script>
     <script src="{% static 'base/vue.js' %}"></script>
     <link rel="stylesheet" href="{% static 'base/bootstrap.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'base/base.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'base/local.css' %}">
-    <title>Le compteur du GASE</title>
-</head>
-<body>
-<script>
+    <script>
      function removeAccents(str) {
          return str.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
      }
-     
+
      function myContains(str, key) {
          return removeAccents(String(str).toLowerCase()).includes(removeAccents(String(key).toLowerCase()));
      }
-</script>
+    </script>
 <script src="{% static 'base/jquery-3.3.1.js' %}"></script>
 <script src="{% static 'base/bootstrap.bundle.js' %}"></script>
 <script src="{% static 'base/bootbox.js' %}"></script>
 <script src="{% static 'base/bootbox.locales.js' %}"></script>
+
+</head>
+<body>
 
 <div class="container">
     <div class="row justify-content-center">
