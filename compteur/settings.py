@@ -30,10 +30,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crispy_forms',
+    'easy_select2',
     'base',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+SELECT2_USE_BUNDLED_JQUERY = False
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

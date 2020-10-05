@@ -85,4 +85,8 @@ class ActivityForm(forms.ModelForm):
     class Meta:
         model = Activity
         exclude = []
-        widgets = { 'comment': Textarea(attrs={'rows': 3}) }
+        widgets = {
+            'comment': Textarea(attrs={'rows': 3}),
+            'volunteer1': Select2(),
+            'volunteer2': Select2(),
+        }
