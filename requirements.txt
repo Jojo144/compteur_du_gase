@@ -1,3 +1,4 @@
 django
 django-crispy-forms
+django-easy-select2>=1.5.7,<1.6
 openpyxl
