@@ -51,9 +51,9 @@ class LocalSettings(models.Model):
     save_mail = models.BooleanField(verbose_name="Utilisation de la fonction de sauvegarde des emails ?", default=False,
                                     help_text="Cette fonction permet de sauvegarder les emails envoyés ou en attente.")
 
-    prefix_object_mail = models.CharField(blank=True, verbose_name="Prefix dans l'objet des emails.", default="",
+    prefix_object_mail = models.CharField(blank=True, verbose_name="Préfixe dans l'objet des emails.", default="",
                                           max_length=15,
-                                          help_text="Un prefix est souvent encadré par des crochers, exemples : [GASE].")
+                                          help_text="Un préfixe est souvent encadré par des crochers, exemples : [GASE].")
 
     debug_mail = models.CharField(blank=True,
                                   verbose_name="Si ce champ est renseigné, tous les emails lui seront envoyés.",
@@ -61,33 +61,37 @@ class LocalSettings(models.Model):
                                   help_text="Ce champ permet de tester la fonction email "
                                             "sans envoyer de mails intempestifs.")
 
-    mail_host = models.CharField(blank=False, verbose_name="Hebergeur pour l'envoi des mails.",
-                                 default="xxx", max_length=50,
+    mail_host = models.CharField(blank=False, verbose_name="Serveur pour l'envoi des mails. « localhost » pour utiliser le serveur du compteur comme serveur d'envoi.",
+                                 default="localhost", max_length=50,
                                  help_text="Exemple : smtp.titi.com.")
 
     mail_port = models.IntegerField(verbose_name="Port smtp pour l'envoi des mails.",
-                                    default=465,
+                                    default=25,
                                     help_text="Exemple : 25 (sans chiffrement), "
                                               "465 (chiffrement implicite, SSL), "
                                               "587 (chiffrement explicite, TLS).")
 
     mail_protocole = models.CharField(
         choices=[('no', 'Pas de chiffrement'), ('tls', 'Utiliser TLS'), ('ssl', 'Utiliser SSL')],
-        verbose_name="Protocole utilisé pour l'envoie de mails.",
+        verbose_name="Chiffrement utilisé pour l'envoi de mails.",
         default="no", max_length=100)
 
     mail_timeout = models.IntegerField(default=4, verbose_name="Timeout pour l'envoi de mail.")
 
-    mail_from = models.CharField(blank=False, verbose_name="Expéditeur pour l'envoi des mails.",
-                                     default="tata@titi.com", max_length=100,
+    mail_from = models.CharField(blank=True, verbose_name="Expéditeur pour l'envoi des mails.",
+                                     default="tata@example.com", max_length=100,
                                      help_text="Exemple : tata@titi.com.")
 
-    mail_username = models.CharField(blank=False, verbose_name="Nom d'utilisateur pour l'envoi des mails.",
-                                     default="tata", max_length=100,
-                                     help_text="Exemple : tata.")
+    mail_username = models.CharField(blank=True, verbose_name="Nom d'utilisateur pour l'envoi des mails.",
+                                     default="", max_length=100,
+                                     help_text="Utilisateur SMTP, exemple : tata. Si vide : n'utilisera pas d'authentification")
 
-    mail_passwd = models.CharField(blank=False, verbose_name="Mot de passe pour l'envoi des mails.",
-                                   default="xxx", max_length=100)
+    mail_passwd = models.CharField(blank=True, verbose_name="Mot de passe pour l'envoi des mails.",
+                                   default="", max_length=100,
+                                   help_text="Mot de passe SMTP. Si vide : n'utilisera pas d'authentification")
+
+    def __str__(self):
+        return "Réglages divers"
 
     class Meta:
         verbose_name = "Réglages divers"
@@ -95,11 +99,7 @@ class LocalSettings(models.Model):
 
 
 def get_local_settings():
-    localsettings = LocalSettings.objects.first()
-    if localsettings is None:
-        localsettings = LocalSettings.objects.create()
-    return localsettings
-
+    return LocalSettings.objects.first()
 
 class Category(models.Model):
     name = models.CharField(max_length=200, verbose_name="Nom")
