@@ -36,6 +36,10 @@ INSTALLED_APPS = [
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 SELECT2_USE_BUNDLED_JQUERY = False
+SELECT2_ATTRS={
+    'theme': 'bootstrap4',
+    'width': '100%'
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

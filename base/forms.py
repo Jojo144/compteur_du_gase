@@ -1,6 +1,8 @@
 from django import forms
+from django.conf import settings
 from django.forms import inlineformset_factory, Textarea
 from django.utils.safestring import mark_safe
+from easy_select2.widgets import Select2
 
 from .models import *
 from .templatetags.my_tags import *
@@ -87,6 +89,6 @@ class ActivityForm(forms.ModelForm):
         exclude = []
         widgets = {
             'comment': Textarea(attrs={'rows': 3}),
-            'volunteer1': Select2(),
-            'volunteer2': Select2(),
+            'volunteer1': Select2(select2attrs=settings.SELECT2_ATTRS),
+            'volunteer2': Select2(select2attrs=settings.SELECT2_ATTRS),
         }
