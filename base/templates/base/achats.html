@@ -275,12 +275,12 @@
          var account_diff = {{ max_amount | comma_to_dot }} - this.totalAmount();
          if (account_diff < 0) {
            if ( {{ min_account_allow | yesno:"true,false" }}) {
-             if (! confirm("Vous n'avez pas assez de sous sur votre compte ! Il manque " + -account_diff.toFixed(2) + " €. Voulez-vous quand même effectuer l'achat ?") ) {
+             if (! confirm("Vous n'avez pas assez de sous dans votre cagnotte ! Il manque " + -account_diff.toFixed(2) + " €. Voulez-vous quand même effectuer l'achat ?") ) {
                e.preventDefault()
              }
            }
            else{
-             alert ("Vous n'avez pas assez de sous sur votre compte ! Il manque " + -account_diff.toFixed(2) + " €.");
+             alert ("Vous n'avez pas assez de sous dans votre cagnotte ! Il manque " + -account_diff.toFixed(2) + " €.");
              e.preventDefault()
            }
          }
@@ -295,7 +295,7 @@
          }
        }
        else {
-         if (! confirm("Ce compte est configuré pour que le client paye la somme exacte après un achat sans approvisionner son compte. Voulez-vous quand même effectuer l'achat ? Si vous acceptez, vous devez encaisser la somme du ticket de caisse qui est de " + this.totalAmount().toFixed(2) + " €")) {
+         if (! confirm("Cette cagnotte est configurée pour que le client paye la somme exacte après un achat sans approvisionner cagnotte. Voulez-vous quand même effectuer l'achat ? Si vous acceptez, vous devez encaisser la somme du ticket de caisse qui est de " + this.totalAmount().toFixed(2) + " €")) {
            e.preventDefault()
          }
        }

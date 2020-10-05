@@ -34,10 +34,10 @@
 
     <hr class="gestion-hr">
 
-    <h4>Valeur du stock et des comptes</h4>
+    <h4>Valeur du stock et des cagnottes</h4>
     Valeur du stock total (références non visibles incluses) : {{ value_stock | round0 }} €
     <br>
-    Somme des soldes des comptes : {{ value_accounts | round0 }} €
+    Somme des soldes des cagnottes : {{ value_accounts | round0 }} €
     <br>
     Donc il doit y avoir en banque : {{ diff_values | round0 }} €
     (si toutes les factures ont été payées et que tous les adhérents ont bien fait leur virement)
@@ -92,7 +92,7 @@
     <ul>
         <li>
             Pour annuler un achat erronné, une façon de faire est de refaire le même achat en
-            mettant des quantités négatives à la place. Cela approvisionne le compte et les
+            mettant des quantités négatives à la place. Cela approvisionne la cagnotte et les
             stocks correctement.
         </li>
         <li>

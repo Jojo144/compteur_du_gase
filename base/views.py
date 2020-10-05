@@ -173,11 +173,11 @@ def achats(request, household_id):
             opa.save()
             household.account += s
             household.save()
-            messages.success(request, '✔ Approvisionnement du compte de {0:.2f} € effectué'.format(s))
+            messages.success(request, '✔ Approvisionnement de la cagnotte de {0:.2f} € effectué'.format(s))
 
         msg += "Ce qui nous donne un total de {} €.\n\nCiao!".format(s)
         balance = household.account
-        messages.success(request, '✔ Votre compte a été débité de {} €<br>Solde restant : {} €'.format(round2(s),
+        messages.success(request, '✔ Votre cagnotte a été débitée de {} €<br>Solde restant : {} €'.format(round2(s),
                                                                                                        round2(balance)))
         mails = household.get_emails_receipt()
         my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,
@@ -241,8 +241,8 @@ def compte(request, household_id):
             op.save()
             household.account += q
             household.save()
-            messages.success(request, '✔ Approvisionnement du compte de {0:.2f} € effectué'.format(q))
-            msg = 'Votre compte a été approvisionné de {} €'.format(q)
+            messages.success(request, '✔ Approvisionnement de la cagnotte de {0:.2f} € effectué'.format(q))
+            msg = 'Votre cagnotte a été approvisionné de {} €'.format(q)
             mails = household.get_emails_receipt()
             my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,
                          success_msg='Le ticket de caisse a été envoyé par mail',
@@ -294,7 +294,7 @@ def get_comptes_stats():
 
     # stats
     comptes_stats = [{'value': '{0:.2f}'.format(values[i]), 'date': dates[i].isoformat(),
-                      'label': 'Evolution : {0:.2f} €'.format(labels[i])}
+                      'label': 'Évolution : {0:.2f} €'.format(labels[i])}
                      for i in range(len(dates))]
 
     return comptes_stats
@@ -553,7 +553,7 @@ def get_purchases_stats():
 
     # stats
     purchases_stats = [{'value': '{0:.2f}'.format(values[i]), 'date': dates[i].isoformat(),
-                        'label': 'Evolution : {0:.2f} €'.format(labels[i])}
+                        'label': 'Évolution : {0:.2f} €'.format(labels[i])}
                        for i in range(len(dates))]
 
     return purchases_stats
@@ -610,7 +610,7 @@ def valueslist(request):
         labels[i] = values[i] - values[i - 1]
 
     diff_stats = [{'value': '{0:.2f}'.format(values[i]), 'date': diff_dates[i],
-                   'label': 'Evolution : {0:.2f} €'.format(labels[i])}
+                   'label': 'Évolution : {0:.2f} €'.format(labels[i])}
                   for i in range(len(diff_dates))]
 
     # return
