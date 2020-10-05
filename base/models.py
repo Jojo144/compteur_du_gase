@@ -442,6 +442,8 @@ class Mail(models.Model):
 class Activity(models.Model):
     class Meta:
         verbose_name = "Activité"
+        ordering = ['-date']
+
     description = models.CharField(max_length=200)
     date = models.DateField()
     volunteer1 = models.ForeignKey(Member, null=True, blank=True, verbose_name='Permanencier 1', on_delete=models.SET_NULL, related_name='volunteer1')
