@@ -449,5 +449,10 @@ class Activity(models.Model):
     volunteer1 = models.ForeignKey(Member, null=True, blank=True, verbose_name='Permanencier 1', on_delete=models.SET_NULL, related_name='volunteer1')
     volunteer2 = models.ForeignKey(Member, null=True, blank=True, verbose_name='Permanencier 2', on_delete=models.SET_NULL, related_name='volunteer2')
     comment = models.TextField(verbose_name='Commentaire', max_length=1000, blank=True)
+
+    @property
+    def volunteers(self):
+        return [self.volunteer1, self.volunteer2]
+
     def __str__(self):
         return self.description
