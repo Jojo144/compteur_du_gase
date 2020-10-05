@@ -1,0 +1,14 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static %}
+
+{% block content %}
+{{ form.media }}
+<script type="text/javascript" src="{% static 'admin/js/core.js' %}"></script>
+
+Yo ! Remplir le formulaire pour ajouter une activité récurrente.
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Ajouter" />
+</form>
+{% endblock %}

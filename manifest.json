@@ -58,6 +58,15 @@
                     "fr": "Choisissez l'email vers lequel envoyer les notifications"
                 },
                 "example": "admin@example.tld"
+            },
+	    {
+                "name": "is_public",
+                "type": "boolean",
+                "ask": {
+                    "en": "Is it a public application?",
+                    "fr": "Est-ce une application publique ?"
+                },
+                "default": false
             }
         ]
     }

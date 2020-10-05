@@ -1,0 +1,30 @@
+<br>
+<div class="container">
+  {% if activity_list %}
+  <table class="table table-striped tableau-perms">
+    <thead><tr>
+      <th scope="col" style="width:210px;"></th>
+      <th scope="col"><div>Permanencier 1 </br></div></th>
+      <th scope="col">Permanencier 2</th>
+      <th scope="col">Commentaire</th>
+      <th scope="col" style="width:115px;"></th>
+    </tr></thead>
+    <tbody>
+      {% for activity in activity_list|slice:":6" %}
+        {% include "base/activity_board_row.html" %}
+      {% endfor %}
+    </tbody>
+    <tbody class="collapse" id="collapsedPart">
+      {% for activity in activity_list|slice:"6:20" %}
+        {% include "base/activity_board_row.html" %}
+      {% endfor %}
+    </tbody>
+  </table>
+  <p><button class="btn btn-info collapsed" type="button" data-toggle="collapse" data-target="#collapsedPart">
+    Voir plus/moins de permanences
+  </button></p>
+
+  {% else %}
+  <p>Pas de prochaine permanence enregistrée. <a href="{% url 'admin:base_activity_changelist' %}">En renseigner une ?</a></p>
+  {% endif %}
+</div>

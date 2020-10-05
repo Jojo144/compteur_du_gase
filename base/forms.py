@@ -1,6 +1,8 @@
 from django import forms
+from django.conf import settings
 from django.forms import inlineformset_factory, Textarea
 from django.utils.safestring import mark_safe
+from easy_select2.widgets import Select2
 
 from .models import *
 from .templatetags.my_tags import *
@@ -8,11 +10,13 @@ from .templatetags.my_tags import *
 
 class HouseholdList(forms.Form):
     household = forms.ModelChoiceField(label='Sélectionnez le compte : ',
+                                       widget=Select2(select2attrs=settings.SELECT2_ATTRS),
                                        queryset=Household.objects.all())
 
 
 class ProviderList(forms.Form):
     provider = forms.ModelChoiceField(label='Sélectionnez un fournisseur : ',
+                                      widget=Select2(select2attrs=settings.SELECT2_ATTRS),
                                       queryset=Provider.objects.all())
 
 
@@ -50,10 +54,7 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         exclude = ['activated']
-
-        widgets = {
-            'comment': Textarea(attrs={'rows': 4}),
-        }
+        widgets = { 'comment': Textarea(attrs={'rows': 4}) }
 
 
 class ProductFormWithoutPurchase(ProductForm):
@@ -78,3 +79,18 @@ class NoteForm(forms.ModelForm):
 # used for details AND creation
 MemberFormSet = inlineformset_factory(Household, Member, fields=('name', 'email', 'tel', 'receipt', 'stock_alert'),
                                       min_num=1, validate_min=True, extra=0)
+
+
+class ActivityForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['description'].widget.attrs['readonly'] = True
+        self.fields['date'].widget.attrs['readonly'] = True
+    class Meta:
+        model = Activity
+        exclude = []
+        widgets = {
+            'comment': Textarea(attrs={'rows': 3}),
+            'volunteer1': Select2(select2attrs=settings.SELECT2_ATTRS),
+            'volunteer2': Select2(select2attrs=settings.SELECT2_ATTRS),
+        }

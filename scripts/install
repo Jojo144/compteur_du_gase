@@ -8,6 +8,7 @@ app=$YNH_APP_INSTANCE_NAME
 
 domain=$YNH_APP_ARG_DOMAIN
 path="/" # for the moment the app works only at root
+is_public=$YNH_APP_ARG_IS_PUBLIC
 admin=$YNH_APP_ARG_ADMIN
 passwd=$YNH_APP_ARG_PASSWD
 email=$YNH_APP_ARG_EMAIL
@@ -26,6 +27,7 @@ path=$(ynh_normalize_url_path $path)
 
 ynh_app_setting_set "$app" domain "$domain"
 ynh_app_setting_set "$app" path "$path"
+ynh_app_setting_set "$app" is_public "$is_public"
 ynh_app_setting_set "$app" admin "$admin"
 ynh_app_setting_set "$app" email "$email"
 
@@ -112,6 +114,20 @@ sudo systemctl enable $app
 sudo yunohost service add $app -l /var/log/$app/error.log /var/log/$app/access.log
 
 
-# C'est public ! (pas de SSO ynh)
-ynh_app_setting_set "$app" skipped_uris "/"
+
+if [[ $is_public -eq 1 ]]; then
+    # unprotected_uris allows SSO credentials to be passed anyway.
+    ynh_app_setting_set "$app" unprotected_uris "/"
+fi
+
+domainregex=$(echo "$domain" | sed 's/-/\%&/g')
+if [ "$path" = "/" ]
+then
+    # to avoid "//static"
+    pathregex=""
+else
+    pathregex=$(echo "$path" | sed 's/-/\%&/g')
+fi
+ynh_app_setting_set "$app" skipped_regex "$domainregex$pathregex/$","$domainregex$pathregex/activité","$domainregex$pathregex/static"
+
 sudo yunohost app ssowatconf

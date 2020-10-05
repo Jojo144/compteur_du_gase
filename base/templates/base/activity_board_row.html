@@ -1,0 +1,28 @@
+<tr>
+  <th scope="row">{{ activity.description }} {{ activity.date|date:"D d M" }}</th>
+
+  {% for person in activity.volunteers %}
+  <td>
+    {{ person|default_if_none:"" }}<br>
+
+    {% if person.tel %}
+    <div class="badge badge-pill badge-light foldable">
+      📞 <span class="initially-folded">
+      <a href="tel:{{ person.tel }}">{{ person.tel }}</a>
+      </span>
+    </div>
+    {% endif %}
+
+    {% if person.email %}
+    <div class="badge badge-pill badge-light foldable">
+      📧 <span class="initially-folded">
+      <a href="mailto:{{ person.email }}">{{ person.email }}</a>
+      </span>
+    </div>
+    {% endif %}
+  </td>
+  {% endfor %}
+
+  <td><div style="width:100%; overflow:auto">{{ activity.comment }}</div></td>
+  <td><a class="btn btn-success" href="{% url 'base:activity_details' activity.id %}" role="button">S'inscrire</a></td>
+</tr>
