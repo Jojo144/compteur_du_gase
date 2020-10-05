@@ -37,6 +37,7 @@
   </button></p>
 
   {% else %}
-  <p>Pas de prochaine permanence enregistrée.</p>
+  <p>Pas de prochaine permanence enregistrée. <a href="{% url 'admin:base_activity_changelist' %}">En renseigner une ?</a></p>
+
   {% endif %}
 </div>
