@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.conf.urls import url
 from django.shortcuts import render, redirect
+from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib.auth.models import User, Group
 
 from datetime import timedelta
@@ -80,8 +81,8 @@ class ApproCompteOpAdmin(admin.ModelAdmin):
 # Formulaire pour ajouter une activité récurrente au tableau des permanences
 class RecurringForm(forms.Form):
     description = forms.CharField(label='Description', initial='Permanence', max_length=100)
-    begin_date = forms.DateField(label='Date de début (incluse)')
-    end_date = forms.DateField(label='Date de fin (incluse)')
+    begin_date = forms.DateField(label='Date de début (incluse)', widget=AdminDateWidget())
+    end_date = forms.DateField(label='Date de fin (incluse)', widget=AdminDateWidget())
     DAYS = (
         (0, "Lundi"),
         (1, "Mardi"),
