@@ -142,3 +142,15 @@ hr.gestion-hr {
     width: 100%;
     table-layout: fixed;
 }
+
+.foldable {
+  cursor: pointer;
+}
+.foldable .initially-folded {
+  display: none;
+}
+
+.foldable:hover .initially-folded,
+.foldable:active .initially-folded {
+  display: unset;
+}
