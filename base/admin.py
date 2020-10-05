@@ -119,7 +119,7 @@ class ActivityAdmin(admin.ModelAdmin):
                     if d.weekday() in days:
                         a = Activity(description=description, date=d)
                         a.save()
-                return redirect('admin:base_activity_changelist') #cleanup
+                return redirect('admin:base_activity_changelist')
         else:
             form = RecurringForm()
         return render(request, 'admin/recurring.html',
