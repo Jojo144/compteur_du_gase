@@ -477,7 +477,7 @@ def get_appros_stats():
 
     # stats
     comptes_stats = [{'value': '{0:.2f}'.format(values[i]), 'date': dates[i].isoformat(),
-                      'label': 'Evolution : {0:.2f} €'.format(labels[i])}
+                      'label': 'Évolution : {0:.2f} €'.format(labels[i])}
                      for i in range(len(dates))]
 
     return comptes_stats
