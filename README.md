@@ -139,4 +139,5 @@ manage.py export_households /path/to/filename.xlsx
 
 ## Credits
 
-Favicon made by Freepik from www.flaticon.com
+- Favicon made by Freepik from www.flaticon.com
+- Bootstrap4 Select2 theme CSS is from [BootStrap4 Select2 theme 1.3.2](https://github.com/ttskch/select2-bootstrap4-theme)
