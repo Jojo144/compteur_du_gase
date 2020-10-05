@@ -10,11 +10,13 @@ from .templatetags.my_tags import *
 
 class HouseholdList(forms.Form):
     household = forms.ModelChoiceField(label='Sélectionnez le compte : ',
+                                       widget=Select2(select2attrs=settings.SELECT2_ATTRS),
                                        queryset=Household.objects.all())
 
 
 class ProviderList(forms.Form):
     provider = forms.ModelChoiceField(label='Sélectionnez un fournisseur : ',
+                                      widget=Select2(select2attrs=settings.SELECT2_ATTRS),
                                       queryset=Provider.objects.all())
 
 
