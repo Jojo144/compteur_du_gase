@@ -45,7 +45,7 @@ ynh_webpath_available $domain $path
 ynh_install_app_dependencies $pkg_dependencies
 
 sudo mkdir -p $final_path
-git clone https://github.com/Jojo144/compteur_du_gase $final_path
+cp -r .. $final_path
 
 python3 -m venv $final_path/venv
 venv_python=$final_path/venv/bin/python3
