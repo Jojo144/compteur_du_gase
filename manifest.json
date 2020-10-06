@@ -64,8 +64,8 @@
                 "name": "email",
                 "type": "email",
                 "ask": {
-                    "en": "Choose email were send notification",
-                    "fr": "Choisissez l'email vers lequel envoyer les notifications"
+                    "en": "Choose email were send error notifications",
+                    "fr": "Choisissez l'email vers lequel envoyer les notifications d'erreur"
                 },
                 "example": "admin@example.tld"
             },
