@@ -23,6 +23,10 @@ sudo useradd $app -d $final_path \
 ynh_abort_if_errors
 
 
+#     ynh_normalize_url_path example    # -> /example
+#     ynh_normalize_url_path /example   # -> /example
+#     ynh_normalize_url_path /example/  # -> /example
+#     ynh_normalize_url_path /          # -> /
 path=$(ynh_normalize_url_path $path)
 
 ynh_app_setting_set "$app" domain "$domain"
@@ -66,7 +70,7 @@ if [ "$path" = "/" ]
 then
     ynh_replace_string "YNH_APP_ARG_PATH" "" $settings_local
 else
-    ynh_replace_string "YNH_APP_ARG_PATH" "${path%?}/" $settings_local
+    ynh_replace_string "YNH_APP_ARG_PATH" "${path:1}/" $settings_local
 fi
 ynh_replace_string "YNH_APP_ARG_EMAIL" $email $settings_local
 ynh_replace_string "YNH_APP_SECRET_KEY" $secret $settings_local
