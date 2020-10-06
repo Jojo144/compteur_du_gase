@@ -7,7 +7,7 @@ source /usr/share/yunohost/helpers
 app=$YNH_APP_INSTANCE_NAME
 
 domain=$YNH_APP_ARG_DOMAIN
-path="/" # for the moment the app works only at root
+path=$YNH_APP_ARG_PATH
 is_public=$YNH_APP_ARG_IS_PUBLIC
 admin=$YNH_APP_ARG_ADMIN
 passwd=$YNH_APP_ARG_PASSWD
@@ -62,7 +62,13 @@ settings_local=$final_path/compteur/settings_local.py
 cp $final_path/compteur/settings_local.py.example $settings_local
 ynh_replace_string "YNH_APP_ARG_ADMIN" $admin $settings_local
 ynh_replace_string "YNH_APP_ARG_DOMAIN" $domain $settings_local
-ynh_replace_string "YNH_APP_ARG_PATH" $path $settings_local
+# In settings_local, the path should be empty or wiht a trailing / and no starting /
+if [ "$path" = "/" ]
+then
+    ynh_replace_string "YNH_APP_ARG_PATH" "" $settings_local
+else
+    ynh_replace_string "YNH_APP_ARG_PATH" "${path%?}/" $settings_local
+fi
 ynh_replace_string "YNH_APP_ARG_EMAIL" $email $settings_local
 ynh_replace_string "YNH_APP_SECRET_KEY" $secret $settings_local
 ynh_replace_string "YNH_APP_STATIC_ROOT" $final_path/static $settings_local

@@ -134,6 +134,7 @@ MESSAGE_TAGS = {
 SECRET_KEY = "blabla"
 DEBUG = True
 ALLOWED_HOSTS = []
+PATH = ""
 
 try:
     from .settings_local import *
