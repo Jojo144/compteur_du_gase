@@ -6,7 +6,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
-from django.core.mail import send_mail, get_connection
 from django.views.generic.edit import CreateView, UpdateView
 from django.db import transaction
 from django.db.models import Q, Sum
@@ -17,50 +16,19 @@ from .templatetags.my_tags import *
 
 
 
-def add_prefix_subject(subject):
-    prefix = get_local_settings().prefix_object_mail
-    return ' '.join([prefix, subject])
-
-def my_send_mail(request, subject, message, recipient_list, success_msg, error_msg, kind, save=True):
+def my_send_mail(request, subject, message, recipients, kind):
     local_settings = get_local_settings()
-    if not local_settings.use_mail:
-        return True
-    if recipient_list:
-        save_mail = save and local_settings.save_mail
-        if save_mail:
-            mail = Mail(recipients=', '.join(recipient_list), subject=subject, message=message, kind=kind)
-            mail.save()
-        subject_mail = add_prefix_subject(subject)
-        debug_mail = local_settings.debug_mail
-        if debug_mail:
-            print("* Mode de test pour les mails qui sont automatiquement envoyés à {}.".format(debug_mail))
-            recipient_list_cleaned = [debug_mail]
+    if (local_settings.use_mail and recipients):
+        subject = ' '.join([local_settings.prefix_object_mail, subject])
+        mail = Mail(subject=subject, message=message, kind=kind)
+        mail.save()
+        mail.recipients.set(recipients)
+        if mail.send(local_settings):
+            messages.success(request, '✔ ' + mail.success_msg())
         else:
-            recipient_list_cleaned = recipient_list
-        mail_from = local_settings.mail_from
-        try:
-            with get_connection(host=local_settings.mail_host,
-                                port=local_settings.mail_port,
-                                username=local_settings.mail_username,
-                                password=local_settings.mail_passwd,
-                                use_tls=(local_settings.mail_protocole == 'tls'),
-                                use_ssl=(local_settings.mail_protocole == 'ssl'),
-                                timeout=local_settings.mail_timeout) as connection:
-                send_mail(subject_mail, message, mail_from, recipient_list_cleaned, fail_silently=False,
-                          connection=connection)
-            if save_mail:
-                mail.send = True
-                mail.save()
-            messages.success(request, '✔ ' + success_msg)
-            return True
-        except Exception as e:
-            if save_mail:
-                mail.send = False
-                mail.save()
-            messages.error(request, '✘ ' + error_msg)
-            print("Erreur lors de l'envoi du mail : {}".format(e))
-            return False
-    return False
+            messages.error(request, '✘ ' + mail.error_msg())
+    else:
+        pass
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -108,7 +76,6 @@ def gestion(request):
                    'value_accounts': value_accounts,
                    'diff_values': value_accounts - value_stock,
                    'alert_pdts': alert_pdts,
-                   'save_mails': local_settings.save_mail,
                    'use_subscriptions': local_settings.use_subscription,
                    })
 
@@ -164,14 +131,10 @@ def achats(request, household_id):
                 s -= op.price
                 msg += "{} ({} € / unité) : {} unité  -> {} €\n".format(pdt.name, pdt.price, q, op.price)
                 if pdt.stock_alert and pdt.stock <= pdt.stock_alert:
-                    ref = pdt.get_email_stock_alert()
-                    if ref:
-                        my_send_mail(request, subject='Alerte de stock',
-                                     message='Le stock de {} est bas : il reste {} unités'.format(pdt, pdt.stock),
-                                     recipient_list=[ref],
-                                     success_msg='Alerte stock envoyée par mail',
-                                     error_msg='Erreur : l\'alerte stock n\'a pas été envoyée par mail',
-                                     kind=Mail.REFERENT)
+                    my_send_mail(request, subject='Alerte de stock : {}'.format(pdt),
+                                 message='Le stock de {} est bas : il reste {} unités'.format(pdt, pdt.stock),
+                                 recipients=pdt.get_email_stock_alert(),
+                                 kind=Mail.ALERTE_STOCK)
         if household.on_the_flight:
             opa = ApproCompteOp(household=household, amount=s, kind=ApproCompteOp.ONTHEFLIGHT)
             opa.save()
@@ -183,11 +146,7 @@ def achats(request, household_id):
         balance = household.account
         messages.success(request, '✔ Votre cagnotte a été débitée de {} €<br>Solde restant : {} €'.format(round2(s),
                                                                                                        round2(balance)))
-        mails = household.get_emails_receipt()
-        my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,
-                     success_msg='Le ticket de caisse a été envoyé par mail',
-                     error_msg='Erreur : le ticket de caisse n\'a pas été envoyé par mail',
-                     kind=Mail.RECEIPT)
+        my_send_mail(request, subject='Ticket de caisse', message=msg, recipients=household.get_emails_receipt(), kind=Mail.TICKET)
         return HttpResponseRedirect(reverse('base:index'))
     else:
         local_settings = get_local_settings()
@@ -246,12 +205,9 @@ def compte(request, household_id):
             household.account += q
             household.save()
             messages.success(request, '✔ Approvisionnement de la cagnotte de {0:.2f} € effectué'.format(q))
-            msg = 'Votre cagnotte a été approvisionné de {} €'.format(q)
-            mails = household.get_emails_receipt()
-            my_send_mail(request, subject='Ticket de caisse', message=msg, recipient_list=mails,
-                         success_msg='Le ticket de caisse a été envoyé par mail',
-                         error_msg='Erreur : le ticket de caisse n\'a pas été envoyé par mail',
-                         kind=Mail.RECEIPT)
+            my_send_mail(request, subject="Approvisionnement de votre cagnotte",
+                         message='Votre cagnotte a été approvisionnée de {} €'.format(q),
+                         recipients=household.get_emails_receipt(), kind=Mail.APPRO_CAGNOTTE)
             return HttpResponseRedirect(reverse('base:index'))
     else:
         form = ApproCompteFormKind() if use_appro_kind else ApproCompteForm()
@@ -419,15 +375,11 @@ def appro(request, provider_id):
                     op.save()
                     pdt.stock += q
                     pdt.save()
-                    ref = pdt.get_email_stock_alert()
-                    if ref:
+                    for ref in pdt.get_email_stock_alert():
                         msgs[ref] = msgs.get(ref, '') + '{} a été approvisionné de {} unités\n'.format(pdt, q)
             messages.success(request, '✔ Approvisionnement effectué')
             for (key, value) in msgs.items():
-                my_send_mail(request, subject='Approvisionnement', message=value, recipient_list=[key],
-                             success_msg='Mail de confirmation envoyé au référent',
-                             error_msg='Erreur : le mail de confirmation n\'a pas été envoyé',
-                             kind=Mail.REFERENT)
+                my_send_mail(request, subject='Approvisionnement : {}'.format(prov), message=value, recipients=[key], kind=Mail.APPRO_STOCK)
             return HttpResponseRedirect(reverse('base:index'))
     else:
         form = ProductList(pdts)
@@ -860,10 +812,9 @@ def detail_note(request, note_id):
 # ----------------------------------------------------------------------------------------------------------------------
 
 def mailslist(request):
-    columns = ['jour', 'destinataires', 'sujet', 'message', 'type', 'envoyé ?']
-    mails = [{"id": p.id, "jour": p.date.strftime("%d/%m/%Y"), "destinataires": p.recipients,
-              "sujet": add_prefix_subject(p.subject), "message": p.message,
-              "type": p.get_kind_display(), "envoyé ?": bool_to_utf8(p.send)}
+    columns = ['jour', 'destinataires', 'sujet', 'envoyé ?']
+    mails = [{"id": p.id, "jour": p.date.strftime("%d/%m/%Y"), "destinataires": ', '.join(p.recipient_list()),
+              "sujet": p.subject, "envoyé ?": bool_to_utf8(p.sent)}
              for p in Mail.objects.all()]
     columns = json.dumps(columns)
     mails = json.dumps(mails)
@@ -871,82 +822,44 @@ def mailslist(request):
 
 
 def mails_action(request, mails, action):
-    for m in mails:
+    for mail in mails:
         if action == "send":
-            subject = m.subject
-            message = m.message
-            recipient_list = [v.strip() for v in m.recipients.split(',')]
-            success_msg = 'Message envoyé par mail'
-            error_msg = 'Erreur : le message n\'a pas été envoyé par mail'
-            kind = m.kind
-
-            test = my_send_mail(request, subject, message, recipient_list, success_msg, error_msg, kind, save=False)
-
-            if test:
-                m.send = True
+            local_settings = get_local_settings()
+            if mail.send(local_settings):
+                messages.success(request, '✔ ' + mail.success_msg())
             else:
-                m.send = False
-            m.save()
+                messages.error(request, '✘ ' + mail.error_msg())
         elif action == "del":
-            m.delete()
+            mail.delete()
         else:
             raise NotImplementedError("Action inconnue : " + str(action))
-
-    return redirect('base:mailslist') #mailslist(request)
+    return redirect('base:mailslist')
 
 
 def mails_send_all(request):
     mails = Mail.objects.all()
-
-    return mails_action(request, mails, action="send")
-
-
-def mails_send_referents(request):
-    mails = Mail.objects.filter(kind=Mail.REFERENT)
-
-    return mails_action(request, mails, action="send")
-
-
-def mails_send_receipts(request):
-    mails = Mail.objects.filter(kind=Mail.RECEIPT)
-
     return mails_action(request, mails, action="send")
 
 
 def mails_del_send(request):
-    mails = Mail.objects.filter(send=True)
-
+    mails = Mail.objects.filter(sent=True)
     return mails_action(request, mails, action="del")
 
 
-def mails_del_wait(request):
-    mails = Mail.objects.filter(send=False)
-
-    return mails_action(request, mails, action="del")
-
-
-def mails_del_referents(request):
-    mails = Mail.objects.filter(kind=Mail.REFERENT)
-
-    return mails_action(request, mails, action="del")
-
-
-def mails_del_receipts(request):
-    mails = Mail.objects.filter(kind=Mail.RECEIPT)
-
+def mails_del_all(request):
+    mails = Mail.objects.all()
     return mails_action(request, mails, action="del")
 
 
 def mail_del(request, mail_id):
     mails = Mail.objects.filter(pk=mail_id)
-
     return mails_action(request, mails, action="del")
 
 
 def mail_send(request, mail_id):
     mails = Mail.objects.filter(pk=mail_id)
-
     return mails_action(request, mails, action="send")
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # inventaire
