@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.core.mail import send_mail, get_connection
 from django import forms
 
 
@@ -54,9 +55,6 @@ class LocalSettings(models.Model):
     use_mail = models.BooleanField(verbose_name="Utilisation de la fonction envoi d'email ?", default=True,
                                    help_text="Cette fonction permet d'envoyer les tickets de caisse ou "
                                              "des alertes stocks aux référents des produits.")
-
-    save_mail = models.BooleanField(verbose_name="Utilisation de la fonction de sauvegarde des emails ?", default=False,
-                                    help_text="Cette fonction permet de sauvegarder les emails envoyés ou en attente.")
 
     prefix_object_mail = models.CharField(blank=True, verbose_name="Préfixe dans l'objet des emails.", default="",
                                           max_length=15,
@@ -221,7 +219,7 @@ class Household(models.Model):
         return Member.objects.filter(household=self.pk)
 
     def get_emails_receipt(self):
-        return [str(m.email) for m in self.get_members().filter(receipt=True)]
+        return self.get_members().filter(receipt=True)
 
     class Meta:
         verbose_name = 'Foyer'
@@ -311,9 +309,9 @@ class Product(models.Model):
 
     def get_email_stock_alert(self):
         if self.referent and self.referent.stock_alert and self.referent.email != '':
-            return str(self.referent.email)
+            return [self.referent]
         else:
-            return None
+            return []
 
     class Meta:
         verbose_name = 'Produit'
@@ -426,16 +424,71 @@ class Mail(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     message = models.TextField(blank=False, verbose_name="Message")
     subject = models.TextField(blank=False, verbose_name="Sujet")
-    recipients = models.TextField(blank=False, verbose_name="Destinataires")
-    send = models.BooleanField(verbose_name="Message envoyé ?", default=False)
+    recipients = models.ManyToManyField(Member, verbose_name="Destinataires")
+    sent = models.BooleanField(verbose_name="Message envoyé ?", default=False)
 
-    REFERENT = 'referent'
-    RECEIPT = 'receipt'
+    APPRO_CAGNOTTE, TICKET, ALERTE_STOCK, APPRO_STOCK, NOTIFICATION = 'appro_cagnotte', 'ticket', 'alerte_stock', 'appro_stock', 'notification'
     KIND_CHOICES = [
-        (REFERENT, 'Référent'),
-        (RECEIPT, 'Ticket de caisse'),
+        (APPRO_CAGNOTTE, 'approvisionnement de la cagnotte'),
+        (TICKET, 'ticket de caisse'),
+        (ALERTE_STOCK, 'alerte stock'),
+        (APPRO_STOCK, 'approvisionnement stock'),
+        (NOTIFICATION, 'notification')
     ]
-    kind = models.CharField(max_length=8, choices=KIND_CHOICES, default=REFERENT)
+    kind = models.CharField(max_length=20, choices=KIND_CHOICES, default='notification')
+
+    def success_msg(self):
+        if self.kind == self.APPRO_CAGNOTTE:
+            return "La notification d'approvisionnement a bien été envoyée"
+        elif self.kind == self.TICKET:
+            return "Le ticket de caisse a bien été envoyé"
+        elif self.kind == self.ALERTE_STOCK:
+            return "L'alerte stock a bien été envoyée"
+        elif self.kind == self.APPRO_STOCK:
+            return "La notification d'approvisionnement a bien été envoyée"
+        else:
+            return "La notification a bien été envoyée"
+
+    def error_msg(self):
+        if self.kind == self.APPRO_CAGNOTTE:
+            return "La notification d'approvisionnement n'a pas été envoyée"
+        elif self.kind == self.TICKET:
+            return "Le ticket de caisse n'a pas été envoyé"
+        elif self.kind == self.ALERTE_STOCK:
+            return "L'alerte stock n'a pas été envoyée"
+        elif self.kind == self.APPRO_STOCK:
+            return "La notification d'approvisionnement n'a pas été envoyée"
+        else:
+            return "La notification n'a pas été envoyée"
+
+    def recipient_list(self):
+        return [m.email for m in self.recipients.all()]
+
+    def send(self, local_settings):
+        debug_mail = local_settings.debug_mail
+        if debug_mail:
+            print("* Mode de test pour les mails qui sont automatiquement envoyés à {}.".format(debug_mail))
+            recipient_list = [debug_mail]
+        else:
+            recipient_list = self.recipient_list()
+
+        try:
+            with get_connection(host=local_settings.mail_host,
+                                port=local_settings.mail_port,
+                                username=local_settings.mail_username,
+                                password=local_settings.mail_passwd,
+                                use_tls=(local_settings.mail_protocole == 'tls'),
+                                use_ssl=(local_settings.mail_protocole == 'ssl'),
+                                timeout=local_settings.mail_timeout) as connection:
+                send_mail(self.subject, self.message, local_settings.mail_from, recipient_list,
+                          fail_silently=False, connection=connection)
+                self.sent = True
+                self.save()
+            return True
+        except Exception as e:
+            # todo better error reporting
+            print("Erreur lors de l'envoi du mail : {}".format(e))
+            return False
 
 
 # activité/permanence pour le tableau des permanences
