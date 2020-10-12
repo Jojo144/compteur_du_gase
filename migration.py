@@ -132,11 +132,11 @@ if migrate_members:
                    stock_alert=False).save()
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Appro Comptes
+# Appro Cagnottes
 # ----------------------------------------------------------------------------------------------------------------------
 
 if migrate_appro_comptes:
-    print('\nMigrating Appro Comptes')
+    print('\nMigrating Appro Cagnottes')
     ApproCompteOp.objects.all().delete()
     mycursor.execute("SELECT * FROM " + prefix + "COMPTES WHERE OPERATION='APPROVISIONNEMENT' ORDER BY DATE ASC")
     myresult = mycursor.fetchall()

@@ -21,7 +21,7 @@ class ProviderList(forms.Form):
 
 
 class ApproCompteForm(forms.Form):
-    amount = forms.DecimalField(label="De combien d'argent le compte doit-il être approvisionné ?",
+    amount = forms.DecimalField(label="De combien d'argent la cagnotte doit-elle être approvisionnée ?",
                                 help_text="♥ Merci de ne pas oublier d'encaisser l'argent !",
                                 decimal_places=2)
 
@@ -31,7 +31,7 @@ class ApproCompteFormKind(ApproCompteForm):
                                        "</br>Annulation/correction pour corriger une erreur "
                                        "de saisie (valeur positive ou négative)."
                                        "</br>Remboursement pour un remboursement ou "
-                                       "lorsque le foyer clotûre son compte (valeur négative).")
+                                       "lorsque le foyer clotûre sa cagnotte (valeur négative).")
 
 
 

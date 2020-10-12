@@ -4,24 +4,24 @@
 {% block content %}
 <div class="medium-content">
 
-    <h4>Valeur des approvisionnements des foyers</h4>
-    Valeur des approvisionnements des foyers : {{ value_appro | round0 }} €
+    <h4>Valeur des approvisionnements des cagnottes</h4>
+    Valeur des approvisionnements des cagnottes : {{ value_appro | round0 }} €
     <div class="gestion-btn">
-	<a class="btn btn-info" href="{% url 'base:compteslist' %}">Evolution et liste détaillée des approvisionnements des
-            foyers</a>
+	<a class="btn btn-info" href="{% url 'base:compteslist' %}">Évolution et liste détaillée des approvisionnements des
+            cagnottes.</a>
     </div>
 
     <h4>Valeur des approvisionnements du stock de l'épicerie</h4>
     Valeur des approvisionnements du stock de l'épicerie : {{ value_purchase | round0 }} €
     <div class="gestion-btn">
-	<a class="btn btn-info" href="{% url 'base:approslist' %}">Evolution et liste détaillée des approvisionnements du stock de
+	<a class="btn btn-info" href="{% url 'base:approslist' %}">Évolution et liste détaillée des approvisionnements du stock de
             l'épicerie</a>
     </div>
 
     <h4>Valeur des achats des foyers</h4>
     Valeur cumulée des achats des foyers : {{ value_purchase_household | round0 }} €
     <div class="gestion-btn">
-	<a class="btn btn-info" href="{% url 'base:purchaseslist' %}">Evolution et liste détaillée des achats des foyers</a>
+	<a class="btn btn-info" href="{% url 'base:purchaseslist' %}">Évolution et liste détaillée des achats des foyers</a>
     </div>
 
     <h4>Fonctionnement de l'épicerie</h4>
@@ -31,7 +31,7 @@
 
     <h4>Nombre de foyers et de membres</h4>
     <div class="gestion-btn">
-	<a class="btn btn-info" href="{% url 'base:membersstats' %}">Evolution du nombre de foyers et de membres.</a>
+	<a class="btn btn-info" href="{% url 'base:membersstats' %}">Évolution du nombre de foyers et de membres.</a>
     </div>
 </div>
 {% endblock content %}

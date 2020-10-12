@@ -4,7 +4,7 @@
 {% load my_tags %}
 
 {% block content %}
-<h4>Evolution des approvisionnements des foyers</h4>
+<h4>Évolution des approvisionnements des cagnottes</h4>
 
 <div class="medium-content">
 <canvas id="myChart"></canvas>
@@ -36,7 +36,7 @@
 
      data: {
          datasets: [{
-             label: 'Approvisionnement cumulé des foyers (en €)',
+             label: 'Approvisionnement cumulé des cagnottes (en €)',
              backgroundColor: chartCol1,
              borderColor: chartCol1,
          fill: false,
@@ -51,7 +51,7 @@
      },
 
      options: {
-     title: { text: 'Approvisionnement cumulé des foyers' },
+     title: { text: 'Approvisionnement cumulé des cagnottes' },
      scales: {
              xAxes: [{
                  type: 'time',
@@ -265,7 +265,7 @@
 
           this.total = this.total_sum(data);
 
-          document.getElementById("print-total").innerHTML = "Total des approvisionnements des foyers sélectionnés : <b>" + this.total.toFixed(2) + " €</b>";
+          document.getElementById("print-total").innerHTML = "Total des approvisionnements des cagnottes sélectionnés : <b>" + this.total.toFixed(2) + " €</b>";
 
           return data
       },

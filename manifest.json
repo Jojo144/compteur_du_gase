@@ -5,7 +5,7 @@
     "version": "2019-09-15",
     "description": {
         "en": "A django app.",
-        "fr": "Logiciel de gestion de comptes et de stock pour un GASE (Groupement d'Achat en Service Épicerie)."
+        "fr": "Logiciel de gestion de cagnottes et de stock pour un GASE (Groupement d'Achat en Service Épicerie)."
     },
     "license": "WTFPL-2.0",
     "maintainer": {

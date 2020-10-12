@@ -185,7 +185,7 @@ class ActivatedManager(models.Manager):
 
 class Household(models.Model):
     name = models.CharField(max_length=200,
-                            help_text="Nom qui apparaitra dans la liste des comptes pour faire ses achats.",
+                            help_text="Nom qui apparaitra dans la liste des foyers pour faire ses achats.",
                             verbose_name="nom du foyer")
     number = models.IntegerField(default=0, verbose_name="numero d'adhérent", validators=[validate_household_number])
     address = models.CharField(max_length=200, blank=True,
@@ -194,7 +194,7 @@ class Household(models.Model):
                                verbose_name="adresse")
     comment = models.TextField(blank=True, verbose_name="commentaire")
     account = models.DecimalField(default=0, max_digits=10, decimal_places=2, editable=False,
-                                  verbose_name="solde du compte")  # INVARIANT : account should be sum of operations
+                                  verbose_name="solde de la cagnotte")  # INVARIANT : account should be sum of operations
     date = models.DateField(auto_now_add=True)  # date d'inscription
     date_closed = models.DateField(blank=True, null=True, verbose_name="Date de clôture",
                                    help_text="Remplir seulement si le foyer souhaite arrêter.")  # date de cloture
@@ -205,7 +205,7 @@ class Household(models.Model):
         verbose_name="Paie à la volée", default=False,
         help_text="Réalise un approvisionnement automatique du montant du panier avant de payer."
                   "Cette fonction peut être utilise si l'on autorise le payement à la volée, c'est-à-dire lorsque "
-                  "le client n'a pas besoin d'approvisionner son compte mais paye la juste somme.")
+                  "le client n'a pas besoin d'approvisionner sa cagnotte mais paye la juste somme.")
 
     activated = models.BooleanField(default=True,
                                     help_text="Un foyer non activé n'apparaît pas dans le logiciel. Utilisé pour archiver les foyers et ses membres",
