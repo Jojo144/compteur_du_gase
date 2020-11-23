@@ -65,6 +65,8 @@ Tester aussi de redémarrer pour voir si les services se lancent bien tous seuls
 Vous pouvez choisir un autre répertoire que `/opt/compteur_gase` ça devrait marcher.
 Il y a des *warnings* à propos du cache pip, je les ai ignoré pour le moment.
 
+Attention, si vous tombez sur une page Apache "It works" c'est que vous avez Apache d'installé au lieu de Nginx (ou les deux).
+
 ### Installation en ligne
 
 Paquet Yunohost.
