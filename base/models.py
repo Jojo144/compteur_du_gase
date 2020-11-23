@@ -112,9 +112,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-    def get_products(self):
-        return Product.objects.filter(category=self.pk)
-
     class Meta:
         verbose_name = 'Catégorie'
         ordering = ['name']
@@ -148,9 +145,6 @@ class Provider(models.Model):
 
     def __str__(self):
         return self.name
-
-    def get_products(self):
-        return Product.objects.filter(provider=self.pk)
 
     class Meta:
         verbose_name = 'Fournisseur'

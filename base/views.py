@@ -363,7 +363,7 @@ def pre_appro(request):
 
 def appro(request, provider_id):
     prov = Provider.objects.get(pk=provider_id)
-    pdts = prov.get_products()
+    pdts = Product.objects.filter(provider=prov, visible=True)
     if request.method == 'POST':
         form = ProductList(pdts, request.POST)
         if form.is_valid():
