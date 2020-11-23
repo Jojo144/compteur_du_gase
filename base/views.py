@@ -394,7 +394,7 @@ def approslist(request):
     columns = ['jour', 'mois', 'année', 'fournisseur', 'produit', "coût total (prix de vente)"]
     if use_cost_of_purchase:
         columns.append("coût total (prix d'achat)")
-    appros = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "fournisseur": str(p.product.provider),
+    appros = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "fournisseur": str(p.product.provider if p.product else "Produit supprimé"),
                "produit": str(p.product), "coût total (prix d'achat)": '{0:.2f} €'.format(p.cost_of_purchase()),
                "coût total (prix de vente)": '{0:.2f} €'.format(p.cost_of_price()),
                "date": p.date.isoformat()}
