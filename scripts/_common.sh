@@ -43,7 +43,9 @@ pip_install () {
     /opt/yunohost/ihatemoney/venv/bin/pip install --upgrade \
      'gunicorn>=19.3.0' \
      'PyMySQL>=0.9,<0.10' \
-     'ihatemoney>=4,<5' \
+
+    /opt/yunohost/ihatemoney/venv/bin/pip install --upgrade \
+     git+https://github.com/spiral-project/ihatemoney.git
 
 }
 
