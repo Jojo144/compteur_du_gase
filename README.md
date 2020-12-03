@@ -25,7 +25,7 @@ Deux principes ont guidé l'écriture du logiciel : "tout le monde doit pouvoir 
 
 Il n'y avait pas de statistiques dans la version de base, cela a probablement été rajouté par les Nantais.
 
-Version de démo ici : https://demo-compteur.gase.eu.org/
+Version de démo ici : https://demo-compteur.gase.eu.org
 
 ## Configuration
 
