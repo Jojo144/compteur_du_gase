@@ -62,7 +62,7 @@
             },
 	    {
                 "name": "email",
-                "type": "email",
+                "type": "string",
                 "ask": {
                     "en": "Choose email were send error notifications",
                     "fr": "Choisissez l'email vers lequel envoyer les notifications d'erreur"
