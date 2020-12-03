@@ -26,7 +26,8 @@ final_path=/opt/$app
 venv_python=$final_path/venv/bin/python3
 venv_pip=$final_path/venv/bin/pip
 
-rsync -va ../ $final_path/
+# Les exclude sont là pour permettre les tests de paquet ynh en local
+rsync -va ../ $final_path/ --filter=':- ../.gitignore' --exclude=/conf/gunicorn_config.py
 sudo -u $app $venv_pip install -r $final_path/requirements.txt
 sudo -u $app $venv_python $final_path/manage.py migrate --noinput
 
