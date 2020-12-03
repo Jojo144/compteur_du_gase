@@ -62,7 +62,7 @@
             },
 	    {
                 "name": "email",
-                "type": "email",
+                "type": "string",
                 "ask": {
                     "en": "Choose email were send error notifications",
                     "fr": "Choisissez l'email vers lequel envoyer les notifications d'erreur"
@@ -75,6 +75,15 @@
                 "ask": {
                     "en": "Is it a public application?",
                     "fr": "Est-ce une application publique ?"
+                },
+                "default": false
+            },
+	    {
+                "name": "is_home_public",
+                "type": "boolean",
+                "ask": {
+                    "en": "Do you want to allow public access to home page (and home page only)? The home page contains names, phones and emails of next permanences volunteers. If this is a public application, this setting has no effect.",
+                    "fr": "Voulez-vous autoriser l'accès public à la page d'accueil (et elle seule) ? La page d'accueil contient les noms, téléphone et adresses mail des permanencier·es pour les prochaines permanences. Si l'application est publique, ce paramètre n'a aucun effet."
                 },
                 "default": false
             }
