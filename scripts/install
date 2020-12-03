@@ -9,6 +9,7 @@ app=$YNH_APP_INSTANCE_NAME
 domain=$YNH_APP_ARG_DOMAIN
 path=$YNH_APP_ARG_PATH
 is_public=$YNH_APP_ARG_IS_PUBLIC
+is_home_public=$YNH_APP_ARG_IS_HOME_PUBLIC
 admin=$YNH_APP_ARG_ADMIN
 passwd=$YNH_APP_ARG_PASSWD
 email=$YNH_APP_ARG_EMAIL
@@ -32,6 +33,7 @@ path=$(ynh_normalize_url_path $path)
 ynh_app_setting_set "$app" domain "$domain"
 ynh_app_setting_set "$app" path "$path"
 ynh_app_setting_set "$app" is_public "$is_public"
+ynh_app_setting_set "$app" is_home_public "$is_home_public"
 ynh_app_setting_set "$app" admin "$admin"
 ynh_app_setting_set "$app" email "$email"
 
@@ -116,27 +118,16 @@ sudo systemctl daemon-reload
 sudo cp ../conf/gunicorn_config.py $final_path
 
 
-## Reload Nginx and regenerate SSOwat conf
-sudo service nginx reload
-sudo systemctl start $app
-sudo systemctl enable $app
-sudo yunohost service add $app -l /var/log/$app/error.log /var/log/$app/access.log
-
-
-
 if [[ $is_public -eq 1 ]]; then
     # unprotected_uris allows SSO credentials to be passed anyway.
     ynh_app_setting_set "$app" unprotected_uris "/"
 fi
 
-domainregex=$(echo "$domain" | sed 's/-/\%&/g')
-if [ "$path" = "/" ]
-then
-    # to avoid "//static"
-    pathregex=""
-else
-    pathregex=$(echo "$path" | sed 's/-/\%&/g')
-fi
-ynh_app_setting_set "$app" skipped_regex "$domainregex$pathregex/$","$domainregex$pathregex/activité","$domainregex$pathregex/static"
+handle_is_home_public
 
+## Reload Nginx and regenerate SSOwat conf
 sudo yunohost app ssowatconf
+sudo service nginx reload
+sudo systemctl start $app
+sudo systemctl enable $app
+sudo yunohost service add $app -l /var/log/$app/error.log /var/log/$app/access.log
