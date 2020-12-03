@@ -6,6 +6,8 @@ source /usr/share/yunohost/helpers
 
 app=$YNH_APP_INSTANCE_NAME
 domain=$(ynh_app_setting_get --app=$app --key=domain)
+path=$(ynh_app_setting_get --app=$app --key=path)
+is_home_public=$(ynh_app_setting_get $app is_home_public)
 
 
 ynh_script_progression --message="Backing up the app before upgrading (may take a while)..." --time --weight=1
@@ -22,16 +24,33 @@ ynh_abort_if_errors
 
 ynh_script_progression --message="Upgrading..." --time --weight=1
 
+
+#--------------------------- PRE-UPGRADE MIGRATIONS------------------
+
+# MIGRATION : set default to is_home_public=0
+if [ -z $is_home_public ]
+then
+    is_home_public=0
+    domain=$(ynh_app_setting_set $app is_home_public $is_home_public)
+fi
+handle_is_home_public
+
+#-------------------------------UPGRADE-------------------------
+
 final_path=/opt/$app
 venv_python=$final_path/venv/bin/python3
 venv_pip=$final_path/venv/bin/pip
 
 # Les exclude sont là pour permettre les tests de paquet ynh en local
 rsync -va ../ $final_path/ --filter=':- ../.gitignore' --exclude=/conf/gunicorn_config.py
+chown $app $final_path
 sudo -u $app $venv_pip install -r $final_path/requirements.txt
 sudo -u $app $venv_python $final_path/manage.py migrate --noinput
 
 
-ynh_script_progression --message="Restarting GUnicorn..." --time --weight=1
+#----------------------------FINALIZATION-----------------------
 
+ynh_script_progression --message="Restarting GUnicorn..." --time --weight=1
 sudo systemctl restart $app
+sudo yunohost app ssowatconf
+sudo service nginx reload
