@@ -92,9 +92,9 @@ sudo -u $app $venv_python $final_path/manage.py migrate --noinput
 sudo -u $app $venv_python $final_path/manage.py collectstatic --noinput
 
 # Create the admin
-echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('${admin}', '${email}', '${passwd}')" | $venv_python $final_path/manage.py shell
+echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('${admin}', '${email}', '${passwd}')" | sudo -u $app $venv_python $final_path/manage.py shell
 # Set a working sending email by default
-echo "UPDATE base_localsettings SET mail_from = 'Le compteur du GASE <le-compteur@$domain>';" |$venv_python $final_path/manage.py dbshell
+echo "UPDATE base_localsettings SET mail_from = 'Le compteur du GASE <le-compteur@$domain>';" | sudo -u $app $venv_python $final_path/manage.py dbshell
 
 
 # Modify Nginx configuration file and copy it to Nginx conf directory
