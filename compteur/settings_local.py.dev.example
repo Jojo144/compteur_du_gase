@@ -1,0 +1,15 @@
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Utilise une base de données nommée différement de la BDD par défaut Évite les
+# problèmes bizarres comme la base de données de dév qui est copiée et utilisée
+# sur le serveur yunohost lorsqu'on teste l'app yunohost depuis le dossier de
+# dév.
+#
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db-dev.sqlite3'),
+    }
+}
