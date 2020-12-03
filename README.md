@@ -39,6 +39,8 @@ Différentes options sont également disponibles dans l'interface graphique dans
 
 Toutes les remarques et contributions sont les bienvenues. N'hésitez pas à entrer en contact avec moi si vous souhaitez l'installer dans votre épicerie.
 
+Pour le développement, des détails techniques sont disponibles dans le fichier [HACKING.md](./HACKING.md)
+
 Contact : jojo144@girole.fr
 
 ## Installation
