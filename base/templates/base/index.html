@@ -27,4 +27,14 @@
   {{ txt_home2 | linebreaksbr }}
 </p>
 
+{{ request.user }}
+<br>
+{{ request.user.is_authenticated }}
+{{ request.user.is_staff }}
+{{ request.user.is_superuser }}
+<br>
+coucou
+<br>
+{{ plop }}
+
 {% endblock content %}

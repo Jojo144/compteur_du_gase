@@ -5,7 +5,7 @@
   <td>
     {{ person|default_if_none:"" }}<br>
 
-    {% if person.tel %}
+    {% if request.user.is_authenticated and person.tel %}
     <div class="badge badge-pill badge-light foldable">
       📞 <span class="initially-folded">
       <a href="tel:{{ person.tel }}">{{ person.tel }}</a>
@@ -13,7 +13,7 @@
     </div>
     {% endif %}
 
-    {% if person.email %}
+    {% if request.user.is_authenticated and person.email %}
     <div class="badge badge-pill badge-light foldable">
       📧 <span class="initially-folded">
       <a href="mailto:{{ person.email }}">{{ person.email }}</a>
