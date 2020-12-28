@@ -15,10 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import redirect
 
 from compteur.settings import PATH
 
 urlpatterns = [
     path(PATH, include('base.urls')),
+    path('admin/logout/', lambda request: redirect('https://ynh.local/yunohost/sso/?a\
+ction=logout')),
     path(PATH + 'admin/', admin.site.urls),
 ]
