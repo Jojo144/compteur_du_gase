@@ -11,8 +11,6 @@ path=$YNH_APP_ARG_PATH
 is_public=$YNH_APP_ARG_IS_PUBLIC
 is_home_public=$YNH_APP_ARG_IS_HOME_PUBLIC
 admin=$YNH_APP_ARG_ADMIN
-passwd=$YNH_APP_ARG_PASSWD
-email=$YNH_APP_ARG_EMAIL
 
 final_path=/opt/$app
 
@@ -35,7 +33,6 @@ ynh_app_setting_set "$app" path "$path"
 ynh_app_setting_set "$app" is_public "$is_public"
 ynh_app_setting_set "$app" is_home_public "$is_home_public"
 ynh_app_setting_set "$app" admin "$admin"
-ynh_app_setting_set "$app" email "$email"
 
 
 secret=$(ynh_string_random 24) # A bug don't allow to do random string bigger than 24
@@ -63,6 +60,8 @@ $venv_pip install pip --upgrade
 $venv_pip install gunicorn
 $venv_pip install -r $final_path/requirements.txt
 
+admin_mail=$(ynh_user_get_info --username="$admin" --key=mail)
+
 # Configuration Django
 settings_local=$final_path/compteur/settings_local.py
 cp $final_path/compteur/settings_local.py.example $settings_local
@@ -74,7 +73,7 @@ then
 else
     ynh_replace_string "YNH_APP_ARG_PATH" "${path:1}/" $settings_local
 fi
-ynh_replace_string "YNH_APP_ARG_EMAIL" $email $settings_local
+ynh_replace_string "YNH_APP_ARG_EMAIL" $admin_mail $settings_local
 ynh_replace_string "YNH_APP_SECRET_KEY" $secret $settings_local
 ynh_replace_string "YNH_APP_STATIC_ROOT" $final_path/static $settings_local
 echo 'YNH_INTEGRATION_ENABLED = True' >> $settings_local
@@ -92,8 +91,6 @@ sudo chgrp -R www-data /var/log/$app
 sudo -u $app $venv_python $final_path/manage.py migrate --noinput
 sudo -u $app $venv_python $final_path/manage.py collectstatic --noinput
 
-# Create the admin
-echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('${admin}', '${email}', '${passwd}')" | sudo -u $app $venv_python $final_path/manage.py shell
 # Set a working sending email by default
 echo "UPDATE base_localsettings SET mail_from = 'Le compteur du GASE <le-compteur@$domain>';" | sudo -u $app $venv_python $final_path/manage.py dbshell
 
