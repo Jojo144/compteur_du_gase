@@ -77,6 +77,7 @@ fi
 ynh_replace_string "YNH_APP_ARG_EMAIL" $email $settings_local
 ynh_replace_string "YNH_APP_SECRET_KEY" $secret $settings_local
 ynh_replace_string "YNH_APP_STATIC_ROOT" $final_path/static $settings_local
+echo 'YNH_INTEGRATION_ENABLED = True' >> $settings_local
 
 # Set permissions
 sudo chown -R $app:www-data $final_path
