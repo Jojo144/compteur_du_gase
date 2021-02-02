@@ -105,6 +105,19 @@ sachet	    0     1
 bouteille   0     1
 pot         0     1
 
+# Notes sur l'intégration YunoHost
+
+L'intégration YunoHost est optionelle, elle est désactivée si l'application
+n'est pas installée via le package YunoHost.
+
+L'intégration YunoHost consiste en un mécanisme d'installation et une
+intégration de l'authentification permetant au compteur d'exploiter les comptes
+utilisateur YunoHost. Quelques notes concernant l'intégration de
+l'authentification :
+
+- le contrôle d'accès (quel utilisateur YunoHost peut accéder au compteur) se
+  fait depuis l'admin YunoHost
+- Tous les utilisateurs autorisés sont administrateurs du compteur
 
 ## Sauvegarde de la base de donnée
 
