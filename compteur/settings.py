@@ -47,13 +47,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'ynh_auth.auth.CustomHeaderMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
-
-AUTHENTICATION_BACKENDS = [
-    'ynh_auth.auth.AllAdminRemoteUserBackend',
 ]
 
 ROOT_URLCONF = 'compteur.urls'
@@ -141,7 +136,25 @@ DEBUG = True
 ALLOWED_HOSTS = []
 PATH = ""
 
+# YunoHost integration
+
+YNH_INTEGRATION_ENABLED = False
+
 try:
     from .settings_local import *
 except ModuleNotFoundError:
     print('Warning: the file settings_local.py was not found, you are in debug mode.')
+
+if YNH_INTEGRATION_ENABLED:
+    AUTHENTICATION_BACKENDS = [
+        'ynh_auth.auth.AllAdminRemoteUserBackend',
+    ]
+
+    # Insert our middleware right after AuthenticationMiddleware
+    auth_middleware_index = MIDDLEWARE.index(
+        'django.contrib.auth.middleware.AuthenticationMiddleware'
+    )
+    MIDDLEWARE.insert(
+        auth_middleware_index + 1,
+        'ynh_auth.middleware.CustomHeaderMiddleware',
+    )
