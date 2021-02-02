@@ -142,10 +142,3 @@ admin.site.register(Activity, ActivityAdmin)
 
 admin.site.register(ChangeStockOp, ChangeStockOpAdmin)
 admin.site.register(ApproCompteOp, ApproCompteOpAdmin)
-
-
-# ### Use Ynh login instead of Django's one ###
-
-from django.contrib.auth.decorators import login_required
-# the ?r parameter is the base 64 encode of: https://ynh.local/admin
-admin.site.login = login_required(admin.site.login, login_url='https://ynh.local/yunohost/sso/?r=aHR0cHM6Ly95bmgubG9jYWwvYWRtaW4')
