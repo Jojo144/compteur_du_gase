@@ -1,9 +1,3 @@
-from django.contrib.auth.middleware import RemoteUserMiddleware
-
-class CustomHeaderMiddleware(RemoteUserMiddleware):
-    header = 'HTTP_REMOTE_USER'
-
-
 from django.contrib.auth.backends import RemoteUserBackend
 
 class AllAdminRemoteUserBackend(RemoteUserBackend):
