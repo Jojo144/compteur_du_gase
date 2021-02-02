@@ -111,7 +111,7 @@ def pre_achats(request):
 
 
 def achats(request, household_id):
-    household = Household.objects.get(pk=household_id)
+    household = get_object_or_404(Household, pk=household_id)
     if request.method == 'POST':
         s = 0
         msg = "Voici votre ticket de caisse :\n"
@@ -191,7 +191,7 @@ def pre_compte(request):
 
 
 def compte(request, household_id):
-    household = Household.objects.get(pk=household_id)
+    household = get_object_or_404(Household, pk=household_id)
     history = ApproCompteOp.objects.filter(household_id=household_id).order_by('-date')[:5]
     local_settings = get_local_settings()
     use_appro_kind = local_settings.use_appro_kind
@@ -293,7 +293,7 @@ def create_product(request):
 
 
 def detail_product(request, product_id):
-    pdt = Product.objects.get(pk=product_id)
+    pdt = get_object_or_404(Product, pk=product_id)
     if request.method == 'POST':
         if get_local_settings().use_cost_of_purchase:
             form = ProductForm(request.POST, instance=pdt)
@@ -311,7 +311,7 @@ def detail_product(request, product_id):
     return render(request, 'base/detail_product.html', {'pdt': pdt, 'stock_value': pdt.value_stock(), 'form': form})
 
 def archive_product(request, product_id):
-    pdt = Product.objects.get(pk=product_id)
+    pdt = get_object_or_404(Product, pk=product_id)
     pdt.activated = False
     pdt.save()
     messages.success(request, '✔ {} archivé !'.format(pdt.name))
@@ -321,7 +321,7 @@ def product_history(request, product_id):
     operations = [{"label": str(p.label), "date": str(p.date), "quantity": str(p.quantity), "price": str(p.price)}
                   for p in ChangeStockOp.objects.filter(product_id=product_id).order_by('-date')]
     operations = json.dumps(operations)
-    pdt = Product.objects.get(id=product_id)
+    pdt = get_object_or_404(Product, id=product_id)
     plural_unit = pdt.unit.plural_name()
     return render(request, 'base/product_history.html', {'operations': operations, 'pdt': pdt, 'unit': plural_unit})
 
@@ -362,7 +362,7 @@ def pre_appro(request):
 
 
 def appro(request, provider_id):
-    prov = Provider.objects.get(pk=provider_id)
+    prov = get_object_or_404(Provider, pk=provider_id)
     pdts = Product.objects.filter(provider=prov, visible=True)
     if request.method == 'POST':
         form = ProductList(pdts, request.POST)
@@ -721,7 +721,7 @@ class HouseholdUpdate(UpdateView):
 
 
 def archive_household(request, household_id):
-    h = Household.objects.get(pk=household_id)
+    h = get_object_or_404(Household, pk=household_id)
     h.activated = False
     h.save()
     messages.success(request, '✔ {} archivé !'.format(h.name))
@@ -755,7 +755,7 @@ def create_provider(request):
 
 
 def detail_provider(request, provider_id):
-    provider = Provider.objects.get(pk=provider_id)
+    provider = get_object_or_404(Provider, pk=provider_id)
     if request.method == 'POST':
         form = ProviderForm(request.POST, instance=provider)
         if form.is_valid():
@@ -794,7 +794,7 @@ def create_note(request):
 
 
 def detail_note(request, note_id):
-    pdt = Note.objects.get(pk=note_id)
+    pdt = get_object_or_404(Note, pk=note_id)
 
     if request.method == 'POST':
         form = NoteForm(request.POST, instance=pdt)
@@ -852,13 +852,13 @@ def mails_del_all(request):
 
 
 def mail_del(request, mail_id):
-    mails = Mail.objects.filter(pk=mail_id)
-    return mails_action(request, mails, action="del")
+    mail = get_object_or_404(Mail, pk=mail_id)
+    return mails_action(request, [mail], action="del")
 
 
 def mail_send(request, mail_id):
-    mails = Mail.objects.filter(pk=mail_id)
-    return mails_action(request, mails, action="send")
+    mail = get_object_or_404(Mail, pk=mail_id)
+    return mails_action(request, [mail], action="send")
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -887,10 +887,10 @@ def inventory(request):
 
 
 def stats(request, product_id):
+    pdt = get_object_or_404(Product, pk=product_id)
     # opes = ChangeStockOp.objects.filter(product=product_id, date__date__gt=date(2018, 1, 1))
     opes = ChangeStockOp.objects.filter(product=product_id).order_by('date')
     data = [{'stock': str(a.stock), 'date': a.date.isoformat(), 'label': a.label} for a in opes]
-    pdt = Product.objects.get(pk=product_id)
     return render(request, 'base/stats.html', {'pdt': pdt, 'data': data, })
 
 
