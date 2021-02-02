@@ -44,30 +44,11 @@
             },
             {
                 "name": "admin",
-                "type": "string",
+                "type": "user",
                 "ask": {
-                    "en": "Choose the administrator of your app (does not need to be an existing YunoHost user)",
-                    "fr": "Choisissez l'administrateur de votre application (ne doit pas nécessairement être un utilisateur YunoHost)"
-                },
-                "example": "admin",
-                "default": "admin"
-            },
-            {
-                "name": "passwd",
-                "type": "password",
-                "ask": {
-                    "en": "Choose a password for this administrator",
-                    "fr": "Choisissez un mot de passe pour cet administrateur"
+                    "en": "Choose the administrator of your app (existing YunoHost user)",
+                    "fr": "Choisissez l'administrateur de votre application (doit être un utilisateur YunoHost existant)"
                 }
-            },
-	    {
-                "name": "email",
-                "type": "string",
-                "ask": {
-                    "en": "Choose email were send error notifications",
-                    "fr": "Choisissez l'email vers lequel envoyer les notifications d'erreur"
-                },
-                "example": "admin@example.tld"
             },
 	    {
                 "name": "is_public",
