@@ -8,8 +8,6 @@ app=$YNH_APP_INSTANCE_NAME
 
 domain=$YNH_APP_ARG_DOMAIN
 path=$YNH_APP_ARG_PATH
-is_public=$YNH_APP_ARG_IS_PUBLIC
-is_home_public=$YNH_APP_ARG_IS_HOME_PUBLIC
 admin=$YNH_APP_ARG_ADMIN
 
 final_path=/opt/$app
@@ -30,8 +28,6 @@ path=$(ynh_normalize_url_path $path)
 
 ynh_app_setting_set "$app" domain "$domain"
 ynh_app_setting_set "$app" path "$path"
-ynh_app_setting_set "$app" is_public "$is_public"
-ynh_app_setting_set "$app" is_home_public "$is_home_public"
 ynh_app_setting_set "$app" admin "$admin"
 
 
@@ -119,12 +115,9 @@ sudo systemctl daemon-reload
 sudo cp ../conf/gunicorn_config.py $final_path
 
 
-if [[ $is_public -eq 1 ]]; then
-    # unprotected_uris allows SSO credentials to be passed anyway.
-    ynh_app_setting_set "$app" unprotected_uris "/"
-fi
+ynh_permission_url --permission="main" --url="/"
+ynh_permission_create --permission="home_page" --url="/$" --additional_urls="/activité" "/static" --allowed="visitors"
 
-handle_is_home_public
 
 ## Reload Nginx and regenerate SSOwat conf
 sudo yunohost app ssowatconf
