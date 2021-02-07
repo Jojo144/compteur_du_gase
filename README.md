@@ -69,7 +69,8 @@ Il y a des *warnings* à propos du cache pip, je les ai ignoré pour le moment.
 
 Attention, si vous tombez sur une page Apache "It works" c'est que vous avez Apache d'installé au lieu de Nginx (ou les deux).
 
-### Installation en ligne
+
+### Installation en ligne avec Yunohost
 
 Paquet Yunohost.
 ```
@@ -106,19 +107,28 @@ Pensez ensuite à mettre en place une sauvegarde.
 | bouteille |  0   |    1    |
 | pot       |  0   |    1    |
 
-# Notes sur l'intégration YunoHost
+
+### Notes sur l'intégration YunoHost
 
 L'intégration YunoHost est optionelle, elle est désactivée si l'application
 n'est pas installée via le package YunoHost.
 
 L'intégration YunoHost consiste en un mécanisme d'installation et une
 intégration de l'authentification permetant au compteur d'exploiter les comptes
-utilisateur YunoHost. Quelques notes concernant l'intégration de
-l'authentification :
+utilisateur YunoHost.
 
-- le contrôle d'accès (quel utilisateur YunoHost peut accéder au compteur) se
-  fait depuis l'admin YunoHost
-- Tous les utilisateurs autorisés sont administrateurs du compteur
+Il y a deux permissions pour chaque instance du compteur :
+  - une pour la page d'accueil (et le tableau des permanences)
+  - une pour le reste du logiciel
+
+Pour chacune de ces permissions on peut définir qui peut y accéder (n'importe
+qui/n'importe quel utilisateur loggué/des utilisateurs d'un certain groupe) via
+l'interface d'administration de YunoHost.
+
+Tous les utilisateurs autorisés à accéder à une instance du compteur sont
+administrateurs de cette instance, i.e. peuvent accéder à l'interface
+d'administration de Django (via "Gestion > Interface d'administration").
+
 
 ## Sauvegarde de la base de donnée
 
