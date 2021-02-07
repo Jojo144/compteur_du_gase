@@ -94,16 +94,17 @@ Puis c'est parti !
 
 Pensez ensuite à mettre en place une sauvegarde.
 
-Exemples d'unités :
+##### Exemples d'unités
 
-        Vrac  Pluriel
-unité	    0     0
-kg	        1     0
-L	        1     0
-tablette    0     1
-sachet	    0     1
-bouteille   0     1
-pot         0     1
+|           | Vrac | Pluriel |
+|-----------|------|---------|
+| unité     |  0   |    0    |
+| kg        |  1   |    0    |
+| L         |  1   |    0    |
+| tablette  |  0   |    1    |
+| sachet    |  0   |    1    |
+| bouteille |  0   |    1    |
+| pot       |  0   |    1    |
 
 
 ## Sauvegarde de la base de donnée
