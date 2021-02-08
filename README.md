@@ -124,6 +124,9 @@ Il y a deux permissions pour chaque instance du compteur :
 Pour chacune de ces permissions on peut définir qui peut y accéder (n'importe
 qui/n'importe quel utilisateur loggué/des utilisateurs d'un certain groupe) via
 l'interface d'administration de YunoHost.
+La confguration par défaut est que n'importe qui peut accéder à l'accueil mais
+seuls les membres authentifiés (de n'importe quel groupe) peuvent avoir accès au
+reste du compteur.
 
 Tous les utilisateurs autorisés à accéder à une instance du compteur sont
 administrateurs de cette instance, i.e. peuvent accéder à l'interface
