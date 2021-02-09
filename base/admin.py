@@ -142,3 +142,7 @@ admin.site.register(Activity, ActivityAdmin)
 
 admin.site.register(ChangeStockOp, ChangeStockOpAdmin)
 admin.site.register(ApproCompteOp, ApproCompteOpAdmin)
+
+from django.contrib.admin.views.decorators import staff_member_required
+
+admin.site.login = staff_member_required(admin.site.login, login_url='login_router')

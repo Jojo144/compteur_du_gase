@@ -13,6 +13,5 @@ def login_router(request):
     - transcode it in ynh format
     - pass it to the ynh login page through redirection
     """
-    redirect_url = request.get('next', settings.LOGIN_REDIRECT_URL)
-    ynh_login_url = f'/yunohost/sso/?r={b64encode(redirect_url)}'
-    return redirect(ynh_login_url)
+    redirect_url = request.GET.get('next', settings.LOGIN_REDIRECT_URL)
+    return redirect(redirect_url)
