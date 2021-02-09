@@ -46,8 +46,8 @@
                 "name": "admin",
                 "type": "user",
                 "ask": {
-                    "en": "Choose the administrator of your app (existing YunoHost user)",
-                    "fr": "Choisissez l'administrateur de votre application (doit être un utilisateur YunoHost existant)"
+                    "en": "Choose the user who will receive the error notifications (existing YunoHost user)",
+                    "fr": "Choisissez l'utilisateur qui recevra les notifications d'erreur (doit être un utilisateur YunoHost existant)"
                 }
             }
         ]
