@@ -401,29 +401,23 @@ def approslist(request):
               for p in ChangeStockOp.objects.filter(label="ApproStock")]
     columns = json.dumps(columns)
     appros = json.dumps(appros)
-    appros_stats = get_appros_stats()
+    appros_stats = get_appros_stats(use_cost_of_purchase)
     return render(request, 'base/approslist.html',
                   {'columns': columns, 'appros': appros, 'use_cost_of_purchase': use_cost_of_purchase,
                    'appros_stats': appros_stats})
 
 
-def get_appros_stats():
-    purchase = get_local_settings().use_cost_of_purchase
-
+def get_appros_stats(use_cost_of_purchase):
     # dates
-    dates = [date.today()]
-    for p in ChangeStockOp.objects.filter(label="ApproStock"):
-        if p.date.date() not in dates:
-            dates.append(p.date.date())
-
-    dates.sort()
+    ops = ChangeStockOp.objects.filter(label="ApproStock")
+    dates = sorted({ p.date.date() for p in ops } | {date.today()})
 
     # value
     values = [0] * len(dates)
     labels = [0] * len(dates)
-    for p in ChangeStockOp.objects.filter(label="ApproStock"):
+    for p in ops:
         for ii, i in enumerate(range(dates.index(p.date.date()), len(dates))):
-            if purchase:
+            if use_cost_of_purchase:
                 value = p.cost_of_purchase()
             else:
                 value = p.cost_of_price()
@@ -460,22 +454,19 @@ def stockslist(request):
 def purchaseslist(request):
     columns = ['jour', 'mois', 'année', 'prix moyen du panier', 'nombre de paniers', 'total']
 
-    dates = []
-    for d in Purchase.objects.all():
-        date = d.date.date()
-        if date not in dates:
-            dates.append(date)
-
-    dates.sort()
+    ops = Purchase.objects.all()
+    dates = sorted({d.date.date() for d in ops})
 
     purchases = []
 
     for date in dates:
         baskets = []
-        for p in Purchase.objects.all():
+        for p in ops:
             if p.date.date() == date:
-                price = PurchaseDetailOp.objects.filter(purchase=p).aggregate(Sum('price'))['price__sum']
-                baskets.append(-price)
+                q = PurchaseDetailOp.objects.filter(purchase=p)
+                if q:
+                    price = q.aggregate(Sum('price'))['price__sum']
+                    baskets.append(-price)
         total_baskets = sum(baskets)
         mean_baskets = total_baskets / len(baskets)
         purchases.append({"date": date.isoformat(), "jour": date.day, "mois": date.month, "année": date.year,
@@ -520,10 +511,12 @@ def get_purchases_stats():
 # ----------------------------------------------------------------------------------------------------------------------
 
 def valueslist(request):
+    use_cost_of_purchase = get_local_settings().use_cost_of_purchase
+
     # get stats
     purchases_stats = get_purchases_stats()
     comptes_stats = get_comptes_stats()
-    appros_stats = get_appros_stats()
+    appros_stats = get_appros_stats(use_cost_of_purchase)
 
     # compute diff
     diff_dates = []

@@ -98,8 +98,8 @@
 <div id="vue-table">
 
     <div id="print-total"></div>
-    <div class="description">Ici, c'est le prix d'achat ou le prix de vente qui est pris en compte (selon l'option activée). La valeur du stock peut être connue
-        quant à elle dans la section correspondante.
+    <div class="description">La valeur d'un stock sur une période donée peut être connue grâce au filtres.
+      {% if use_cost_of_purchase %} C'est le prix de vente qui est pris en compte. {% endif %}
     </div>
     <form class="form-inline">
         <div class="text-right filter">
