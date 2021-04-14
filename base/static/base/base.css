@@ -154,3 +154,7 @@ hr.gestion-hr {
 .foldable:active .initially-folded {
   display: unset;
 }
+
+.activity-canceled {
+    color: #bbbbbb;
+}

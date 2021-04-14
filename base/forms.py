@@ -2,7 +2,9 @@ from django import forms
 from django.conf import settings
 from django.forms import inlineformset_factory, Textarea
 from django.utils.safestring import mark_safe
-from easy_select2.widgets import Select2
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, HTML, Button, Field
+from easy_select2.widgets import Select2, Select2Multiple
 
 from .models import *
 from .templatetags.my_tags import *
@@ -86,6 +88,28 @@ class ActivityForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['description'].widget.attrs['readonly'] = True
         self.fields['date'].widget.attrs['readonly'] = True
+        self.helper = FormHelper()
+        local_settings = get_local_settings()
+        fieldset = Fieldset("",
+                "description",
+                "date",
+                "volunteer1",
+                "volunteer2",
+                "interested_members",
+                "comment")
+        if local_settings.use_activity_reminders:
+            fieldset.fields += (
+                HTML("""<hr /><details><summary>Options avancées</summary>"""),
+                "required_volunteers",
+                "required_interested_members",
+                HTML("""</details>""")
+            )
+        fieldset.fields += (ButtonHolder(
+            Button('index', 'Annuler', css_class='btn btn-light'),
+            Submit('submit', 'Enregistrer', css_class='btn btn-info'), css_class="text-center mb-4"
+        ),)
+        self.helper.layout = Layout(fieldset)
+
     class Meta:
         model = Activity
         exclude = []
@@ -93,4 +117,5 @@ class ActivityForm(forms.ModelForm):
             'comment': Textarea(attrs={'rows': 3}),
             'volunteer1': Select2(select2attrs=settings.SELECT2_ATTRS),
             'volunteer2': Select2(select2attrs=settings.SELECT2_ATTRS),
+            'interested_members': Select2Multiple(select2attrs=settings.SELECT2_ATTRS)
         }

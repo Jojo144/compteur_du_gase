@@ -1,0 +1,11 @@
+Coucou les gasier·es 👏,
+{% if not activity.canceled %}
+Bonne nouvelle !
+
+L'activité {{activity.description}} du {{activity.date}} aura bien lieu !
+{% else %}
+Mauvaise nouvelle : l'activité {{activity.description}} du {{activity.date}} est annulée faute d'inscription·s.
+{% endif%}
+
+Les bises,
+Le compteur du gase 💌
