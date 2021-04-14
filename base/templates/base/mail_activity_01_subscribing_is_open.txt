@@ -1,0 +1,18 @@
+Coucou les gasier·es 👏,
+
+Les inscriptions pour {{activity.description}} du {{activity.date}} sont ouvertes.
+
+Pour que cette activité ait lieu, il faut qu'il y ait suffisamment d'inscrit·es.
+
+Actuellement, il manque :
+{% if not activity.has_enough_volunteers%}- {{ activity.volunteers_missing_count}} permanencier·e·s{% endif %}
+{% if not activity.has_enough_interested_members%}- {{activity.interested_members_missing_count}} membres intéressé·e·s{% endif %}
+
+Pour vous inscrire, c'est par ici : https://gase.gouv.fr{% url 'base:activity_details' activity.id %}
+
+Faute d'inscrit·es, cette activité sera annulée 😶
+
+Fermeture des inscriptions le {{subscription_close_date}}.
+
+Les bises,
+Le compteur du gase 💌

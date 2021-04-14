@@ -1,7 +1,10 @@
+
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail, get_connection
 from django import forms
+from django.template.loader import render_to_string
 
 
 # there should be only one instance of this model
@@ -56,6 +59,10 @@ class LocalSettings(models.Model):
                                    help_text="Cette fonction permet d'envoyer les tickets de caisse ou "
                                              "des alertes stocks aux référents des produits.")
 
+    use_activity_reminders = models.BooleanField(
+        verbose_name="Utilisation de la fonction de relance pour les activités ?", default=False,
+        help_text="Cette fonction permet d'envoyer des relances pour les inscriptions aux activités du gase.")
+
     prefix_object_mail = models.CharField(blank=True, verbose_name="Préfixe dans l'objet des emails.", default="",
                                           max_length=15,
                                           help_text="Un préfixe est souvent encadré par des crochers, exemples : [GASE].")
@@ -94,6 +101,22 @@ class LocalSettings(models.Model):
     mail_passwd = models.CharField(blank=True, verbose_name="Mot de passe pour l'envoi des mails.",
                                    default="", max_length=100,
                                    help_text="Mot de passe SMTP. Si vide : n'utilisera pas d'authentification")
+    mail_mailinglist_address = models.CharField(blank=True, verbose_name="Adresse de la mailing list du gase",
+                                                default="", max_length=100,
+                                                help_text="Entrer ici l'adresse email de la mailing list de votre gase "
+                                                           "cette adresse sera utilisée pour les communications "
+                                                          "concernant tous les membres (par exemple les rappels "
+                                                          "d'inscription aux activités)")
+    required_interested_members_default = models.IntegerField(verbose_name="Nombre minimum de participants pour qu'une "
+                                                                           "activité puisse se tenir",
+                                                              help_text="ce nombre est le nombre par défaut "
+                                                                           "proposé lors de l'ajout d'une activité)",
+                                                              default=1)
+    required_volunteers_default = models.IntegerField(verbose_name="Nombre minimum de permanencier pour qu'une "
+                                                                           "activité puisse se tenir",
+                                                              help_text="ce nombre est le nombre par défaut "
+                                                                           "proposé lors de l'ajout d'une activité)",
+                                                              default=1)
 
     def __str__(self):
         return "Réglages divers"
@@ -105,6 +128,33 @@ class LocalSettings(models.Model):
 
 def get_local_settings():
     return LocalSettings.objects.first()
+
+
+def get_default_required_volunteers():
+    """
+        Retourne la valeur par défaut pour le nombre de permanenciers requis pour qu'une activité puisse avoir lieu
+        C'est la valeur qui sera proposée lors de la création d'une nouvelle activité. L'administrateur pourra
+        changer la valeur par défaut dans les "Local Settings" depuis l'admin django
+        """
+    try:
+        settings = get_local_settings()
+        return settings.required_volunteers_default
+    except:
+        return 1
+
+
+def get_required_interested_members_default():
+    """
+    Retourne la valeur par défaut pour le nombre de membres intéressés par une activité
+    C'est la valeur qui sera proposée lors de la création d'une nouvelle activité. L'administrateur pourra
+    changer la valeur par défaut dans les "Local Settings" depuis l'admin django
+    """
+    try:
+        settings = get_local_settings()
+        return settings.required_interested_members_default
+    except:
+        return 1
+
 
 class Category(models.Model):
     name = models.CharField(max_length=200, verbose_name="Nom")
@@ -232,6 +282,7 @@ class Household(models.Model):
 class MemberManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(household__activated=True)
+
 
 class Member(models.Model):
     name = models.CharField(max_length=200, verbose_name="nom")
@@ -412,7 +463,7 @@ class Note(models.Model):
     action = models.BooleanField(verbose_name="Action(s) réalisée(s) ?", default=False,
                                  help_text="Si aucune action n'est nécessaire, côcher cette case.")
 
-
+from typing import List
 # mails
 class Mail(models.Model):
     date = models.DateTimeField(auto_now_add=True)
@@ -458,13 +509,14 @@ class Mail(models.Model):
     def recipient_list(self):
         return [m.email for m in self.recipients.all()]
 
-    def send(self, local_settings):
+    def send(self, local_settings, recipient_list: List = None):
         debug_mail = local_settings.debug_mail
-        if debug_mail:
+
+        if not recipient_list and not debug_mail:
+            recipient_list = self.recipient_list()
+        elif debug_mail:
             print("* Mode de test pour les mails qui sont automatiquement envoyés à {}.".format(debug_mail))
             recipient_list = [debug_mail]
-        else:
-            recipient_list = self.recipient_list()
 
         try:
             with get_connection(host=local_settings.mail_host,
@@ -476,6 +528,7 @@ class Mail(models.Model):
                                 timeout=local_settings.mail_timeout) as connection:
                 send_mail(self.subject, self.message, local_settings.mail_from, recipient_list,
                           fail_silently=False, connection=connection)
+                print(f"Done: {recipient_list}")
                 self.sent = True
                 self.save()
             return True
@@ -496,10 +549,70 @@ class Activity(models.Model):
     volunteer1 = models.ForeignKey(Member, null=True, blank=True, verbose_name='Permanencier 1', on_delete=models.SET_NULL, related_name='volunteer1')
     volunteer2 = models.ForeignKey(Member, null=True, blank=True, verbose_name='Permanencier 2', on_delete=models.SET_NULL, related_name='volunteer2')
     comment = models.TextField(verbose_name='Commentaire', max_length=1000, blank=True)
+    canceled = models.BooleanField(verbose_name="Annulé", default=False, blank=False,
+                                   help_text="Est-ce que cette activité est annulée (faute de participant·e·s par "
+                                             "exemple)")
+    interested_members = models.ManyToManyField(to=Member, blank=True,
+                                                verbose_name="Personnes intéressées",
+                                                help_text="La liste des personnes intéressées permet de déterminer "
+                                                          "si une activité vaut le coup d'être organisée ou si elle "
+                                                          "mérite d'être annulée.")
+    required_volunteers = models.IntegerField(verbose_name='Nombre Permanencier·e·s requis',
+                                              help_text="Il faudra qu'il y ait au moins ce nombre de permanencier·es "
+                                                        "inscrit·es pour que cette activité puisse avoir lieu. "
+                                                        "S'il n'y a pas assez d'inscrit·es, des emails de relance "
+                                                        "seront envoyés (et dans ce cas l'activité sera annulée"
+                                                        "la veille de la date prévue) "
+                                                        "Mettre 0 ou -1 pour désactiver cette fonctionnalité.",
+                                              default=get_default_required_volunteers(), validators=(MinValueValidator(0), MaxValueValidator(2) ))
+    required_interested_members = models.IntegerField(
+        verbose_name='Nombre de personnes intéressées requises',
+        help_text="Nombre de personnes intéressées pour que celle-ci ait lieu. "
+                  "S'il n'y a pas assez d'inscrit·es, des emails de relance "
+                  "seront envoyés (et dans ce cas l'activité sera annulée"
+                  "la veille de la date prévue) "
+                  "Mettre 0 ou -1 pour désactiver cette fonctionnalité.",
+        default=get_required_interested_members_default(), validators=(MinValueValidator(0), ))
 
     @property
     def volunteers(self):
         return [self.volunteer1, self.volunteer2]
+
+    @property
+    def volunteers_count(self):
+        return len([v for v in self.volunteers if v])
+
+    @property
+    def volunteers_required(self):
+        return self.required_volunteers > 0
+
+    @property
+    def has_enough_volunteers(self):
+        return self.volunteers_count >= self.required_volunteers or not self.volunteers_required
+
+    @property
+    def volunteers_missing_count(self):
+        return self.required_volunteers - self.volunteers_count if not self.has_enough_volunteers else 0
+
+    @property
+    def interested_members_count(self):
+        return self.interested_members.count()
+
+    @property
+    def interested_members_required(self):
+        return self.required_interested_members > 0
+
+    @property
+    def has_enough_interested_members(self):
+        return self.interested_members_count >= self.required_interested_members or not self.interested_members_required
+
+    @property
+    def interested_members_missing_count(self):
+        return self.required_interested_members - self.interested_members_count if not self.has_enough_interested_members else 0
+
+    @property
+    def can_be_hold(self):
+        return self.has_enough_volunteers and self.has_enough_interested_members
 
     def __str__(self):
         return self.description

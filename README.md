@@ -146,3 +146,67 @@ manage.py export_households /path/to/filename.xlsx
 
 - Favicon made by Freepik from www.flaticon.com
 - Bootstrap4 Select2 theme CSS is from [BootStrap4 Select2 theme 1.3.2](https://github.com/ttskch/select2-bootstrap4-theme)
+
+## Configuration
+
+## Envoi d'email
+
+| Variable                         | Label dans l'admin                                                                                          | Description                                                                                                  |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| prefix_object_mail               | Préfixe dans l'objet des emails.                                                                            | Ajoute un prefixe dans le sujet des mails, par exemple "[GASE]"                                              |
+| mail_host                        | Serveur pour l'envoi des mails. « localhost » pour utiliser le serveur du compteur comme serveur d'envoi.   | Nom d'hôte du serveur SMTP que le Compteur utilisera pour envoyer des emails                                 |
+| mail_port                        | Port smtp pour l'envoi des mails.                                                                           |                                                                                                              |
+| mail_from                        | Expéditeur pour l'envoi des mails.                                                                          | Adresse email affichée en "From" dans les emails envoyés par le Compteur                                     |
+| mail_username                    | Nom d'utilisateur pour l'envoi des mails.                                                                   | Nom d'utilisateur utilisé par le Compteur pour s'authentifier auprès du serveur SMTP                         |
+| mail_passwd                      | Mot de passe pour l'envoi des mails.                                                                        | Mot de passe utilisé par le Compteur pour s'authentifier auprès du serveur SMTP                              |
+| mail_protocole                   | Chiffrement utilisé pour l'envoi de mails.                                                                  | Définit si la connexion entre le Compteur et le serveur est Chiffrée (TLS ou SSL) ou non chiffrée            |
+| mail_timeout                     | Timeout pour l'envoi de mail.                                                                               | Définit la patience qu'aura le Compteur pour échanger avec le serveur SMTP avant d'abandonner (en secondes)  |
+| mail_mailinglist_address         | Adresse de la mailing list du gase                                                                          | Adresse mail de la mailing list de l'épicerie (pour envoyer le même courriel à tous les membres)             |                                                                                                             |
+
+### Gestion automatisée de la planification des activités de l'épicerie
+
+Le compteur permet de gérer les activités de l'épicerie. Par activité on entend, par exemple, une permanence, une
+assemblée générale, une distribution, etc.
+
+![](doc/images/permanences-page-accueil.png)
+
+Pour activer cette fonctionnalité, vous devez paramétrer `use_activity_reminders` à `True` (cochez la case `Utilisation de la fonction de relance pour les activités ?` dans `admin > Réglages divers > Réglages divers`).
+
+Le compteur peut aussi gérer les relances par email s'il n'y a pas assez de participants inscrit·es :
+* un email est envoyé 7 jours avant l'activité pour annoncer que les inscriptions sont ouvertes
+* un email de relance est envoyé 3 jours avant la date de l'activité pour inciter les gens à s'inscrire
+  
+La veille de la date de l'activité, le compteur vérifie que l'activité peut avoir lieu en vérifiant le nombre
+de volontaires inscrit·es pour tenir l'activité et le nombre de membres intéressé·es par l'activité.
+S'il y a assez de personnes inscrites, l'activité est confirmée. Dans le cas contraire, le compteur marque
+automatiquement l'activité comme annulée. Dans ces deux cas un email est envoyé pour indiquer aux membres de l'épicerie
+ce qu'il en est.
+Le nombre d'inscrit·es requis est paramétrable dans les `Options avancées` de chaque activité :
+
+![](doc/images/permanences-options-avancees-activite.png)
+
+Pour cette fonctionnalité, les variables de configuration suivantes sont intéressantes (en plus de celles concernant l'envoi d'email, bien sûr) :
+
+| Variable                         | Label dans l'admin                                             | Description                                                                                |
+| -------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| activity_board                   | Utiliser le tableau des permanences ?                          | Activer la gestion des activités dans le Compteur.                                         |
+| use_activity_reminders           | Utilisation de la fonction de relance pour les activités ?     | Activer les relances par email et la gestion automatique des activités par le Compteur.    | 
+| mail_mailinglist_address         | Adresse de la mailing list du gase ?                           | Email où seront envoyées les relances                                                      |
+
+Pour envoyer les emails, des templates sont utilisés.
+Il y a des templates pour le sujet des emails :
+* `base/templates/base/mail_activity_01_subscribing_is_open_subject.txt`
+* `base/templates/base/mail_activity_02_not_enough_participants_subject.txt`
+* `base/templates/base/mail_activity_03_confirm_or_cancel_activity_subject.txt`
+  
+Et des templates pour le corps des emails
+* `base/templates/base/mail_activity_01_subscribing_is_open.txt`
+* `base/templates/base/mail_activity_02_not_enough_participants.txt`
+* `base/templates/base/mail_activity_03_confirm_or_cancel_activity.txt`
+
+Enfin, vous devez créer la tâche planifiée (les tâches sont gérées par [Django-Q](https://django-q.readthedocs.io/)) :
+```bash
+python manage.py install_scheduled_tasks
+```
+
+Cette tâche planifiée sera exécutée tous les matins à 2:00.

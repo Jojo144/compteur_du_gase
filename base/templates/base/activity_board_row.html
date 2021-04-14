@@ -1,5 +1,8 @@
-<tr>
-  <th scope="row">{{ activity.description }} {{ activity.date|date:"D d M" }}</th>
+<tr class="{%if activity.canceled%}activity-canceled{%endif%}">
+  <th scope="row">
+    <div>{{ activity.description }}</div>
+    <div class=""><small>{{ activity.date|date:"l d F" }}</small></div>
+  </th>
 
   {% for person in activity.volunteers %}
   <td>
@@ -24,5 +27,31 @@
   {% endfor %}
 
   <td><div style="width:100%; overflow:auto">{{ activity.comment }}</div></td>
-  <td><a class="btn btn-success" href="{% url 'base:activity_details' activity.id %}" role="button">S'inscrire</a></td>
+  <td>
+    {% if use_activity_reminders %}
+      <div style="font-size: 80%;">
+        {% if activity.has_enough_volunteers %}
+          <span title="Il y a suffisamment de permanencier·e·s inscrit·e·s pour que cette activité ait lieu.">✔️</span>
+        {% else %}
+          <span title="Il n'y a pas suffisamment de permanencier·e·s inscrit·e·s pour que cette activité ait lieu.">❌️</span>
+        {% endif %}
+        Permanencier·e·s : {{ activity.volunteers_count }}
+      </div>
+      <div style="font-size: 80%;">
+        {% if activity.has_enough_interested_members %}
+          <span title="Il y a suffisamment de personnes intéressées pour que cette activité ait lieu.">✔️</span>
+        {% else %}
+          <span title="Il n'y a pas suffisamment de personnes intéressées pour que cette activité ait lieu.">❌️</span>
+        {% endif %}
+        Intéressé·e·s : {{ activity.interested_members_count }}
+      </div>
+    {% endif %}
+  </td>
+  <td>
+    {% if not activity.canceled %}
+      <a class="btn btn-success w-100" href="{% url 'base:activity_details' activity.id %}" role="button">S'inscrire</a>
+    {% else %}
+      <a class="btn btn-secondary w-100" href="{% url 'base:activity_details' activity.id %}" role="button">Annulé</a>
+    {% endif %}
+  </td>
 </tr>

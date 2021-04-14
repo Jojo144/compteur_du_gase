@@ -87,6 +87,22 @@ PrivateTmp=true
 WantedBy=multi-user.target
 EOF
 
+echo "* Creating /etc/systemd/system/${app}_tasks.service"
+cat > /etc/systemd/system/${app}_tasks.service << EOF
+[Unit]
+Description=Démon pour les taches planifiées du compteur du GASE
+After=network.target
+
+[Service]
+User=$app
+Group=www-data
+WorkingDirectory=$app_path
+ExecStart=$final_path/venv/bin/python manage.py qcluster
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
 echo "* Creating /etc/nginx/sites-enabled/$app.conf"
 cat > /etc/nginx/sites-enabled/$app.conf << EOF
 server {

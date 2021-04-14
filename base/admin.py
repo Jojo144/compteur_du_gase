@@ -96,7 +96,7 @@ class RecurringForm(forms.Form):
 
 # Ajout du formulaire pour activité récurrente à l'interface d'admin
 class ActivityAdmin(admin.ModelAdmin):
-    list_display = ('description', 'date', 'volunteer1', 'volunteer2', 'comment')
+    list_display = ('description', 'date', 'volunteer1', 'volunteer2', 'comment', 'can_be_hold', 'canceled')
 
     def get_urls(self):
         urls = super().get_urls()

@@ -1,0 +1,1 @@
+Relance : inscriptions ouvertes pour : {{activity.description}} du {{activity.date}}

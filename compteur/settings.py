@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'crispy_forms',
     'easy_select2',
+    'django_q',
     'base',
 ]
 
@@ -39,6 +40,16 @@ SELECT2_USE_BUNDLED_JQUERY = False
 SELECT2_ATTRS={
     'theme': 'bootstrap4',
     'width': '100%'
+}
+
+Q_CLUSTER = {
+    'name': 'DjangORM',
+    'workers': 4,
+    'timeout': 90,
+    'retry': 120,
+    'queue_limit': 50,
+    'bulk': 10,
+    'orm': 'default'
 }
 
 MIDDLEWARE = [
