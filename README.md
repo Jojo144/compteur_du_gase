@@ -82,6 +82,20 @@ Pour mettre à jour :
 sudo yunohost app upgrade compteur_gase -u https://github.com/Jojo144/compteur_du_gase
 ```
 
+Après une migration Stretch -> Buster on a eu besoin de reconstruire les venv :
+
+```
+cp db.sqlite3 ~/db-back.sqlite3
+rm -rf venv/
+sudo -u compteur_gase__X bash
+python3 -m venv venv
+source venv/bin/activate
+pip install gunicorn
+pip install -r requirements.txt
+systemctl restart compteur_gase__X
+```
+
+
 ### Après l'installation (quel que soit le mode d'installation)
 
 À la première utilisation il faut aller dans l'interface administration pour 
