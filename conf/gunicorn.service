@@ -1,13 +1,13 @@
 [Unit]
-Description=YNH_APP_INSTANCE_NAME gunicorn daemon
+Description=compteur_gase gunicorn daemon
 After=network.target
 
 [Service]
-PIDFile=/run/gunicorn/YNH_APP_INSTANCE_NAME-pid
-User=YNH_APP_INSTANCE_NAME
+PIDFile=/run/gunicorn/compteur_gase-pid
+User=compteur_gase
 Group=www-data
-WorkingDirectory=/opt/YNH_APP_INSTANCE_NAME
-ExecStart=/opt/YNH_APP_INSTANCE_NAME/venv/bin/gunicorn -c /opt/YNH_APP_INSTANCE_NAME/gunicorn_config.py compteur.wsgi
+WorkingDirectory=/opt/compteur_gase
+ExecStart=/opt/compteur_gase/venv/bin/gunicorn -c /opt/compteur_gase/gunicorn_config.py compteur.wsgi
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
 PrivateTmp=true

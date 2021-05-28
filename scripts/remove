@@ -1,25 +1,44 @@
 #!/bin/bash
 
+# Move in the directory where thescript is (useless for Ynh)
+cd $(dirname $(realpath -s $0))
+
 source _common.sh
-source /usr/share/yunohost/helpers
+if [[ "$1" == "--local" ]]
+then
+    source yunohost_helpers.sh
+    app="compteur_gase"
+    domain="localhost"
+else
+    source /usr/share/yunohost/helpers
+    app=$YNH_APP_INSTANCE_NAME
+    domain=$(ynh_app_setting_get "$app" domain)
+fi
 
 
-app=$YNH_APP_INSTANCE_NAME
-domain=$(ynh_app_setting_get "$app" domain)
-
-sudo service $app stop
-# sudo killall $app  # seems useless
+systemctl stop $app
 
 # Remove sources and configuration files
-sudo rm -Rf /opt/$app
-sudo rm -f /etc/nginx/conf.d/$domain.d/$app.conf
+rm -Rf /opt/$app
+if [[ "$1" == "--local" ]]
+then
+    rm -f /etc/nginx/conf.d/$app.conf
+else
+    rm -f /etc/nginx/conf.d/$domain.d/$app.conf
+fi
 
-ynh_remove_app_dependencies
-sudo yunohost service remove $app
-sudo rm -f /etc/systemd/system/$app.service
-sudo systemctl daemon-reload
-sudo service nginx reload
-sudo yunohost app ssowatconf
-sudo userdel $app
+rm -f /etc/systemd/system/$app.service
+systemctl daemon-reload
+
+if [[ "$1" != "--local" ]]
+then
+    ynh_remove_app_dependencies
+    yunohost service remove $app
+    yunohost app ssowatconf
+fi
+
+systemctl restart nginx
+
+userdel $app
 
 # Should we remove the log? Let's say no for the moment.
