@@ -1,8 +1,28 @@
 #!/bin/bash
 
-source _common.sh
-source /usr/share/yunohost/helpers
+# Move in the directory where thescript is (useless for Ynh)
+cd $(dirname $(realpath -s $0))
 
+source _common.sh
+if [[ "$1" == "--local" ]]
+then
+    source yunohost_helpers.sh
+    YNH_APP_INSTANCE_NAME="compteur_gase"
+    YNH_APP_ARG_DOMAIN="localhost"
+    YNH_APP_ARG_PATH="/"
+    YNH_APP_ARG_IS_PUBLIC=1
+    YNH_APP_ARG_IS_HOME_PUBLIC=1
+    YNH_APP_ARG_ADMIN="admin" # PERSONNALISER
+    YNH_APP_ARG_PASSWD="adminadmin" # PERSONNALISER
+    YNH_APP_ARG_EMAIL="bla@bla.fr" # PERSONNALISER
+else
+    source /usr/share/yunohost/helpers
+fi
+
+
+ynh_abort_if_errors
+
+ynh_script_progression --message="Retreiving arguments..." --weight=1
 
 app=$YNH_APP_INSTANCE_NAME
 
@@ -15,14 +35,7 @@ passwd=$YNH_APP_ARG_PASSWD
 email=$YNH_APP_ARG_EMAIL
 
 final_path=/opt/$app
-
-# We do this first so that we have nothing to remove if we fail
-# FIXME don't delete the user in case of failure here!
-sudo useradd $app -d $final_path \
-    || (ynh_die "User already exists: ${app}.\n Aborting.")
-
-ynh_abort_if_errors
-
+test ! -e "$final_path" || ynh_die --message="This path already contains a folder"
 
 #     ynh_normalize_url_path example    # -> /example
 #     ynh_normalize_url_path /example   # -> /example
@@ -37,10 +50,10 @@ ynh_app_setting_set "$app" is_home_public "$is_home_public"
 ynh_app_setting_set "$app" admin "$admin"
 ynh_app_setting_set "$app" email "$email"
 
-
-secret=$(ynh_string_random 24) # A bug don't allow to do random string bigger than 24
+secret=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 ynh_app_setting_set "$app" secret "$secret"
 
+# TODO
 # Check domain/path availability
 ynh_webpath_available $domain $path
 
@@ -49,21 +62,35 @@ ynh_webpath_available $domain $path
 # ynh_webpath_register $app $domain $path
 
 
-# Dependencies
+
+ynh_script_progression --message="Installing system dependencies..." --weight=1
 ynh_install_app_dependencies $pkg_dependencies
 
-sudo mkdir -p $final_path
+
+ynh_script_progression --message="Creating $app user..." --weight=1
+ynh_system_user_create --username=$app --home_dir=$final_path
+
+
+ynh_script_progression --message="Setting up source files..." --weight=1
+mkdir -p $final_path
 cp -r .. $final_path
 
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:www-data "$final_path"
+
+
+ynh_script_progression --message="Installing Python venv..." --weight=1
 python3 -m venv $final_path/venv
 venv_python=$final_path/venv/bin/python3
 venv_pip=$final_path/venv/bin/pip
 
-$venv_pip install pip --upgrade
-$venv_pip install gunicorn
-$venv_pip install -r $final_path/requirements.txt
+ynh_script_progression --message="Installing Python dependencies..." --weight=1
+sudo -H $venv_pip install pip --upgrade
+sudo -H $venv_pip install gunicorn
+sudo -H $venv_pip install -r $final_path/requirements.txt
 
-# Configuration Django
+ynh_script_progression --message="Configuring Django..." --weight=1
 settings_local=$final_path/compteur/settings_local.py
 cp $final_path/compteur/settings_local.py.example $settings_local
 ynh_replace_string "YNH_APP_ARG_DOMAIN" $domain $settings_local
@@ -78,46 +105,59 @@ ynh_replace_string "YNH_APP_ARG_EMAIL" $email $settings_local
 ynh_replace_string "YNH_APP_SECRET_KEY" $secret $settings_local
 ynh_replace_string "YNH_APP_STATIC_ROOT" $final_path/static $settings_local
 
-# Set permissions
-sudo chown -R $app:www-data $final_path
 
+ynh_script_progression --message="Creating log folder..." --weight=1
+mkdir -p /var/log/$app
+chown -R $app /var/log/$app
+chgrp -R www-data /var/log/$app
 
-# Log folder
-sudo mkdir -p /var/log/$app
-sudo chown -R $app /var/log/$app
-sudo chgrp -R www-data /var/log/$app
-
-
+ynh_script_progression --message="Applying Django migrations and static files..." --weight=1
 sudo -u $app $venv_python $final_path/manage.py migrate --noinput
 sudo -u $app $venv_python $final_path/manage.py collectstatic --noinput
 
-# Create the admin
-echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('${admin}', '${email}', '${passwd}')" | sudo -u $app $venv_python $final_path/manage.py shell
-# Set a working sending email by default
+ynh_script_progression --message="Creating Django admin if not existing..." --weight=1
+cat <<EOF | sudo -u $app $venv_python $final_path/manage.py shell
+from django.contrib.auth import get_user_model
+User = get_user_model()  # get the currently active user model,
+User.objects.filter(username='admin').exists() or \
+    User.objects.create_superuser('${admin}', '${email}', '${passwd}')
+EOF
+
+ynh_script_progression --message="Set a working sending email by default..." --weight=1
 echo "UPDATE base_localsettings SET mail_from = 'Le compteur du GASE <le-compteur@$domain>';" | sudo -u $app $venv_python $final_path/manage.py dbshell
 
 
-# Modify Nginx configuration file and copy it to Nginx conf directory
-if [ "$path" = "/" ]
+ynh_script_progression --message="Configuring Nginx..." --weight=1
+nginx_conf=
+if [[ "$1" == "--local" ]]
 then
-    # to avoid "//static"
-    ynh_replace_string "STATICPATHTOCHANGE" "/static" ../conf/nginx.conf
+    nginx_conf=/etc/nginx/sites-enabled/$app.conf
+    cp ../conf/nginx-local.conf $nginx_conf
+    ynh_replace_string "FINALPATHTOCHANGE" $final_path $nginx_conf
 else
-    ynh_replace_string "STATICPATHTOCHANGE" "$path/static" ../conf/nginx.conf
+    nginx_conf=/etc/nginx/conf.d/$domain.d/$app.conf
+    cp ../conf/nginx.conf $nginx_conf
+    if [ "$path" = "/" ]
+    then
+        # to avoid "//static"
+        ynh_replace_string "STATICPATHTOCHANGE" "/static" $nginx_conf
+    else
+        ynh_replace_string "STATICPATHTOCHANGE" "$path/static" $nginx_conf
+    fi
+    ynh_replace_string "PATHTOCHANGE" $path $nginx_conf
+    ynh_replace_string "YNH_APP_INSTANCE_NAME" $app $nginx_conf
 fi
-ynh_replace_string "PATHTOCHANGE" $path ../conf/nginx.conf
-ynh_replace_string "YNH_APP_INSTANCE_NAME" $app ../conf/nginx.conf
-sudo cp ../conf/nginx.conf /etc/nginx/conf.d/$domain.d/$app.conf
 
 
-# Service gunicorn
+ynh_script_progression --message="Configuring a systemd service..." --weight=1
 ynh_replace_string "YNH_APP_INSTANCE_NAME" $app ../conf/gunicorn_config.py
 ynh_replace_string "YNH_APP_INSTANCE_NAME" $app ../conf/gunicorn.service
-sudo cp ../conf/gunicorn.service /etc/systemd/system/$app.service
-sudo systemctl daemon-reload
-sudo cp ../conf/gunicorn_config.py $final_path
+cp ../conf/gunicorn.service /etc/systemd/system/$app.service
+systemctl daemon-reload
+cp ../conf/gunicorn_config.py $final_path
 
 
+ynh_script_progression --message="Configuring SSOwat..." --weight=1
 if [[ $is_public -eq 1 ]]; then
     # unprotected_uris allows SSO credentials to be passed anyway.
     ynh_app_setting_set "$app" unprotected_uris "/"
@@ -125,9 +165,22 @@ fi
 
 handle_is_home_public
 
-## Reload Nginx and regenerate SSOwat conf
-sudo yunohost app ssowatconf
-sudo service nginx reload
-sudo systemctl start $app
-sudo systemctl enable $app
-sudo yunohost service add $app -l /var/log/$app/error.log /var/log/$app/access.log
+if [[ "$1" != "--local" ]]
+then
+    yunohost app ssowatconf
+fi
+
+ynh_script_progression --message="Reloading Nginx web server..." --weight=1
+systemctl restart nginx
+
+ynh_script_progression --message="Starting $app service..." --weight=1
+systemctl enable $app
+systemctl restart $app
+
+if [[ "$1" != "--local" ]]
+then
+    ynh_script_progression --message="Integrating service in YunoHost..." --weight=1
+    yunohost service add $app -l /var/log/$app/error.log /var/log/$app/access.log
+fi
+
+ynh_script_progression --message="Installation of $app completed" --last
