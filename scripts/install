@@ -114,11 +114,8 @@ sudo cp ../conf/gunicorn.service /etc/systemd/system/$app.service
 sudo systemctl daemon-reload
 sudo cp ../conf/gunicorn_config.py $final_path
 
-
-ynh_permission_url --permission="main" --url="/"
-ynh_permission_create --permission="home_page" --url="/$" --additional_urls="/activité" "/static" --allowed="visitors"
-ynh_permission_create --permission="ynh_auth" --url="/ynh_auth" --allowed="all_users" --protected=true
-
+# Permissions
+set_initial_permissions
 
 ## Reload Nginx and regenerate SSOwat conf
 sudo yunohost app ssowatconf
