@@ -1,5 +1,7 @@
 from django.contrib import admin
+from django.contrib.admin.views.decorators import staff_member_required
 from django.conf.urls import url
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib.auth.models import User, Group
@@ -143,6 +145,4 @@ admin.site.register(Activity, ActivityAdmin)
 admin.site.register(ChangeStockOp, ChangeStockOpAdmin)
 admin.site.register(ApproCompteOp, ApproCompteOpAdmin)
 
-from django.contrib.admin.views.decorators import staff_member_required
-
-admin.site.login = staff_member_required(admin.site.login, login_url='login_router')
+admin.site.login = staff_member_required(admin.site.login, login_url=settings.LOGIN_URL)
