@@ -8,6 +8,8 @@ app=$YNH_APP_INSTANCE_NAME
 domain=$(ynh_app_setting_get --app=$app --key=domain)
 path=$(ynh_app_setting_get --app=$app --key=path)
 
+final_path=/opt/$app
+settings_local=$final_path/compteur/settings_local.py
 
 ynh_script_progression --message="Backing up the app before upgrading (may take a while)..." --time --weight=1
 
@@ -27,42 +29,49 @@ ynh_script_progression --message="Upgrading..." --time --weight=1
 #--------------------------- PRE-UPGRADE MIGRATIONS------------------
 
 
-# MIGRATION : migrate from old permissions system
-if [ ynh_legacy_permissions_exists ]
+# MIGRATION : migrate from old permissions system to new-style permissions
+if ynh_legacy_permissions_exists
 then
-    # Get legacy permission settings from settings
-    is_home_public=$(ynh_app_setting_get $app is_home_public)
-    if [ -z $is_home_public ]
-    then
-        is_home_public=0
-    fi
-    is_public=$(ynh_app_setting_get $app is_public)
-
-    # Initialize to default package install values
-    set_initial_permissions
-
-    # Apply legacy settings with new-style permissions
-    if [ $is_public -eq 1]
-    then
-        ynh_permission_update --permission main --add visitors
-    fi
-
-    if [ $is_home_public -eq 1]
-    then
-        ynh_permission_update --permission home_page --add visitors
-    fi
-
-    # Delete old settings
-    ynh_app_setting_delete --app=$app --key=is_public
-    ynh_app_setting_delete --app=$app --key=is_home_public
-
     # And URL/sso legacy settings
     ynh_legacy_permissions_delete_all
 fi
 
+# We can have no legacy permissions but still need to initialize new ones
+set_initial_permissions
+
+# MIGRATION : migrate from setting-based permission to new-style permissions
+
+# Get legacy permission settings from settings
+is_home_public=$(ynh_app_setting_get --app=$app --key=is_home_public)
+is_public=$(ynh_app_setting_get --app=$app --key=is_public)
+
+if [ -n "$is_public" ]
+then
+    # no need for manual migration for is_public (auto-handled by ynh)
+    # just remove the un-needed setting
+    ynh_app_setting_delete --app=$app --key=is_public
+fi
+
+if [ -n "$is_home_public" ]
+then
+    if [[ $is_home_public -eq 1 ]]
+    then
+        ynh_permission_update --permission home_page --add visitors
+    else
+        ynh_permission_update --permission home_page --remove visitors
+    fi
+    ynh_app_setting_delete --app=$app --key=is_home_public
+fi
+
+# MIGRATION : Enable django auth module
+if grep -vq 'YNH_INTEGRATION_ENABLED = True' $settings_local
+then
+    echo 'YNH_INTEGRATION_ENABLED = True' >> $settings_local
+fi
+
 #-------------------------------UPGRADE-------------------------
 
-final_path=/opt/$app
+
 venv_python=$final_path/venv/bin/python3
 venv_pip=$final_path/venv/bin/pip
 

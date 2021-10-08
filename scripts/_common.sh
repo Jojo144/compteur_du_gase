@@ -5,17 +5,23 @@ pkg_dependencies="python3-pip python3-virtualenv python3-venv python3-wheel sqli
 set_initial_permissions() {
     ynh_permission_url --permission="main" --url="/"
 
-    ynh_permission_create \
-        --label "Page d'accueil (horaires/permanences…)" \
-        --permission="home_page" \
-        --url="/$" \
-        --additional_urls="/activité" "/static" \
-        --allowed="all_users"
+    if ! ynh_permission_exists --permission="home_page"
+    then
+        ynh_permission_create \
+            --label "Page d\'accueil" \
+            --permission="home_page" \
+            --url="/$" \
+            --additional_urls="/activité" "/static" \
+            --allowed="all_users"
+    fi
 
-    ynh_permission_create \
-        --permission="ynh_auth" \
-        --url="/ynh_auth" \
-        --allowed="all_users" \
-        --protected=true
-        --show_tile="false"
+    if ! ynh_permission_exists --permission="ynh_auth"
+    then
+       ynh_permission_create \
+           --permission="ynh_auth" \
+           --url="/ynh_auth" \
+           --allowed="all_users" \
+           --protected=true \
+           --show_tile="false"
+    fi
 }
