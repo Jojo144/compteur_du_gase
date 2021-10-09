@@ -12,7 +12,7 @@ set_initial_permissions() {
             --permission="home_page" \
             --url="/$" \
             --additional_urls="/activité" "/static" \
-            --allowed="all_users"
+            --allowed="visitors"
     fi
 
     if ! ynh_permission_exists --permission="ynh_auth"
