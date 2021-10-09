@@ -117,6 +117,12 @@ sudo cp ../conf/gunicorn_config.py $final_path
 # Permissions
 set_initial_permissions
 
+# Choisit un nom pratique pour la tuile (qui peut être changé par la suite) + rend la tuile visible
+app_label="Le compteur du GASE "
+app_label+=$YNH_APP_INSTANCE_NUMBER
+ynh_permission_update --permission="main" --show_tile=true --label= "$app_label"
+
+
 ## Reload Nginx and regenerate SSOwat conf
 sudo yunohost app ssowatconf
 sudo service nginx reload
