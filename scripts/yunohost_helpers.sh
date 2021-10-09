@@ -8,7 +8,7 @@
 #C# more complicated in real yunohost...
 ynh_install_app_dependencies () {
     local dependencies=$@
-#    apt-get update
+    apt-get update
     apt-get install --yes $dependencies
 }
 
