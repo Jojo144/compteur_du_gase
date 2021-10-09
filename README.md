@@ -3,12 +3,15 @@
 
 ## Présentation
 
-Le Compteur du Gase Gestion permet de gérer les comptes et stocks d'un GASE (Groupement d'Achat en Service Épicerie, une épicerie autogérée).
+*Le Compteur du Gase* permet de gérer les comptes et stocks d'un GASE (Groupement d'Achat en Service Épicerie, une épicerie autogérée).
 Le logiciel est pensé pour les groupements d’achats / épiceries fonctionnant de la façon suivante :
-    • Chaque adhérent a un compte qu’il crédite.
-    • Quand on fait des courses, on entre dans le logiciel ce que l’on achète (à la manière d’un logiciel de caisse) et cela débite notre compte en conséquence.
-    • Le logiciel met aussi à jour les stocks et propose un suivi de ceux-ci.
-Il permet de gérer les stocks, les comptes des adhérents et la liste des adhérents.
+* Chaque adhérent a un compte qu’il crédite.
+* Quand on fait des courses, on entre dans le logiciel ce que l’on achète (à la manière d’un logiciel de caisse) et cela débite notre compte en conséquence.
+* Le logiciel met aussi à jour les stocks et propose un suivi de ceux-ci.
+  Il permet de gérer les stocks, les comptes des adhérents et la liste des adhérents.
+
+Le CdG intègre aussi un tableau des permanences qui permet de s'inscrire pour tenir les permanences de l'épiceries.
+
 
 
 ## Capture d'écran
@@ -22,11 +25,11 @@ Depuis quelques années, les trois GASE (des épiceries autogérées) de Nantes 
 Le Compteur du GASE est une réécriture du logiciel MoneyCoop pour en refaire une version plus moderne, plus pratique, avec de
 superbes statistiques et avec un meilleur nom !
 
-MoneyCoop a été écrit en ~ 2012 par Pascal L. pour l'épicerie l'indépendante à Paris 18ème.
-Cette épicerie consistait deux gros placards au fond d'une salle de réunion et une permanence par semaine.
+MoneyCoop a été écrit en ~ 2012 par Pascal L. pour l'épicerie l'Indépendante à Paris 18ème.
+Cette épicerie consistait en deux gros placards au fond d'une salle de réunion et une permanence par semaine.
 Au début, les comptes étaient faits avec une feuille Excel mais ça s'est rapidement révélé ingérable.
-Comme ils avaient peu de temps le logiciel était en ligne et chacun enregistrait ses achats chez soi, de sorte de consacrer tout le temps des permanences à l'échange, et à l'organisation (commandes).
-L'indépendante a été influencée par le GASE de Rochefort en Terre. Puis d'autres groupements ont demandé les sources de MoneyCoop pour l'utiliser, notamment à Nantes via une personne qui était à l'indépendante avant, à Champigny...
+Comme ils avaient peu de temps le logiciel était en ligne et chacun enregistrait ses achats chez soi, de façon à consacrer tout le temps des permanences à l'échange, et à l'organisation (commandes).
+L'Indépendante a été influencée par le GASE de Rochefort en Terre. Puis d'autres groupements ont demandé les sources de MoneyCoop pour l'utiliser, notamment à Nantes via une personne qui était à l'Indépendante avant, à Champigny...
 Deux principes ont guidé l'écriture du logiciel : "tout le monde doit pouvoir tout faire" (même mot de passe pour tous), "simple et robuste" (par exemple pas possible de supprimer des choses pour éviter les erreurs).
 
 Il n'y avait pas de statistiques dans la version de base, cela a probablement été rajouté par les Nantais.
@@ -44,24 +47,24 @@ Version de démo ici : https://demo-compteur.gase.eu.org
 
 Si vous utilisez le Compteur du Gase et que vous acceptez d'apparaître sur cette liste, merci d'envoyer un mail à jojo144@girole.fr .
 
+## Démonstration
 
-## Contributions
+Version de démo ici : https://demo-compteur.gase.eu.org
+Nom d'utilisateur : demo
+Mot de passe : demo
 
-Toutes les remarques et contributions sont les bienvenues. N'hésitez pas à entrer en contact avec moi si vous souhaitez l'installer dans votre épicerie.
-
-Pour le développement, des détails techniques sont disponibles dans le fichier [HACKING.md](./HACKING.md)
-
-Contact : jojo144@girole.fr
 
 
 ## Installation
 
-Deux façons d'installer le logiciel : soit en local sur Debian/Ubuntu, soit en ligne avec [Yunohost](https://yunohost.org).
+Nous proposons deux façons d'installer le logiciel :
+- soit en local : le logciel est installé sur un ordinateur et est accessible sur celui-ci (sans avoir besoin d'accès internet)
+- soit en ligne : le logiciel est installé sur un serveur et est accessible sur n'importe quel appareil disposant d'un accès à internet
 
 Le compteur du GASE est une application écrite en [Django](https://www.djangoproject.com/), un framework Python pour écrire des applications web.
 Dans les deux cas, il sagit donc d'installer un serveur web (Nginx) et de faire tourner Gunicorn.
 
-### Installation en local
+### Installation en local sur Debian ou Ubuntu
 
 Testé sur Ubuntu 19.04. Il suffit d'exécuter le script `local_install.sh` qui fait tout ce qu'il faut.
 ```
@@ -80,9 +83,12 @@ Il y a des *warnings* à propos du cache pip, je les ai ignoré pour le moment.
 
 Attention, si vous tombez sur une page Apache "It works" c'est que vous avez Apache d'installé au lieu de Nginx (ou les deux).
 
+
 ### Installation en ligne avec Yunohost
 
-Paquet Yunohost.
+[Yunohost](https://yunohost.org) est une distribution dérivée de Debian facilitant l'autohébergement.
+Nous proposons un paquet Yunohost.
+
 ```
 sudo yunohost app install https://github.com/Jojo144/compteur_du_gase
 ```
@@ -91,19 +97,6 @@ Pour le moment seuls les scripts `install`, `upgrade` `remove` fonctionne.
 Pour mettre à jour :
 ```
 sudo yunohost app upgrade compteur_gase -u https://github.com/Jojo144/compteur_du_gase
-```
-
-Après une migration Stretch -> Buster on a eu besoin de reconstruire les venv :
-
-```
-cp db.sqlite3 ~/db-back.sqlite3
-rm -rf venv/
-sudo -u compteur_gase__X bash
-python3 -m venv venv
-source venv/bin/activate
-pip install gunicorn
-pip install -r requirements.txt
-systemctl restart compteur_gase__X
 ```
 
 
@@ -117,9 +110,19 @@ Vous pouvez paramétrer le compteur dans l'interface d'administration.
 
 - Dans "Réglages divers" vous pouvez désactiver les fonctionalités non utilisées, paramétrer l'envoi d'email... etc
 
-Puis c'est parti !
+**Pensez ensuite à mettre en place des sauvegardes.** (voir paragraphe ci-dessous)
 
-**Pensez ensuite à mettre en place une sauvegarde (voir ci-dessous)**.
+### Personalisation graphique
+
+Pour utiliser un logo, activez l'option dans les réglages divers puis :
+```
+cd /opt/compteur_gase
+cp /bla/bla/bla/logo.png base/static/base/
+sudo -u compteur_gase venv/bin/python3 manage.py collectstatic
+```
+
+Pour personnaliser l'interface graphique, il est aussi possible de créer un fichier
+`local.css` dans le répertoire contenant le fichier `base.css`.
 
 ### Notes sur l'intégration YunoHost
 
@@ -129,7 +132,6 @@ n'est pas installée via le package YunoHost.
 L'intégration YunoHost consiste en un mécanisme d'installation et une
 intégration de l'authentification permetant au compteur d'exploiter les comptes
 utilisateur YunoHost.
-
 
 Il y a deux permissions pour chaque instance du compteur :
   - une pour la page d'accueil (et le tableau des permanences)
@@ -143,18 +145,38 @@ La confguration par défaut est que n'importe qui peut accéder à l'accueil mai
 seuls les membres authentifiés (de n'importe quel groupe) peuvent avoir accès au
 reste du compteur.
 
+Remarque : pour avoir accès au logiciel entier il est nécessaire d'avoir *les deux*
+permissions. Si on ne donne que la seconde ça ne va pas marcher...
+
+Les utilisateurs qui n'ont accès qu'à la page d'accueil peuvent consulter et
+modifier le tableau des permanences. Par contre, les mails et numéros de téléphone
+ne s'afficherons pas pour les visiteurs (utilisateurs non authentifiés sur
+l'instance).
+
+
 Tous les utilisateurs autorisés à accéder à une instance du compteur sont
 administrateurs de cette instance, i.e. peuvent accéder à l'interface
 d'administration de Django (via "Gestion > Interface d'administration").
 
-## Sauvegarde de la base de donnée
 
-Il faut sauvegarder le fichier `db.sqlite3` qui se trouve là où est installée votre application
-(dans `/opt/compteur_gase` par exemple). Par exemple en faisant une copie sur un serveur distant
-(scp ou cp dans un dossier Nextcloup) ou en le copiant sur une clé USB (cp).
+## Sauvegardes
 
-Pour faire une sauvegarde automatique (exemple tous les jours ou toutes les heures) vous pouvez
-utiliser cron.
+Il faut sauvegarder le fichier `db.sqlite3` qui se trouve là où est installée votre
+application (dans `/opt/compteur_gase` par exemple). C'est lui qui contient la base
+de donnée, c'est à dire toutes les données enregistrées dans le logiciel (membres,
+achats, ...).
+
+Vous pouvez utiliser le mécanisme de sauvegarde qui vous plait mais nous vous
+recommandons chaudement de mettre en place des sauvegardes automatiques et
+fréquentes.
+
+Par exemple en faisant une copie sur un serveur distant (scp ou cp dans un dossier
+Nextcloup) ou en le copiant sur une clé USB (cp).
+
+Pour faire une sauvegarde automatique (exemple tous les jours ou toutes les heures)
+vous pouvez utiliser cron.
+
+Si vous utilisez Yunohost vous pouvez aussi utiliser le script `backup` fourni.
 
 
 ## Mise à jour
@@ -186,6 +208,7 @@ Puis `./manage.py shell` et dans ce shell Django :
 %run migration.py
 ```
 
+
 ## Export de certaines tables
 
 Il est possible d'exporter certaines tables :
@@ -195,7 +218,17 @@ manage.py export_providers /path/to/filename.xlsx
 manage.py export_households /path/to/filename.xlsx
 ```
 
-## Credits
+
+## Contributions
+
+Toutes les remarques et contributions sont les bienvenues. N'hésitez pas à entrer en contact avec nous si vous souhaitez l'installer dans votre épicerie.
+
+Pour le développement, des détails techniques sont disponibles dans le fichier [HACKING.md](./HACKING.md)
+
+Contact : jojo144@girole.fr
+
+
+## Crédits
 
 - Favicon made by Freepik from www.flaticon.com
 - Bootstrap4 Select2 theme CSS is from [BootStrap4 Select2 theme 1.3.2](https://github.com/ttskch/select2-bootstrap4-theme)

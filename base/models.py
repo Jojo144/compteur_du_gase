@@ -49,7 +49,7 @@ class LocalSettings(models.Model):
                                       help_text="Exports de l'historique d'achat et de la liste des produits.")
 
     use_logo = models.BooleanField(verbose_name="Affiche le logo dans la première page ?", default=False,
-                                   help_text="Le fichier de logo doit être placé dans le répertoire base\static\base"
+                                   help_text="Le fichier de logo doit être placé dans le répertoire base/static/base"
                                              " et son nom de fichier doit etre logo.png.")
 
     use_mail = models.BooleanField(verbose_name="Utilisation de la fonction envoi d'email ?", default=True,

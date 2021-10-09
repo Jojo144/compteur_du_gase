@@ -7,6 +7,12 @@
     {{ txt_home | safe }}
 </div>
 
+{% if use_logo %}
+<div class="index-part">
+    <img src="{% static "base/logo.png" %}" alt=" " class="index-logo">
+</div>
+{% endif %}
+
 {% if activity_board %}
 {% include "base/activity_board.html" %}
 {% endif %}
@@ -14,12 +20,6 @@
 {% if use_messages %}
 <div class="index-part">
     {{ txt_message | safe }}
-</div>
-{% endif %}
-
-{% if use_logo %}
-<div class="index-part">
-    <img src="{% static "base\logo.png" %}" alt=" " class="index-logo">
 </div>
 {% endif %}
 
