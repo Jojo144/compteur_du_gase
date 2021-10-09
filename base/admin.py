@@ -146,3 +146,4 @@ admin.site.register(ChangeStockOp, ChangeStockOpAdmin)
 admin.site.register(ApproCompteOp, ApproCompteOpAdmin)
 
 admin.site.login = staff_member_required(admin.site.login, login_url=settings.LOGIN_URL)
+admin.site.site_url = settings.PATH
