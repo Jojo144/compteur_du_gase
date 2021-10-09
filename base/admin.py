@@ -5,6 +5,7 @@ from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib.auth.models import User, Group
+from django.urls import reverse
 
 from datetime import timedelta
 
@@ -146,4 +147,4 @@ admin.site.register(ChangeStockOp, ChangeStockOpAdmin)
 admin.site.register(ApproCompteOp, ApproCompteOpAdmin)
 
 admin.site.login = staff_member_required(admin.site.login, login_url=settings.LOGIN_URL)
-admin.site.site_url = settings.PATH
+admin.site.site_url = reverse('base:index')
