@@ -61,7 +61,7 @@ def index(request):
                    'txt_message': txt_message,
                    'activity_board': local_settings.activity_board,
                    'activity_list': activity_list,
-                   'use_logo': local_settings.use_logo)
+                   'use_logo': local_settings.use_logo})
 
 
 def gestion(request):
