@@ -5,5 +5,6 @@ class AllAdminRemoteUserBackend(RemoteUserBackend):
         user = super().authenticate(request, remote_user)
         user.is_staff = True
         user.is_superuser = True
+        user.set_unusable_password()
         user.save()
         return user
