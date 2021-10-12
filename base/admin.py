@@ -129,7 +129,10 @@ class ActivityAdmin(admin.ModelAdmin):
                       { 'opts': self.model._meta, 'form': form})
 
 
-# admin.site.unregister(User)
+if settings.YNH_INTEGRATION_ENABLED:
+    # users are handled by YunoHost
+    admin.site.unregister(User)
+
 admin.site.unregister(Group)
 
 admin.site.register(Category, CategoryAdmin)

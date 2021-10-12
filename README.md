@@ -124,6 +124,12 @@ sudo -u compteur_gase venv/bin/python3 manage.py collectstatic
 Pour personnaliser l'interface graphique, il est aussi possible de créer un fichier
 `local.css` dans le répertoire contenant le fichier `base.css`.
 
+### Gestion des comptes utilisateurices admin
+
+Accessible depuis l'admin elle-même, on peut créer/changer les comptes admin.
+
+NB: si on utilise YunoHost, la gestion des utilisateurices se fait via YunoHost, et les comptes ne sont pas accessibles dans l'admin du compteur.
+
 ### Notes sur l'intégration YunoHost
 
 L'intégration YunoHost est optionelle, elle est désactivée si l'application
