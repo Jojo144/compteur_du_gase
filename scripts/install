@@ -96,6 +96,9 @@ echo "from django.contrib.auth import get_user_model; User = get_user_model(); U
 # Set a working sending email by default
 echo "UPDATE base_localsettings SET mail_from = 'Le compteur du GASE <le-compteur@$domain>';" | sudo -u $app $venv_python $final_path/manage.py dbshell
 
+# Populate initial database
+sudo -u $app $venv_python $final_path/manage.py loaddata initial_database.json
+
 
 # Modify Nginx configuration file and copy it to Nginx conf directory
 if [ "$path" = "/" ]
