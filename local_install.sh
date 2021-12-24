@@ -52,6 +52,9 @@ sudo -u $app $venv_python $app_path/manage.py collectstatic --noinput
 echo "* Creating admin user"
 echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('${admin}', '${email}', '${passwd}')" | $venv_python $app_path/manage.py shell
 
+echo "* Populating initial database"
+sudo -u $app $venv_python $app_path/manage.py loaddata initial_database.json
+
 echo "* Creating $final_path/gunicorn_config.py"
 cat > $final_path/gunicorn_config.py << EOF
 command = '$final_path/venv/bin/gunicorn'
