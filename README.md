@@ -27,13 +27,14 @@ Il n'y avait pas de statistiques dans la version de base, cela a probablement é
 
 Version de démo ici : https://demo-compteur.gase.eu.org
 
-## Configuration
 
-Ce logiciel peut être utilié tel quel.
+## Épicerie utilisant le logiciel
 
-Néanmoins, pour personnaliser l'interface graphique, il faut créer un fichier local.css dans le répertoire contenant le fichier base.css.
+| Épicerie | Description                            | Utilise le compteur depuis | Contact             |
+|----------|----------------------------------------|----------------------------|---------------------|
+| exemple  | GASE situé à Nantes-est, 100% bénévole | oct 2020                   | exemple@exemple.org |
+|          |                                        |                            |                     |
 
-Différentes options sont également disponibles dans l'interface graphique dans Gestion>Interface d'administration>Réglages divers.
 
 ## Contributions
 
@@ -42,6 +43,7 @@ Toutes les remarques et contributions sont les bienvenues. N'hésitez pas à ent
 Pour le développement, des détails techniques sont disponibles dans le fichier [HACKING.md](./HACKING.md)
 
 Contact : jojo144@girole.fr
+
 
 ## Installation
 
@@ -132,6 +134,15 @@ Il faut sauvegarder le fichier `db.sqlite3` qui se trouve là où est installée
 Au début je sais plus et après :
 
 `sudo -u compteur_gase venv/bin/python3 manage.py migrate`
+
+
+## Configuration
+
+Ce logiciel peut être utilié tel quel.
+
+Néanmoins, pour personnaliser l'interface graphique, il faut créer un fichier local.css dans le répertoire contenant le fichier base.css.
+
+Différentes options sont également disponibles dans l'interface graphique dans Gestion>Interface d'administration>Réglages divers.
 
 
 ## Migration depuis gase-web et Mysql
