@@ -32,7 +32,7 @@ Version de démo ici : https://demo-compteur.gase.eu.org
 
 | Épicerie  | Description                            | Utilise le compteur depuis | Contact             |
 |-----------|----------------------------------------|----------------------------|---------------------|
-| exemple   | GASE situé à Nantes-est, 100% bénévole | oct 2020                   | exemple@exemple.org |
+| exemple   | GASE situé à Camembert, 100% bénévole  | oct 2020                   | exemple@exemple.org |
 |           |                                        |                            |                     |
 
 Si vous utilisez le Compteur du Gase et que vous acceptez d'apparaître sur cette liste, merci d'envoyer un mail à jojo144@girole.fr .
