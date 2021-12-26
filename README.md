@@ -10,6 +10,12 @@ Le logiciel est pensé pour les groupements d’achats / épiceries fonctionnant
     • Le logiciel met aussi à jour les stocks et propose un suivi de ceux-ci.
 Il permet de gérer les stocks, les comptes des adhérents et la liste des adhérents.
 
+
+## Capture d'écran
+
+![Capture d'écran](/screenshot/Screenshot_2021-12-26_Le-compteur-du-GASE.png)
+
+
 ## Historique
 
 Depuis quelques années, les trois GASE (des épiceries autogérées) de Nantes utilisent le logiciel ([MoneyCoop](https://github.com/barchstien/gase-web)).
