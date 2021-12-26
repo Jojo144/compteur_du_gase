@@ -64,7 +64,7 @@ then
 fi
 
 # MIGRATION : Enable django auth module
-if grep -vq 'YNH_INTEGRATION_ENABLED = True' $settings_local
+if ! grep -q 'YNH_INTEGRATION_ENABLED = True' $settings_local
 then
     echo 'YNH_INTEGRATION_ENABLED = True' >> $settings_local
 fi
