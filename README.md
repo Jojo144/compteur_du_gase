@@ -95,9 +95,11 @@ sudo yunohost app install https://github.com/Jojo144/compteur_du_gase
 Pour le moment seuls les scripts `install`, `upgrade` `remove` fonctionne.
 
 Pour mettre à jour :
+**⚠ Faire une sauvegarde de la base de donnée (fichier db.sqlite3) avant toute mse à jour.**
 ```
 sudo yunohost app upgrade compteur_gase -u https://github.com/Jojo144/compteur_du_gase
 ```
+Yunohost 4.2 est requis.
 
 
 ### Après l'installation (quel que soit le mode d'installation)
