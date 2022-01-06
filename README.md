@@ -35,11 +35,12 @@ Version de démo ici : https://demo-compteur.gase.eu.org
 
 
 ## Épiceries utilisant le logiciel
+| Épicerie                  | Description                                                                                                                                                               | Utilise le compteur depuis | Contact                                                                        |
+|---------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|--------------------------------------------------------------------------------|
+| Le GASE de l'Esclain      | Épicerie associative autogérée, quartier Beauséjour à Nantes                                                                                                              | février 2021               | bonjour (arrrobase) gasedelesclain.fr                                          |
+| Le GASE à Roulettes       | GASE 100% bénévole et autogéré à Nantes centre                                                                                                                            | mai 2020                   | commission informatique : informatique (puis un arobase puis) roulettes.eu.org |
+| Petite Epicerie Pell'Mêle | La Petite Epicerie Pell’Mêle est une épicerie associative de produits bio (et locaux si possible) en vrac, créée en octobre 2019. https://pellmele.fr/la-petite-epicerie/ | septembre 2019             | pellmele-epicerie (arrobase) retzien.fr                                        |
 
-| Épicerie  | Description                            | Utilise le compteur depuis | Contact             |
-|-----------|----------------------------------------|----------------------------|---------------------|
-| exemple   | GASE situé à Camembert, 100% bénévole  | oct 2020                   | exemple@exemple.org |
-|           |                                        |                            |                     |
 
 Si vous utilisez le Compteur du Gase et que vous acceptez d'apparaître sur cette liste, merci d'envoyer un mail à jojo144@girole.fr .
 
