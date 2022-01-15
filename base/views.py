@@ -55,13 +55,21 @@ def index(request):
 
     activity_list = Activity.objects.filter(date__gte=date.today()).order_by('date')
 
+    protect_personal_data = (
+        settings.YNH_INTEGRATION_ENABLED
+        and
+        request.user.is_anonymous
+    )
+
     return render(request, 'base/index.html',
                   {'txt_home': local_settings.txt_home,
                    'txt_home2': local_settings.txt_home2,
                    'txt_message': txt_message,
                    'activity_board': local_settings.activity_board,
                    'activity_list': activity_list,
-                   'use_logo': local_settings.use_logo})
+                   'use_logo': local_settings.use_logo,
+                   'protect_personal_data' : protect_personal_data,
+                   })
 
 
 def gestion(request):

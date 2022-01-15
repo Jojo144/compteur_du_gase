@@ -11,7 +11,7 @@ set_initial_permissions() {
             --label "Page d\'accueil" \
             --permission="home_page" \
             --url="/$" \
-            --additional_urls="/activité" "/static" \
+            --additional_urls="/activité" "/static" "/ynh_auth" \
             --allowed="visitors"
     fi
 
