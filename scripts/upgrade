@@ -7,6 +7,7 @@ source /usr/share/yunohost/helpers
 app=$YNH_APP_INSTANCE_NAME
 domain=$(ynh_app_setting_get --app=$app --key=domain)
 path=$(ynh_app_setting_get --app=$app --key=path)
+admin=$(ynh_app_setting_get --app=$app --key=admin)
 
 final_path=/opt/$app
 settings_local=$final_path/compteur/settings_local.py
@@ -78,7 +79,7 @@ venv_pip=$final_path/venv/bin/pip
 # Les exclude sont là pour permettre les tests de paquet ynh en local
 rsync -va ../ $final_path/ --filter=':- ../.gitignore' --exclude=/conf/gunicorn_config.py
 chown $app $final_path
-sudo -u $app $venv_pip install -r $final_path/requirements.txt
+sudo -u $app $venv_pip install -r $final_path/requirements.txt -r $final_path/requirements-yunohost.txt
 sudo -u $app $venv_python $final_path/manage.py migrate --noinput
 
 

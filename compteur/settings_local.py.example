@@ -11,3 +11,5 @@ ADMINS = [('Admin du Compteur', 'YNH_APP_ARG_EMAIL')]
 PATH = 'YNH_APP_ARG_PATH'
 
 STATIC_URL = '/YNH_APP_ARG_PATHstatic/'
+
+YUNOHOST_APP_ID = 'YNH_APP_ID'

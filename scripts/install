@@ -54,7 +54,7 @@ venv_pip=$final_path/venv/bin/pip
 
 $venv_pip install pip --upgrade
 $venv_pip install gunicorn
-$venv_pip install -r $final_path/requirements.txt
+$venv_pip install -r $final_path/requirements.txt -r $final_path/requirements-yunohost.txt
 
 admin_mail=$(ynh_user_get_info --username="$admin" --key=mail)
 
@@ -72,6 +72,7 @@ fi
 ynh_replace_string "YNH_APP_ARG_EMAIL" $admin_mail $settings_local
 ynh_replace_string "YNH_APP_SECRET_KEY" $secret $settings_local
 ynh_replace_string "YNH_APP_STATIC_ROOT" $final_path/static $settings_local
+ynh_replace_string "YNH_APP_ID" $app $settings_local
 echo 'YNH_INTEGRATION_ENABLED = True' >> $settings_local
 
 # Set permissions
@@ -118,8 +119,12 @@ sudo cp ../conf/gunicorn_config.py $final_path
 set_initial_permissions
 
 # Choisit un nom pratique pour la tuile (qui peut être changé par la suite) + rend la tuile visible
-app_label="Le compteur du GASE "
-app_label+=$YNH_APP_INSTANCE_NUMBER
+if [ "$YNH_APP_INSTANCE_NUMBER" = "1" ]
+then
+    app_label="Le compteur du GASE"
+else
+    app_label="Le compteur du GASE $YNH_APP_INSTANCE_NUMBER"
+fi
 ynh_permission_update --permission="main" --show_tile=true --label= "$app_label"
 
 
