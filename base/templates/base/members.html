@@ -71,12 +71,21 @@
 
       computed: {
       orderedData: function () {
-          var data = _.orderBy(this.raw_data, this.sortKey);
-          if (this.reverse) {
-          return _.reverse(data)
-          } else {
+          var order = this.reverse ? 'desc' : 'asc';
+          var sortKey = this.sortKey;
+          var data = _.orderBy(this.raw_data,
+			       function(o) {
+				 var x = o[sortKey] ;
+				 if (sortKey == "date d'adhésion") {
+                                   // expect x formatted like DD/MM/YYYY
+				   return [x.substring(6,10), x.substring(3,5), x.substring(0,2)];
+				 } else {
+				   if (x === null) { return ""; }
+				   else { return x.toLowerCase(); }
+				 };
+			       },
+			       order);
           return data
-          }
       }
       },
 
