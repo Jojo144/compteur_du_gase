@@ -15,13 +15,13 @@ set_initial_permissions() {
             --allowed="visitors"
     fi
 
-    if ! ynh_permission_exists --permission="ynh_auth"
-    then
-       ynh_permission_create \
-           --permission="ynh_auth" \
-           --url="/ynh_auth" \
-           --allowed="all_users" \
-           --protected=true \
-           --show_tile="false"
-    fi
+    # if ! ynh_permission_exists --permission="ynh_auth"
+    # then
+    #    ynh_permission_create \
+    #        --permission="ynh_auth" \
+    #        --url="/ynh_auth" \
+    #        --allowed="all_users" \
+    #        --protected=true \
+    #        --show_tile="false"
+    # fi
 }
