@@ -82,7 +82,6 @@ sudo chown -R $app:www-data $final_path
 # Log folder
 sudo mkdir -p /var/log/$app
 sudo chown -R $app /var/log/$app
-sudo chgrp -R www-data /var/log/$app
 
 
 sudo -u $app $venv_python $final_path/manage.py migrate --noinput
