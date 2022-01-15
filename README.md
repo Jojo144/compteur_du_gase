@@ -104,7 +104,7 @@ Vous pouvez paramétrer le compteur dans l'interface d'administration.
 
 - De même pour les unités (kg, L, buteille, ...).
 
-- Dans "Réglages divers" vuos pouvez désactiver les fonctionalités non utilisées, paramétrer l'envoi d'email... etc
+- Dans "Réglages divers" vous pouvez désactiver les fonctionalités non utilisées, paramétrer l'envoi d'email... etc
 
 Puis c'est parti !
 
