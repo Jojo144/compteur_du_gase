@@ -5,18 +5,30 @@
   <td>
     {{ person|default_if_none:"" }}<br>
 
-    {% if request.user.is_authenticated and person.tel %}
+    {% if person.tel %}
     <div class="badge badge-pill badge-light foldable">
       📞 <span class="initially-folded">
-      <a href="tel:{{ person.tel }}">{{ person.tel }}</a>
+      {% if protect_personal_data %}
+        <a href="{% url 'login_router' %}?next={{ request.get_full_path }}">
+          Connecte-toi pour voir le tél
+        </a>
+      {% else %}
+        <a href="tel:{{ person.tel }}">{{ person.tel }}</a>
+      {% endif %}
       </span>
     </div>
     {% endif %}
 
-    {% if request.user.is_authenticated and person.email %}
+    {% if person.email %}
     <div class="badge badge-pill badge-light foldable">
       📧 <span class="initially-folded">
-      <a href="mailto:{{ person.email }}">{{ person.email }}</a>
+      {% if protect_personal_data %}
+        <a href="{% url 'login_router' %}?next={{ request.get_full_path }}">
+          Connecte-toi pour voir le mail
+        </a>
+      {% else %}
+        <a href="mailto:{{ person.email }}">{{ person.email }}</a>
+      {% endif %}
       </span>
     </div>
     {% endif %}
