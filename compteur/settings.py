@@ -159,5 +159,5 @@ if YNH_INTEGRATION_ENABLED:
         'ynh_auth.middleware.CustomHeaderMiddleware',
     )
 
-    LOGIN_URL = os.path.join(PATH, 'ynh_auth/login_router')
+    LOGIN_URL = os.path.join('/', PATH, 'ynh_auth/login_router')
     LOGOUT_REDIRECT_URL='/yunohost/sso/?action=logout'
