@@ -132,6 +132,7 @@ class ActivityAdmin(admin.ModelAdmin):
 if settings.YNH_INTEGRATION_ENABLED:
     # users are handled by YunoHost
     admin.site.unregister(User)
+    admin.site.login = staff_member_required(admin.site.login, login_url=settings.LOGIN_URL)
 
 admin.site.unregister(Group)
 
@@ -149,5 +150,5 @@ admin.site.register(Activity, ActivityAdmin)
 admin.site.register(ChangeStockOp, ChangeStockOpAdmin)
 admin.site.register(ApproCompteOp, ApproCompteOpAdmin)
 
-admin.site.login = staff_member_required(admin.site.login, login_url=settings.LOGIN_URL)
+
 admin.site.site_url = reverse('base:index')
