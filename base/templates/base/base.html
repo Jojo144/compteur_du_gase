@@ -44,6 +44,13 @@
                 <li><a class="nav-item nav-link" href="{% url 'base:providers' %}">Fournisseurs</a></li>
                 {% if use_messages %} <li><a class="nav-item nav-link" href="{% url 'base:notes' %}">Messages/Actions</a></li> {% endif %}
                 <li><a class="nav-item nav-link" href="{% url 'base:gestion' %}">☭ Gestion</a></li>
+                {% if request.user.is_authenticated %}
+                    <li>
+                        <a class="nav-item nav-link" href="{% url 'logout' %}">
+                            🚪 Se déconnecter
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
         </nav>
     </div>
