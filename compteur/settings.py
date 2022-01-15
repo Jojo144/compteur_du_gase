@@ -147,7 +147,7 @@ except ModuleNotFoundError:
 
 if YNH_INTEGRATION_ENABLED:
     AUTHENTICATION_BACKENDS = [
-        'ynh_auth.auth.AllAdminRemoteUserBackend',
+        'ynh_auth.auth.SSOWatRemoteUserBackend',
     ]
 
     # Insert our middleware right after AuthenticationMiddleware
