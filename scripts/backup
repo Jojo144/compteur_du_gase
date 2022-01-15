@@ -4,12 +4,16 @@ source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
 
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
+
+
 app=$YNH_APP_INSTANCE_NAME
 domain=$(ynh_app_setting_get "$app" domain)
 final_path=/opt/$app
 
-ynh_backup "$final_path"
-ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"
-ynh_backup "/etc/systemd/system/$app.service"
 
-# TODO backup log
+ynh_backup --src_path="$final_path"
+ynh_backup --src_path="/etc/nginx/conf.d/$domain.d/$app.conf"
+ynh_backup --src_path="/etc/systemd/system/$app.service"
+ynh_backup --src_path="/var/log/$app"
