@@ -1,0 +1,20 @@
+
+[
+    {"model": "base.unit", "pk": 1, "fields": {"name": "unit\u00e9", "vrac": false, "pluralize": true}},
+    {"model": "base.unit", "pk": 2, "fields": {"name": "kg", "vrac": true, "pluralize": false}},
+    {"model": "base.unit", "pk": 3, "fields": {"name": "L", "vrac": true, "pluralize": false}},
+    {"model": "base.unit", "pk": 4, "fields": {"name": "tablette", "vrac": false, "pluralize": true}},
+    {"model": "base.unit", "pk": 5, "fields": {"name": "sachet", "vrac": false, "pluralize": true}},
+    {"model": "base.unit", "pk": 6, "fields": {"name": "bouteille", "vrac": false, "pluralize": true}},
+    {"model": "base.unit", "pk": 7, "fields": {"name": "pot", "vrac": false, "pluralize": true}},
+
+    {"model": "base.category", "pk": 1, "fields": {"name": "BOISSONS"}},
+    {"model": "base.category", "pk": 2, "fields": {"name": "C\u00c9R\u00c9ALES"}},
+    {"model": "base.category", "pk": 3, "fields": {"name": "L\u00c9GUMINEUSES"}},
+    {"model": "base.category", "pk": 4, "fields": {"name": "CONDIMENTS"}},
+    {"model": "base.category", "pk": 5, "fields": {"name": "CONSERVES"}},
+    {"model": "base.category", "pk": 6, "fields": {"name": "SUCR\u00c9"}},
+    {"model": "base.category", "pk": 7, "fields": {"name": "INFUSIONS"}},
+    {"model": "base.category", "pk": 8, "fields": {"name": "PRODUITS D'ENTRETIEN"}},
+    {"model": "base.category", "pk": 9, "fields": {"name": "FRAIS"}}
+]

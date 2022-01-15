@@ -109,33 +109,27 @@ systemctl restart compteur_gase__X
 
 ### Après l'installation (quel que soit le mode d'installation)
 
-À la première utilisation il faut aller dans l'interface administration pour 
+Vous pouvez paramétrer le compteur dans l'interface d'administration.
 
-- créer des unités (en général : kg, L, bouteille, sachet, pot) et des catégories (par ex :
-Légumineuses, Conserves, Non alimentaire, ...).
-- réaliser divers paramétrages (désactiver les fonctionnalités non utilisées, paramétrer l'envoi d'email… etc).
+- Des catégories (Légumineuses, Conserves, ...) par défaut sont données mais vous pouvez les changer ou en ajouter.
+
+- De même pour les unités (kg, L, buteille, ...).
+
+- Dans "Réglages divers" vous pouvez désactiver les fonctionalités non utilisées, paramétrer l'envoi d'email... etc
 
 Puis c'est parti !
 
-Pensez ensuite à mettre en place une sauvegarde.
-
-##### Exemples d'unités
-
-|           | Vrac | Pluriel |
-|-----------|------|---------|
-| unité     |  0   |    0    |
-| kg        |  1   |    0    |
-| L         |  1   |    0    |
-| tablette  |  0   |    1    |
-| sachet    |  0   |    1    |
-| bouteille |  0   |    1    |
-| pot       |  0   |    1    |
+**Pensez ensuite à mettre en place une sauvegarde (voir ci-dessous)**.
 
 
 ## Sauvegarde de la base de donnée
 
 Il faut sauvegarder le fichier `db.sqlite3` qui se trouve là où est installée votre application
-(dans `/opt/compteur_gase` par exemple).
+(dans `/opt/compteur_gase` par exemple). Par exemple en faisant une copie sur un serveur distant
+(scp ou cp dans un dossier Nextcloup) ou en le copiant sur une clé USB (cp).
+
+Pour faire une sauvegarde automatique (exemple tous les jours ou toutes les heures) vous pouvez
+utiliser cron.
 
 
 ## Mise à jour
