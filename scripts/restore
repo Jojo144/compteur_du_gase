@@ -49,9 +49,6 @@ ynh_restore_file --origin_path="$gunicorn_path"
 ynh_restore_file --origin_path="$log_path"
 
 sudo chown -R $app:www-data $final_path
-sudo chown -R $app /var/log/$app
-sudo chgrp -R www-data /var/log/$app
-
 
 ## Reload Nginx and regenerate SSOwat conf
 sudo systemctl daemon-reload
