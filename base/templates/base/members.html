@@ -77,6 +77,7 @@
 			       function(o) {
 				 var x = o[sortKey] ;
 				 if (sortKey == "date d'adhésion") {
+                                   // expect x formatted like DD/MM/YYYY
 				   return [x.substring(6,10), x.substring(3,5), x.substring(0,2)];
 				 } else {
 				   if (x === null) { return ""; }
