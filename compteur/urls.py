@@ -22,6 +22,7 @@ from compteur.settings import PATH
 urlpatterns = [
     path(PATH, include('base.urls')),
     path(PATH + 'admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
 
 if settings.YNH_INTEGRATION_ENABLED:
