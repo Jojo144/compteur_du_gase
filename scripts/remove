@@ -22,4 +22,4 @@ sudo service nginx reload
 sudo yunohost app ssowatconf
 sudo userdel $app
 
-# Should we remove the log? Let's say no for the moment.
+sudo rm -Rf /var/log/$app
