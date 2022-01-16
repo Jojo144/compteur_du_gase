@@ -1,4 +1,6 @@
 from tempfile import NamedTemporaryFile
+
+from django.db.models import Sum, F
 from openpyxl import Workbook
 from openpyxl.styles import Font
 
@@ -97,12 +99,18 @@ def generate_export_providers(filename):
 
 def generate_ecarts_data():
     ope = ChangeStockOp.objects.filter(label='Inventaire')
-    dates = {o.date.date() for o in ope}  # on regroupe par jour
-    dates = sorted(dates, reverse=True)[:10]  # on garde les 10 derniers
-    ecarts_data = [{'date': d,
-                    'details': ope.filter(date__date=d),
-                    'result': sum([o.price for o in ope.filter(date__date=d)])}
-                   for d in dates]
+    stats = ope.annotate(
+        calendar_date=F('date__date')
+    ).values(
+        'calendar_date'
+    ).annotate(
+        total=Sum('price')
+    )[:10]  # 10 dernières dates
+
+    ecarts_data = [{'date': stat['calendar_date'],
+                    'details': ope.filter(date__date=stat['calendar_date']),
+                    'result': stat['total']}
+                   for stat in stats]
     return ecarts_data
 
 def generate_export_inventory(filename):
