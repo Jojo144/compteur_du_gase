@@ -5,7 +5,9 @@
 
 <div id="vue-table">
 
-    <div id="print-total"></div>
+    <div id="print-total">
+        Total de la valeur des stocks de l'épicerie sélectionnés : <b> [[ this.total.toFixed(2) ]] €</b>
+    </div>
     <div class="description">Ici, c'est le prix de vente qui est pris en compte. La valeur des achats de l'épicerie peut
         être connue quant à elle dans la section correspondante.
     </div>
@@ -46,7 +48,8 @@
       reverse: false,
       columns: {{ columns | safe }},
 
-      raw_data: {{ stocks | safe }}
+      raw_data: {{ stocks | safe }},
+      total: 0,
       },
 
       computed: {
@@ -79,8 +82,6 @@
           });
 
           this.total = this.total_sum(data);
-
-          document.getElementById("print-total").innerHTML = "Total de la valeur des stocks de l'épicerie sélectionnés : <b>" + this.total + " €</b>";
 
           return data
       },

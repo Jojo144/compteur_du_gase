@@ -97,7 +97,9 @@
 
 <div id="vue-table">
 
-    <div id="print-total"></div>
+    <div id="print-total">
+        Total des approvisionnements du stock de l'épicerie sélectionnés : <b>[[ total.toFixed(2) ]] €</b>
+    </div>
     <div class="description">La valeur d'un stock sur une période donée peut être connue grâce au filtres.
       {% if use_cost_of_purchase %} C'est le prix de vente qui est pris en compte. {% endif %}
     </div>
@@ -206,7 +208,8 @@
       reverse: false,
       columns: {{ columns | safe }},
 
-      raw_data: {{ appros | safe }}
+      raw_data: {{ appros | safe }},
+      total: 0,
       },
 
       computed: {
@@ -267,8 +270,6 @@
           });
 
           this.total = this.total_sum(data);
-
-          document.getElementById("print-total").innerHTML = "Total des approvisionnements du stock de l'épicerie sélectionnés : <b>" + this.total.toFixed(2) + " €</b>";
 
           return data
       },
