@@ -160,3 +160,9 @@ hr.gestion-hr {
 .foldable:active .initially-folded {
   display: unset;
 }
+
+.footer-tip {
+  margin-top: 4rem;
+  text-align: center;
+  opacity: 0.5;
+}
