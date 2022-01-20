@@ -60,7 +60,11 @@
           <td>[[ pdt.pwyw ? "prix libre !" : pdt.price + " €" ]]</td>
           <td>
             <div class="input-group">
-              <input type="text" class="form-control" @keydown.enter="inBasket" :id="'input_pdt_' + id">
+              <input type="text" class="form-control"
+                     :id="'input_pdt_' + id"
+                     @keydown.enter="inBasket"
+                     @input="forceNumericValue"
+              >
               <div class="input-group-append">
                 <span class="input-group-text"> [[ pdt.unit ]] </span>
               </div>
@@ -338,6 +342,9 @@
       },
       getSelectedRow(){
           return document.querySelector('#catalog tbody tr:focus-within');
+      },
+      forceNumericValue(e){
+          e.target.value = e.target.value.replace(/[^0-9,.]/, '');
       },
    },
    mounted() {
