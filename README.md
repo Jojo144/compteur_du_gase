@@ -13,7 +13,6 @@ Le logiciel est pensé pour les groupements d’achats / épiceries fonctionnant
 Le CdG intègre aussi un tableau des permanences qui permet de s'inscrire pour tenir les permanences de l'épiceries.
 
 
-
 ## Capture d'écran
 
 ![Capture d'écran](/screenshot/Screenshot_2021-12-26_Le-compteur-du-GASE.png)
@@ -34,8 +33,6 @@ Deux principes ont guidé l'écriture du logiciel : "tout le monde doit pouvoir 
 
 Il n'y avait pas de statistiques dans la version de base, cela a probablement été rajouté par les Nantais.
 
-Version de démo ici : https://demo-compteur.gase.eu.org
-
 
 ## Épiceries utilisant le logiciel
 | Épicerie                  | Description                                                                                                                                                               | Utilise le compteur depuis | Contact                                                                        |
@@ -47,22 +44,25 @@ Version de démo ici : https://demo-compteur.gase.eu.org
 
 Si vous utilisez le Compteur du Gase et que vous acceptez d'apparaître sur cette liste, merci d'envoyer un mail à jojo144@girole.fr .
 
+
 ## Démonstration
 
 Version de démo ici : https://demo-compteur.gase.eu.org
-Nom d'utilisateur : demo
-Mot de passe : demo
 
+Nom d'utilisateur : demo
+
+Mot de passe : demo
 
 
 ## Installation
 
 Nous proposons deux façons d'installer le logiciel :
-- soit en local : le logciel est installé sur un ordinateur et est accessible sur celui-ci (sans avoir besoin d'accès internet)
-- soit en ligne : le logiciel est installé sur un serveur et est accessible sur n'importe quel appareil disposant d'un accès à internet
+- soit en local → le logciel est installé sur un ordinateur et est accessible sur celui-ci (sans avoir besoin d'accès internet)
+- soit en ligne → le logiciel est installé sur un serveur et est accessible sur n'importe quel appareil disposant d'un accès à internet.
 
 Le compteur du GASE est une application écrite en [Django](https://www.djangoproject.com/), un framework Python pour écrire des applications web.
 Dans les deux cas, il sagit donc d'installer un serveur web (Nginx) et de faire tourner Gunicorn.
+
 
 ### Installation en local sur Debian ou Ubuntu
 
@@ -84,35 +84,38 @@ Il y a des *warnings* à propos du cache pip, je les ai ignoré pour le moment.
 Attention, si vous tombez sur une page Apache "It works" c'est que vous avez Apache d'installé au lieu de Nginx (ou les deux).
 
 
-### Installation en ligne avec Yunohost
+### Installation en ligne avec YunoHost
 
-[Yunohost](https://yunohost.org) est une distribution dérivée de Debian facilitant l'autohébergement.
-Nous proposons un paquet Yunohost.
+[YunoHost](https://yunohost.org) est une distribution dérivée de Debian facilitant l'autohébergement.
+Nous proposons un paquet YunoHost.
 
+Pour installer :
 ```
 sudo yunohost app install https://github.com/Jojo144/compteur_du_gase
 ```
-Pour le moment seuls les scripts `install`, `upgrade` `remove` fonctionne.
+Normalement les scripts `install`, `upgrade`, `remove`, `backup` et `restore` fonctionnent.
 
 Pour mettre à jour :
+
 **⚠ Faire une sauvegarde de la base de donnée (fichier db.sqlite3) avant toute mse à jour.**
 ```
 sudo yunohost app upgrade compteur_gase -u https://github.com/Jojo144/compteur_du_gase
 ```
-Yunohost 4.2 est requis.
+YunoHost 4.2 est requis.
 
 
 ### Après l'installation (quel que soit le mode d'installation)
 
-Vous pouvez paramétrer le compteur dans l'interface d'administration.
+Vous pouvez paramétrer le compteur dans l'interface d'administration :
 
-- Des catégories (Légumineuses, Conserves, ...) par défaut sont données mais vous pouvez les changer ou en ajouter.
+- des catégories (Légumineuses, Conserves, ...) par défaut sont données mais vous pouvez les changer ou en ajouter,
 
-- De même pour les unités (kg, L, buteille, ...).
+- de même pour les unités (kg, L, buteille, ...),
 
-- Dans "Réglages divers" vous pouvez désactiver les fonctionalités non utilisées, paramétrer l'envoi d'email... etc
+- dans "Réglages divers" vous pouvez désactiver les fonctionalités non utilisées, paramétrer l'envoi d'email... etc.
 
 **Pensez ensuite à mettre en place des sauvegardes.** (voir paragraphe ci-dessous)
+
 
 ### Personalisation graphique
 
@@ -126,11 +129,14 @@ sudo -u compteur_gase venv/bin/python3 manage.py collectstatic
 Pour personnaliser l'interface graphique, il est aussi possible de créer un fichier
 `local.css` dans le répertoire contenant le fichier `base.css`.
 
+
 ### Gestion des comptes utilisateurices admin
 
 Accessible depuis l'admin elle-même, on peut créer/changer les comptes admin.
 
-NB: si on utilise YunoHost, la gestion des utilisateurices se fait via YunoHost, et les comptes ne sont pas accessibles dans l'admin du compteur.
+NB : si on utilise YunoHost, la gestion des utilisateurices se fait via YunoHost,
+et les comptes ne sont pas accessibles dans l'admin du compteur.
+
 
 ### Notes sur l'intégration YunoHost
 
@@ -182,9 +188,10 @@ Par exemple en faisant une copie sur un serveur distant (scp ou cp dans un dossi
 Nextcloup) ou en le copiant sur une clé USB (cp).
 
 Pour faire une sauvegarde automatique (exemple tous les jours ou toutes les heures)
-vous pouvez utiliser cron.
+vous pouvez utiliser [cron](https://fr.wikipedia.org/wiki/Cron).
 
-Si vous utilisez Yunohost vous pouvez aussi utiliser le script `backup` fourni.
+Si vous utilisez YunoHost vous pouvez utiliser le script `backup` fourni mais un
+petit `cp` de la base de donnée supplémentaire ne peut pas faire de mal.
 
 
 ## Mise à jour
@@ -192,15 +199,6 @@ Si vous utilisez Yunohost vous pouvez aussi utiliser le script `backup` fourni.
 Au début je sais plus et après :
 
 `sudo -u compteur_gase venv/bin/python3 manage.py migrate`
-
-
-## Configuration
-
-Ce logiciel peut être utilisé tel quel.
-
-Néanmoins, pour personnaliser l'interface graphique, il faut créer un fichier local.css dans le répertoire contenant le fichier base.css.
-
-Différentes options sont également disponibles dans l'interface graphique dans Gestion>Interface d'administration>Réglages divers.
 
 
 ## Migration depuis gase-web et Mysql
