@@ -97,7 +97,9 @@
 
 <div id="vue-table">
 
-    <div id="print-total"></div>
+    <div id="print-total">
+        Total des achats des foyers sélectionnés : <b>[[ total.toFixed(2) ]] €</b>
+    </div>
     <div class="description">
     </div>
     <form class="form-inline">
@@ -205,7 +207,8 @@
       reverse: false,
       columns: {{ columns | safe }},
 
-      raw_data: {{ purchases | safe }}
+      raw_data: {{ purchases | safe }},
+      total: 0,
       },
 
       computed: {
@@ -266,8 +269,6 @@
           });
 
           this.total = this.total_sum(data);
-
-          document.getElementById("print-total").innerHTML = "Total des achats des foyers sélectionnés : <b>" + this.total.toFixed(2) + " €</b>";
 
           return data
       },
