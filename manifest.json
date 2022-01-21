@@ -2,7 +2,7 @@
     "name": "Le compteur du GASE",
     "id": "compteur_gase",
     "packaging_format": 1,
-    "version": "2019-09-15",
+    "version": "2022-01-21",
     "description": {
         "en": "A django app.",
         "fr": "Logiciel de gestion de cagnottes et de stock pour un GASE (Groupement d'Achat en Service Épicerie)."
