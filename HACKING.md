@@ -10,5 +10,5 @@ Il est recommandé d'utiliser des paramètres personalisés pour le dév :
 
 Pour mettre à jour :
 ```
-sudo yunohost app upgrade compteur_gase -u https://github.com/Jojo144/compteur_du_gase/tree/MA-BRANCHE
+sudo yunohost app upgrade compteur_gase -u https://github.com/Jojo144/compteur_du_gase_ynh/tree/MA-BRANCHE
 ```
