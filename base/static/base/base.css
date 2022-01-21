@@ -112,6 +112,12 @@ ul.nav a:hover {
   margin-right: 15px;
 }
 
+.list-overlay-actions {
+  position: sticky;
+  bottom: 0;
+  background: #ffffffbf;
+}
+
 #vue-table {
   margin: 2em 0;
 
