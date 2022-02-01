@@ -25,6 +25,10 @@ On utilise `login_router` pour rediriger vers l'authentification Ynh dans les ca
 non protégés par le SSO :
 - quand on clique sur "Connecte-toi" sur la page d'accueil pour afficher les
   numéros de tel et cie
+- et c'est tout je crois ! À un moment on l'utilisait pour les pages d'admin mais maintenant
+  elles sont protégées par le SSO. Du coup on aurait pu coder l'url en dur sur la page
+  d'accueil mais ça permet 1. de ne pas faire le calcul si pas de clique sur le bouton et
+  2. peut-être on s'en servira plus tard.
 
 
 ### `ynh_auth/apps.py`
