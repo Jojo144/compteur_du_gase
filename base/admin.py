@@ -139,6 +139,11 @@ class LocalSettingsAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def response_post_save_change(self, request, obj):
+        return redirect('admin:index')
+
+
 if settings.YNH_INTEGRATION_ENABLED:
     # users are handled by YunoHost
     admin.site.unregister(User)
