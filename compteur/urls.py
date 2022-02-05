@@ -15,12 +15,21 @@ Including another URLconf
 """
 from django.conf import settings
 from django.contrib import admin
+from django.shortcuts import redirect
 from django.urls import path, include
 
 from compteur.settings import PATH
 
+def redirect_to_detail(request):
+    from base.models import LocalSettings
+    return redirect(
+        'admin:base_localsettings_change',
+        object_id=LocalSettings.objects.first().pk
+    )
+
 urlpatterns = [
     path(PATH, include('base.urls')),
+    path(PATH + 'admin/base/localsettings/', redirect_to_detail),
     path(PATH + 'admin/', admin.site.urls),
     path(PATH + 'accounts/', include('django.contrib.auth.urls')),
 ]
