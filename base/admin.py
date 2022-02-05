@@ -129,6 +129,16 @@ class ActivityAdmin(admin.ModelAdmin):
                       { 'opts': self.model._meta, 'form': form})
 
 
+class LocalSettingsAdmin(admin.ModelAdmin):
+    """
+    Only one instance of LocalSettings is wanted, and one is already created by
+    migrations ; thus there is no need neither to create nor delete objects
+    """
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 if settings.YNH_INTEGRATION_ENABLED:
     # users are handled by YunoHost
     admin.site.unregister(User)
@@ -143,7 +153,7 @@ admin.site.register(Member, MemberAdmin)
 admin.site.register(Household, HouseholdAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Note)
-admin.site.register(LocalSettings)
+admin.site.register(LocalSettings, LocalSettingsAdmin)
 admin.site.register(Mail)
 admin.site.register(Activity, ActivityAdmin)
 
