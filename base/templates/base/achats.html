@@ -12,23 +12,19 @@
     Historique de vos achats
   </button>
 </div>
-
-
 <div id="vue-table" class="row"
      @keyup="onKeyUp"
      @keyup.up="moveSelectionUp"
      @keyup.down="moveSelectionDown"
 >
   <div class="col col-6">
-
     <div class="row">
       <div class="col">
-	<!-- pas dans un form pour ne pas que ça recharge la page quand on fait Entrée -->
+        <!-- pas dans un form pour ne pas que ça recharge la page quand on fait Entrée -->
         <input autofocus type="text" v-model="search" class="form-control search"  placeholder="Tapez pour filtrer ..."
                @keydown.enter="moveSelectionDown"
         >
       </div>
-
       <div class="col text-right">
         <div class="dropdown">
           <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
@@ -39,13 +35,12 @@
             <button class="dropdown-item" @click="category='Toutes catégories'">Toutes catégories
             </button>
             {% for cat in cats %}
-            <button class="dropdown-item" @click="category='{{ cat | escapejs }}'">{{ cat.name | escape }}</button>
+              <button class="dropdown-item" @click="category='{{ cat | escapejs }}'">{{ cat.name | escape }}</button>
             {% endfor %}
           </div>
         </div>
       </div>
     </div>
-
     <table class="table table-striped" id="catalog">
       <thead>
         <tr>
@@ -55,7 +50,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(pdt, id) in filter()">
+        <tr v-for="(pdt, id) in pdts" v-show="matchFilter(pdt)">
           <td>[[ pdt.name ]]</td>
           <td>[[ pdt.pwyw ? "prix libre !" : pdt.price + " €" ]]</td>
           <td>
@@ -213,22 +208,20 @@
    },
 
    methods: {
-     filter: function () {
-       var search = this.search; // important de faire ça sinon this.truc réfère à je sais pas quoi qui est undefined
-       var category = this.category;
-       return _.pickBy(this.pdts, (function (row) {
-         var cat_ok = (category == 'Toutes catégories') || (row.category == category);
-         var filter_ok = myContains(row.name, search);
-         return cat_ok && filter_ok;
-       }))
+     matchFilter(product) {
+       var cat_ok = (this.category == 'Toutes catégories') || (product.category == this.category);
+       var filter_ok = myContains(product.name, this.search);
+       return cat_ok && filter_ok;
      },
-
+     filter: function () {
+       return _.pickBy(this.pdts, this.matchFilter)
+     },
      inBasket: function () {
        var filtered = this.filter();
        for (var id in filtered) {
          var input = document.getElementById("input_pdt_" + id);
          if (input.value) {
-	   var pdt = this.pdts[id];
+	       var pdt = this.pdts[id];
            var value = Number(_.replace(input.value, ",", "."));
            if (value == 0) {
              input.value = '';
@@ -241,17 +234,17 @@
                  alert("Veuillez utiliser un nombre entier pour : " + this.pdts[id].name);
                } else {
                  var before = (this.basket[id]) ? (this.basket[id]) : {qtity: 0, price: 0};
-		 var price;
-		 if (pdt.pwyw) {
-		   do {
-		     price = prompt('Le produit ' + pdt.name + ' est à prix libre.\nCombien voulez vous payer pour la quantité que vous avez prise ? ('
-				  + value + ' ' + pdt.unit + ')');
-		     if (price === null) { return; }
-		     price = parseFloat(_.replace(price, ",", "."));
-		   } while (isNaN(price));
-		 } else {
-		   price = pdt.price * value;
-		 };
+		         var price;
+		         if (pdt.pwyw) {
+		           do {
+		             price = prompt('Le produit ' + pdt.name + ' est à prix libre.\nCombien voulez vous payer pour la quantité que vous avez prise ? ('
+				                  + value + ' ' + pdt.unit + ')');
+		             if (price === null) { return; }
+		             price = parseFloat(_.replace(price, ",", "."));
+		           } while (isNaN(price));
+		         } else {
+		           price = pdt.price * value;
+		         };
                  Vue.set(this.basket, id, {qtity: before.qtity + value, price: before.price + price});
                  input.value = '';
                }
@@ -295,14 +288,14 @@
            }
          }
          else
-         {
-           var balance_end = {{ balance_amount | comma_to_dot }} - this.totalAmount();
-           if (balance_end < 0) {
-             if (! confirm("Ce compte sera en négatif de " + -balance_end.toFixed(2) + " € à la fin la transaction ! Voulez-vous quand même effectuer l'achat ?")) {
-               e.preventDefault()
+           {
+             var balance_end = {{ balance_amount | comma_to_dot }} - this.totalAmount();
+             if (balance_end < 0) {
+               if (! confirm("Ce compte sera en négatif de " + -balance_end.toFixed(2) + " € à la fin la transaction ! Voulez-vous quand même effectuer l'achat ?")) {
+                 e.preventDefault()
+               }
              }
            }
-         }
        }
        else {
          if (! confirm("Cette cagnotte est configurée pour que le client paye la somme exacte après un achat sans approvisionner cagnotte. Voulez-vous quand même effectuer l'achat ? Si vous acceptez, vous devez encaisser la somme du ticket de caisse qui est de " + this.totalAmount().toFixed(2) + " €")) {
@@ -311,51 +304,51 @@
        }
      },
      onKeyUp(event){
-         // cannot match directly a "/" with attribute directive
-         if (event.key === '/') {
-             event.preventDefault();
-             this.jumpToSearch();
-         }
+       // cannot match directly a "/" with attribute directive
+       if (event.key === '/') {
+         event.preventDefault();
+         this.jumpToSearch();
+       }
      },
      jumpToSearch(){
-          document.querySelector('input.search').focus();
-          this.search = '';
-      },
-      moveSelectionUp(e){
-          e.preventDefault();
-          let selected = this.getSelectedRow();
-           if (! selected) {
-              document.querySelector('#catalog tbody tr input').focus()
-          } else if (selected.previousElementSibling) {
-              selected.previousElementSibling.querySelector('input').focus();
+       document.querySelector('input.search').focus();
+       this.search = '';
+     },
+     moveSelectionUp(e){
+       e.preventDefault();
+       let selected = this.getSelectedRow();
+       if (! selected) {
+         document.querySelector('#catalog tbody tr input').focus()
+       } else if (selected.previousElementSibling) {
+         selected.previousElementSibling.querySelector('input').focus();
 
-          }
-      },
-      moveSelectionDown(e){
-          e.preventDefault();
-          let selected = this.getSelectedRow();
-          if (! selected) {
-              document.querySelector('#catalog tbody tr input').focus();
-          } else if (selected.nextElementSibling){
-              selected.nextElementSibling.querySelector('input').focus();
-          }
-      },
-      getSelectedRow(){
-          return document.querySelector('#catalog tbody tr:focus-within');
-      },
-      forceNumericValue(e){
-          e.target.value = e.target.value.replace(/[^0-9,.]/, '');
-      },
+       }
+     },
+     moveSelectionDown(e){
+       e.preventDefault();
+       let selected = this.getSelectedRow();
+       if (! selected) {
+         document.querySelector('#catalog tbody tr input').focus();
+       } else if (selected.nextElementSibling){
+         selected.nextElementSibling.querySelector('input').focus();
+       }
+     },
+     getSelectedRow(){
+       return document.querySelector('#catalog tbody tr:focus-within');
+     },
+     forceNumericValue(e){
+       e.target.value = e.target.value.replace(/[^0-9,.]/, '');
+     },
    },
    mounted() {
-       // start with focus on search
-       document.querySelector('input[autofocus]').focus();
+     // start with focus on search
+     document.querySelector('input[autofocus]').focus();
    },
  })
 </script>
 
 <p class="text-small footer-tip">
- Pssst ! Des raccourcis clavier existent ; essaye <kbd>/</kbd> <kbd>Entrée</kbd> <kbd>↓</kbd> <kbd>↑</kbd> des fois que…
+  Pssst ! Des raccourcis clavier existent ; essaye <kbd>/</kbd> <kbd>Entrée</kbd> <kbd>↓</kbd> <kbd>↑</kbd> des fois que…
 </p>
 
 {% endblock content %}
