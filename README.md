@@ -49,9 +49,7 @@ Si vous utilisez le Compteur du Gase et que vous acceptez d'apparaître sur cett
 
 Version de démo ici : https://demo-compteur.gase.eu.org
 
-Nom d'utilisateur : demo
-
-Mot de passe : demo
+L'interface d'administration n'est pour l'instant pas accessible sans compte sur le serveur gase.eu.org.
 
 
 ## Installation
