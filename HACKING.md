@@ -62,3 +62,5 @@ La définition du `login_router` (voir plus haut).
 On y définit les trois permissions.
 
 Remarque : la permission admin est "protected", c'est-à-dire qu'on ne peut pas la donner aux visiteurs, car sinon le visiteur essaie d'accéder à l'interface d'amdin en tant que anonyme et ça c'est pas possible.
+
+Remarque : si on veut donner la permission "admin" a un utilisateur il faut aussi lui donner la permission "main" même si celle-ci est déjà accordée aux visiteurs sinon ça bug.
