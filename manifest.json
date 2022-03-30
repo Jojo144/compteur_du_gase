@@ -7,13 +7,13 @@
         "fr": "Logiciel de gestion de cagnottes et de stock pour un GASE (Groupement d'Achat en Service Épicerie)."
     },
     "version": "2022-01-21~ynh2",
+    "url": "https://github.com/Jojo144/compteur_du_gase",
     "license": "WTFPL",
     "maintainer": {
         "name": "jojo144",
         "email": "jojo144@girole.fr",
         "url": "https://github.com/Jojo144/compteur_du_gase"
     },
-    "url": "https://github.com/Jojo144/compteur_du_gase",
     "requirements": {
         "yunohost": ">> 4.2"
     },
