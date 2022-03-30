@@ -7,7 +7,7 @@
         "en": "A django app.",
         "fr": "Logiciel de gestion de cagnottes et de stock pour un GASE (Groupement d'Achat en Service Épicerie)."
     },
-    "license": "WTFPL-2.0",
+    "license": "WTFPL",
     "maintainer": {
         "name": "jojo144",
         "email": "jojo144@girole.fr",
