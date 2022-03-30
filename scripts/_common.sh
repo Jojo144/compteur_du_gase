@@ -1,6 +1,15 @@
 #!/bin/bash
 
+#=================================================
+# COMMON VARIABLES
+#=================================================
+
+# dependencies used by the app
 pkg_dependencies="python3-pip python3-virtualenv python3-venv python3-wheel sqlite3 build-essential python3-dev python3-dev libldap2-dev libsasl2-dev ldap-utils"
+
+#=================================================
+# PERSONAL HELPERS
+#=================================================
 
 set_initial_permissions() {
     ynh_permission_url --permission="main" --url="/"
@@ -25,3 +34,11 @@ set_initial_permissions() {
            --show_tile="false"
     fi
 }
+
+#=================================================
+# EXPERIMENTAL HELPERS
+#=================================================
+
+#=================================================
+# FUTURE OFFICIAL HELPERS
+#=================================================

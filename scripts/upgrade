@@ -1,40 +1,69 @@
 #!/bin/bash
 
+#=================================================
+# GENERIC START
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
+
 source _common.sh
 source /usr/share/yunohost/helpers
 
+#=================================================
+# LOAD SETTINGS
+#=================================================
+ynh_script_progression --message="Loading installation settings..."
 
 app=$YNH_APP_INSTANCE_NAME
+
 domain=$(ynh_app_setting_get --app=$app --key=domain)
-path=$(ynh_app_setting_get --app=$app --key=path)
+path_url=$(ynh_app_setting_get --app=$app --key=path)
 admin=$(ynh_app_setting_get --app=$app --key=admin)
+final_path=$(ynh_app_setting_get --app=$app --key=final_path)
+admin_mail=$(ynh_user_get_info --username="$admin" --key=mail)
+secret=$(ynh_app_setting_get --app=$app --key=secret)
 
-final_path=/opt/$app
-settings_local=$final_path/compteur/settings_local.py
+#=================================================
+# CHECK VERSION
+#=================================================
+ynh_script_progression --message="Checking version..."
 
-ynh_script_progression --message="Backing up the app before upgrading (may take a while)..." --time --weight=1
+upgrade_type=$(ynh_check_app_version_changed)
+
+#=================================================
+# BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
+#=================================================
+ynh_script_progression --message="Backing up the app before upgrading (may take a while)..."
 
 # Backup the current version of the app
 ynh_backup_before_upgrade
 ynh_clean_setup () {
-	# restore it if the upgrade fails
+	ynh_clean_check_starting
+	# Restore it if the upgrade fails
 	ynh_restore_upgradebackup
 }
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
+#=================================================
+# STANDARD UPGRADE STEPS
+#=================================================
+# STOP SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Stopping a systemd service..."
 
-ynh_script_progression --message="Upgrading..." --time --weight=1
+ynh_systemd_action --service_name=$app --action="stop" --log_path="systemd"
 
+#=================================================
+# ENSURE DOWNWARD COMPATIBILITY
+#=================================================
+ynh_script_progression --message="Ensuring downward compatibility..."
 
-#--------------------------- PRE-UPGRADE MIGRATIONS------------------
-
-
-# MIGRATION : migrate from old permissions system to new-style permissions
+# Cleaning legacy permissions
 if ynh_legacy_permissions_exists
 then
-    # And URL/sso legacy settings
-    ynh_legacy_permissions_delete_all
+	# And URL/sso legacy settings
+	ynh_legacy_permissions_delete_all
 fi
 
 # We can have no legacy permissions but still need to initialize new ones
@@ -48,48 +77,141 @@ is_public=$(ynh_app_setting_get --app=$app --key=is_public)
 
 if [ -n "$is_public" ]
 then
-    # no need for manual migration for is_public (auto-handled by ynh)
-    # just remove the un-needed setting
-    ynh_app_setting_delete --app=$app --key=is_public
+	# no need for manual migration for is_public (auto-handled by ynh)
+	# just remove the un-needed setting
+	ynh_app_setting_delete --app=$app --key=is_public
 fi
 
 if [ -n "$is_home_public" ]
 then
-    if [[ $is_home_public -eq 1 ]]
-    then
-        ynh_permission_update --permission home_page --add visitors
-    else
-        ynh_permission_update --permission home_page --remove visitors
-    fi
-    ynh_app_setting_delete --app=$app --key=is_home_public
+	if [[ $is_home_public -eq 1 ]]
+	then
+		ynh_permission_update --permission home_page --add visitors
+	else
+		ynh_permission_update --permission home_page --remove visitors
+	fi
+	ynh_app_setting_delete --app=$app --key=is_home_public
 fi
 
 # MIGRATION : Enable django auth module
-if ! grep -q 'YNH_INTEGRATION_ENABLED = True' $settings_local
+if ! grep -q 'YNH_INTEGRATION_ENABLED = True' $final_path/compteur/settings_local.py
 then
-    echo 'YNH_INTEGRATION_ENABLED = True' >> $settings_local
+	echo 'YNH_INTEGRATION_ENABLED = True' >> $final_path/compteur/settings_local.py
 fi
 
-#-------------------------------UPGRADE-------------------------
+#=================================================
+# CREATE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Making sure dedicated system user exists..."
 
+# Create a dedicated user (if not existing)
+ynh_system_user_create --username=$app --home_dir="$final_path"
 
-venv_python=$final_path/venv/bin/python3
-venv_pip=$final_path/venv/bin/pip
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
 
-# Les exclude sont là pour permettre les tests de paquet ynh en local
-rsync -va ../ $final_path/ --filter=':- ../.gitignore' --exclude=/conf/gunicorn_config.py
+if [ "$upgrade_type" == "UPGRADE_APP" ]
+then
+	ynh_script_progression --message="Upgrading source files..."
+
+	# Les exclude sont là pour permettre les tests de paquet ynh en local
+	rsync -va ../ $final_path/ --filter=':- ../.gitignore' --exclude=/conf/gunicorn_config.py
+fi
 
 chmod 750 "$final_path"
 chmod -R o-rwx "$final_path"
 chown -R $app:www-data "$final_path"
 
-sudo -u $app $venv_pip install -r $final_path/requirements.txt -r $final_path/requirements-yunohost.txt
-sudo -u $app $venv_python $final_path/manage.py migrate --noinput
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+ynh_script_progression --message="Upgrading NGINX web server configuration..."
 
+# Create a dedicated NGINX config
+ynh_add_nginx_config
 
-#----------------------------FINALIZATION-----------------------
+#=================================================
+# UPGRADE DEPENDENCIES
+#=================================================
+ynh_script_progression --message="Upgrading dependencies..."
 
-ynh_script_progression --message="Restarting Gunicorn..." --time --weight=1
-sudo systemctl restart $app
-sudo yunohost app ssowatconf
-sudo service nginx reload
+ynh_install_app_dependencies $pkg_dependencies
+
+#=================================================
+# SPECIFIC UPGRADE
+#=================================================
+# ADD A CONFIGURATION
+#=================================================
+ynh_script_progression --message="Adding a configuration file..."
+
+if [ "$path_url" = "/" ]
+then
+    cdgpath=""
+else
+    cdgpath="${path_url:1}/"
+fi
+
+ynh_add_config --template="$final_path/compteur/settings_local.py.example" --destination="$final_path/compteur/settings_local.py"
+ynh_add_config --template="../conf/gunicorn_config.py" --destination="$final_path/gunicorn_config.py"
+
+#=================================================
+# BUILD APP
+#=================================================
+ynh_script_progression --message="Building app..."
+
+pushd $final_path
+	ynh_secure_remove --file="$final_path/venv"
+	python3 -m venv $final_path/venv
+	set +u;
+	source $final_path/venv/bin/activate
+	set -u;
+	pip install --upgrade pip
+	pip install gunicorn
+	pip install -r $final_path/requirements.txt -r $final_path/requirements-yunohost.txt
+	python3 manage.py migrate --noinput
+	set +u;
+	deactivate
+	set -u;
+popd
+
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:www-data "$final_path"
+
+#=================================================
+# GENERIC FINALIZATION
+#=================================================
+# SETUP LOGROTATE
+#=================================================
+ynh_script_progression --message="Upgrading logrotate configuration..."
+
+# Use logrotate to manage app-specific logfile(s)
+ynh_use_logrotate --non-append
+
+#=================================================
+# INTEGRATE SERVICE IN YUNOHOST
+#=================================================
+ynh_script_progression --message="Integrating service in YunoHost..."
+
+yunohost service add $app --log /var/log/$app/error.log /var/log/$app/access.log
+
+#=================================================
+# START SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Starting a systemd service..."
+
+ynh_systemd_action --service_name=$app --action="start" --log_path="systemd" --line_match="Started"
+
+#=================================================
+# RELOAD NGINX
+#=================================================
+ynh_script_progression --message="Reloading NGINX web server..."
+
+ynh_systemd_action --service_name=nginx --action=reload
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_script_progression --message="Upgrade of $app completed"

@@ -1,120 +1,178 @@
 #!/bin/bash
 
+#=================================================
+# GENERIC START
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
+
 source _common.sh
 source /usr/share/yunohost/helpers
 
+#=================================================
+# MANAGE SCRIPT FAILURE
+#=================================================
+
+ynh_clean_setup () {
+	ynh_clean_check_starting
+}
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
+
+#=================================================
+# RETRIEVE ARGUMENTS FROM THE MANIFEST
+#=================================================
+
+domain=$YNH_APP_ARG_DOMAIN
+path_url=$YNH_APP_ARG_PATH
+admin=$YNH_APP_ARG_ADMIN
+admin_mail=$(ynh_user_get_info --username="$admin" --key=mail)
 
 app=$YNH_APP_INSTANCE_NAME
 
-domain=$YNH_APP_ARG_DOMAIN
-path=$YNH_APP_ARG_PATH
-admin=$YNH_APP_ARG_ADMIN
+secret=$(ynh_string_random 24) # A bug don't allow to do random string bigger than 24
+
+#=================================================
+# CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
+#=================================================
+ynh_script_progression --message="Validating installation parameters..."
 
 final_path=/opt/$app
+test ! -e "$final_path" || ynh_die --message="This path already contains a folder"
 
-# We do this first so that we have nothing to remove if we fail
-# FIXME don't delete the user in case of failure here!
-sudo useradd $app -d $final_path \
-    || (ynh_die "User already exists: ${app}.\n Aborting.")
+# Register (book) web path
+ynh_webpath_register --app=$app --domain=$domain --path_url=$path_url
 
-ynh_abort_if_errors
+#=================================================
+# STORE SETTINGS FROM MANIFEST
+#=================================================
+ynh_script_progression --message="Storing installation settings..."
 
+ynh_app_setting_set --app=$app --key=domain --value=$domain
+ynh_app_setting_set --app=$app --key=path --value=$path_url
+ynh_app_setting_set --app=$app --key=admin --value=$admin
+ynh_app_setting_set --app=$app --key=secret --value=$secret
 
-#     ynh_normalize_url_path example    # -> /example
-#     ynh_normalize_url_path /example   # -> /example
-#     ynh_normalize_url_path /example/  # -> /example
-#     ynh_normalize_url_path /          # -> /
-path=$(ynh_normalize_url_path $path)
+#=================================================
+# INSTALL DEPENDENCIES
+#=================================================
+ynh_script_progression --message="Installing dependencies..."
 
-ynh_app_setting_set "$app" domain "$domain"
-ynh_app_setting_set "$app" path "$path"
-ynh_app_setting_set "$app" admin "$admin"
-
-
-secret=$(ynh_string_random 24) # A bug don't allow to do random string bigger than 24
-ynh_app_setting_set "$app" secret "$secret"
-
-# Check domain/path availability
-ynh_webpath_available $domain $path
-
-# FXME Useful? Make the script fail with
-# This app is already installed. The url cannot be changed just by this function. Look into `app changeurl` if it's available.
-# ynh_webpath_register $app $domain $path
-
-
-# Dependencies
 ynh_install_app_dependencies $pkg_dependencies
 
+#=================================================
+# CREATE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Configuring system user..."
+
+# Create a system user
+ynh_system_user_create --username=$app --home_dir="$final_path"
+
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
+ynh_script_progression --message="Setting up source files..."
+
+ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+# Download, check integrity, uncompress and patch the source from app.src
 sudo mkdir -p $final_path
 cp -r .. $final_path
 
-python3 -m venv $final_path/venv
-venv_python=$final_path/venv/bin/python3
-venv_pip=$final_path/venv/bin/pip
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:www-data "$final_path"
 
-$venv_pip install pip --upgrade
-$venv_pip install gunicorn
-$venv_pip install -r $final_path/requirements.txt -r $final_path/requirements-yunohost.txt
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+ynh_script_progression --message="Configuring NGINX web server..."
 
-admin_mail=$(ynh_user_get_info --username="$admin" --key=mail)
+# Create a dedicated NGINX config
+ynh_add_nginx_config
 
-# Configuration Django
-settings_local=$final_path/compteur/settings_local.py
-cp $final_path/compteur/settings_local.py.example $settings_local
-ynh_replace_string "YNH_APP_ARG_DOMAIN" $domain $settings_local
-# In settings_local, the path should be empty or wiht a trailing / and no starting /
-if [ "$path" = "/" ]
+#=================================================
+# SPECIFIC SETUP
+#=================================================
+# ADD A CONFIGURATION
+#=================================================
+ynh_script_progression --message="Adding a configuration file..."
+
+if [ "$path_url" = "/" ]
 then
-    ynh_replace_string "YNH_APP_ARG_PATH" "" $settings_local
+    cdgpath=""
 else
-    ynh_replace_string "YNH_APP_ARG_PATH" "${path:1}/" $settings_local
+    cdgpath="${path_url:1}/"
 fi
-ynh_replace_string "YNH_APP_ARG_EMAIL" $admin_mail $settings_local
-ynh_replace_string "YNH_APP_SECRET_KEY" $secret $settings_local
-ynh_replace_string "YNH_APP_STATIC_ROOT" $final_path/static $settings_local
-ynh_replace_string "YNH_APP_ID" $app $settings_local
-echo 'YNH_INTEGRATION_ENABLED = True' >> $settings_local
 
-# Set permissions
-sudo chown -R $app:www-data $final_path
+ynh_add_config --template="$final_path/compteur/settings_local.py.example" --destination="$final_path/compteur/settings_local.py"
+ynh_add_config --template="../conf/gunicorn_config.py" --destination="$final_path/gunicorn_config.py"
 
+#=================================================
+# BUILD APP
+#=================================================
+ynh_script_progression --message="Building app..."
 
-# Log folder
-sudo mkdir -p /var/log/$app
-sudo chown -R $app /var/log/$app
+pushd $final_path
+	python3 -m venv $final_path/venv
+	set +u;
+	source $final_path/venv/bin/activate
+	set -u;
+	pip install --upgrade pip
+	pip install gunicorn
+	pip install -r $final_path/requirements.txt -r $final_path/requirements-yunohost.txt
+	python3 manage.py migrate --noinput
+	python3 manage.py collectstatic --noinput
+	echo "UPDATE base_localsettings SET mail_from = 'Le compteur du GASE <le-compteur@$domain>';" |  python3 manage.py dbshell
+	python3 manage.py loaddata initial_database.json
+	set +u;
+	deactivate
+	set -u;
+popd
 
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:www-data "$final_path"
 
-sudo -u $app $venv_python $final_path/manage.py migrate --noinput
-sudo -u $app $venv_python $final_path/manage.py collectstatic --noinput
+#=================================================
+# SETUP SYSTEMD
+#=================================================
+ynh_script_progression --message="Configuring a systemd service..."
 
-# Set a working sending email by default
-echo "UPDATE base_localsettings SET mail_from = 'Le compteur du GASE <le-compteur@$domain>';" | sudo -u $app $venv_python $final_path/manage.py dbshell
+# Create a dedicated systemd config
+ynh_add_systemd_config
 
-# Populate initial database
-sudo -u $app $venv_python $final_path/manage.py loaddata initial_database.json
+#=================================================
+# GENERIC FINALIZATION
+#=================================================
+# SETUP LOGROTATE
+#=================================================
+ynh_script_progression --message="Configuring log rotation..."
 
+mkdir -p /var/log/$app
+chown -R $app /var/log/$app
+# Use logrotate to manage application logfile(s)
+ynh_use_logrotate
 
-# Modify Nginx configuration file and copy it to Nginx conf directory
-if [ "$path" = "/" ]
-then
-    # to avoid "//static"
-    ynh_replace_string "STATICPATHTOCHANGE" "/static" ../conf/nginx.conf
-else
-    ynh_replace_string "STATICPATHTOCHANGE" "$path/static" ../conf/nginx.conf
-fi
-ynh_replace_string "PATHTOCHANGE" $path ../conf/nginx.conf
-ynh_replace_string "YNH_APP_INSTANCE_NAME" $app ../conf/nginx.conf
-sudo cp ../conf/nginx.conf /etc/nginx/conf.d/$domain.d/$app.conf
+#=================================================
+# INTEGRATE SERVICE IN YUNOHOST
+#=================================================
+ynh_script_progression --message="Integrating service in YunoHost..."
 
+yunohost service add $app --log /var/log/$app/error.log /var/log/$app/access.log
 
-# Service gunicorn
-ynh_replace_string "YNH_APP_INSTANCE_NAME" $app ../conf/gunicorn_config.py
-ynh_replace_string "YNH_APP_INSTANCE_NAME" $app ../conf/gunicorn.service
-sudo cp ../conf/gunicorn.service /etc/systemd/system/$app.service
-sudo systemctl daemon-reload
-sudo cp ../conf/gunicorn_config.py $final_path
+#=================================================
+# START SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Starting a systemd service..."
 
-# Permissions
+# Start a systemd service
+ynh_systemd_action --service_name=$app --action="start" --log_path="systemd" --line_match="Started"
+
+#=================================================
+# SETUP SSOWAT
+#=================================================
+ynh_script_progression --message="Configuring permissions..."
+
 set_initial_permissions
 
 # Choisit un nom pratique pour la tuile (qui peut être changé par la suite) + rend la tuile visible
@@ -126,10 +184,15 @@ else
 fi
 ynh_permission_update --permission="main" --show_tile=true --label= "$app_label"
 
+#=================================================
+# RELOAD NGINX
+#=================================================
+ynh_script_progression --message="Reloading NGINX web server..."
 
-## Reload Nginx and regenerate SSOwat conf
-sudo yunohost app ssowatconf
-sudo service nginx reload
-sudo systemctl start $app
-sudo systemctl enable $app
-sudo yunohost service add $app -l /var/log/$app/error.log /var/log/$app/access.log
+ynh_systemd_action --service_name=nginx --action=reload
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_script_progression --message="Installation of $app completed"

@@ -1,6 +1,6 @@
 {
     "name": "Le compteur du GASE",
-    "id": "compteur_gase",
+    "id": "compteur_du_gase",
     "packaging_format": 1,
     "description": {
         "en": "A django app.",
