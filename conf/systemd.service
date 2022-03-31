@@ -5,7 +5,7 @@ After=network.target
 [Service]
 PIDFile=/run/gunicorn/__APP__-pid
 User=__APP__
-Group=www-data
+Group=__APP__
 WorkingDirectory=__FINALPATH__/
 ExecStart=__FINALPATH__/venv/bin/gunicorn -c __FINALPATH__/gunicorn_config.py compteur.wsgi
 ExecReload=/bin/kill -s HUP $MAINPID
