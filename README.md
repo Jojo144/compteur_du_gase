@@ -12,6 +12,8 @@ Le logiciel est pensé pour les groupements d’achats / épiceries fonctionnant
 
 Le CdG intègre aussi un tableau des permanences qui permet de s'inscrire pour tenir les permanences de l'épiceries.
 
+[![Integration level](https://dash.yunohost.org/integration/compteur_du_gase.svg)](https://dash.yunohost.org/appci/app/compteur_du_gase) ![](https://ci-apps.yunohost.org/ci/badges/compteur_du_gase.status.svg)  ![](https://ci-apps.yunohost.org/ci/badges/compteur_du_gase.maintain.svg)
+[![Install compteur_du_gase with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=compteur_du_gase)
 
 ## Capture d'écran
 
