@@ -89,7 +89,7 @@ Nous proposons un paquet YunoHost.
 
 Pour installer :
 ```
-sudo yunohost app install https://github.com/Jojo144/compteur_du_gase_ynh
+sudo yunohost app install https://github.com/YunoHost-Apps/compteur_du_gase_ynh
 ```
 Normalement les scripts `install`, `upgrade`, `remove`, `backup` et `restore` fonctionnent.
 
@@ -97,7 +97,7 @@ Pour mettre à jour :
 
 **⚠ Faire une sauvegarde de la base de donnée (fichier db.sqlite3) avant toute mse à jour.**
 ```
-sudo yunohost app upgrade compteur_gase -u https://github.com/Jojo144/compteur_du_gase_ynh
+sudo yunohost app upgrade compteur_gase -u https://github.com/YunoHost-Apps/compteur_du_gase_ynh
 ```
 YunoHost 4.2 est requis.
 
