@@ -69,9 +69,9 @@ Testé sur Ubuntu 19.04. Il suffit d'exécuter le script `local_install.sh` qui 
 sudo apt-get install python3-venv nginx
 sudo mkdir /opt/compteur_gase
 cd /opt/compteur_gase
-sudo git clone https://github.com/Jojo144/compteur_du_gase_ynh
+sudo git clone https://github.com/Jojo144/compteur_du_gase
 # personaliser les variables dans local_install.sh
-sudo compteur_du_gase_ynh/local_install.sh
+sudo compteur_du_gase/local_install.sh
 ```
 Ensuite le logiciel est accessible sur http://localhost .
 Tester aussi de redémarrer pour voir si les services se lancent bien tous seuls.
@@ -89,7 +89,7 @@ Nous proposons un paquet YunoHost.
 
 Pour installer :
 ```
-sudo yunohost app install https://github.com/YunoHost-Apps/compteur_du_gase_ynh
+sudo yunohost app install https://github.com/YunoHost-Apps/compteur_du_gase
 ```
 Normalement les scripts `install`, `upgrade`, `remove`, `backup` et `restore` fonctionnent.
 
@@ -97,7 +97,7 @@ Pour mettre à jour :
 
 **⚠ Faire une sauvegarde de la base de donnée (fichier db.sqlite3) avant toute mse à jour.**
 ```
-sudo yunohost app upgrade compteur_gase -u https://github.com/YunoHost-Apps/compteur_du_gase_ynh
+sudo yunohost app upgrade compteur_gase -u https://github.com/YunoHost-Apps/compteur_du_gase
 ```
 YunoHost 4.2 est requis.
 
