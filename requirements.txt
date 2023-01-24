@@ -1,5 +1,4 @@
-django>=2.2,<3.0  # LTS version
-django-crispy-forms>=1.9.2,<1.10
-# We can bump to openpyxl 3.x once we drop Debian Strech (Py3.5) support
-django-easy-select2>=1.5.7,<1.6
-openpyxl>=2.6.4,<3.0
+django>=3.2,<3.4  # LTS version
+django-crispy-forms>=1.13.0,<1.14
+django-easy-select2>=1.5.8,<1.5.9  # careful, compatibility drop happen on patch-level :-(
+openpyxl>=3.0.9,<3.1
