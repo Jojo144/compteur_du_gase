@@ -26,19 +26,22 @@
         >
       </div>
       <div class="col text-right">
-        <div class="dropdown">
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
-                  data-toggle="dropdown">
-            [[ category ]]
-          </button>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <button class="dropdown-item" @click="category='Toutes catégories'">Toutes catégories
-            </button>
-            {% for cat in cats %}
-              <button class="dropdown-item" @click="category='{{ cat | escapejs }}'">{{ cat.name | escape }}</button>
-            {% endfor %}
-          </div>
-        </div>
+          {% if use_categories %}
+              <div class="dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                          data-toggle="dropdown">
+                      [[ category ]]
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <button class="dropdown-item" @click="category='Toutes catégories'">Toutes catégories
+                      </button>
+                      {% for cat in cats %}
+                          <button class="dropdown-item"
+                                  @click="category='{{ cat | escapejs }}'">{{ cat.name | escape }}</button>
+                      {% endfor %}
+                  </div>
+              </div>
+          {% endif %}
       </div>
     </div>
     <table class="table table-striped" id="catalog">

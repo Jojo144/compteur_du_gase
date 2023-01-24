@@ -169,17 +169,20 @@ def achats(request, household_id):
         balance = household.account
         alerte_balance_amount = local_settings.min_balance
 
-        context = {'household': household,
-                   'cats': Category.objects.all(),
-                   'max_amount': household.account - local_settings.min_account,
-                   'balance_amount': balance,
-                   'pdts': pdts,
-                   'history': history,
-                   'use_exports': local_settings.use_exports,
-                   'alerte_balance': balance < alerte_balance_amount,
-                   'alerte_balance_amount': '{0:.2f}'.format(alerte_balance_amount),
-                   'on_the_flight': household.on_the_flight,
-                   'min_account_allow': local_settings.min_account_allow}
+        context = {
+            'household': household,
+            'cats': Category.objects.all(),
+            'max_amount': household.account - local_settings.min_account,
+            'balance_amount': balance,
+            'pdts': pdts,
+            'history': history,
+            'use_exports': local_settings.use_exports,
+            'alerte_balance': balance < alerte_balance_amount,
+            'alerte_balance_amount': '{0:.2f}'.format(alerte_balance_amount),
+            'on_the_flight': household.on_the_flight,
+            'min_account_allow': local_settings.min_account_allow,
+            'use_categories': local_settings.use_categories,
+        }
 
         return render(request, 'base/achats.html', context)
 
@@ -334,13 +337,21 @@ def product_history(request, product_id):
     return render(request, 'base/product_history.html', {'operations': operations, 'pdt': pdt, 'unit': plural_unit})
 
 
+
 def products(request):
     local_settings = get_local_settings()
-    if local_settings.use_cost_of_purchase:
-        columns = ['nom', 'catégorie', 'fournisseur', "prix d'achat", 'prix de vente', 'vrac', 'visible',
-                   'alerte stock', 'stock']
-    else:
-        columns = ['nom', 'catégorie', 'fournisseur', 'prix', 'vrac', 'visible', 'alerte stock', 'stock']
+    all_columns = ['nom', 'catégorie', 'fournisseur', "prix d'achat", 'prix de vente', 'vrac',
+     'visible',
+     'alerte stock', 'stock']
+    columns = []
+    for column in all_columns:
+        if not (
+                (column == "prix d'achat" and not local_settings.use_cost_of_purchase)
+                or
+                (column == "catégorie" and not local_settings.use_cost_of_purchase)
+        ):
+            columns.append(column)
+
     pdts = [{"id": p.id, "nom": p.name, "catégorie": str(p.category), "fournisseur": str(p.provider),
              "prix d'achat": '{} € / {}'.format(p.cost_of_purchase, p.unit.name),
              "prix de vente": '{} € / {}'.format(p.price, p.unit.name), "prix": '{} € / {}'.format(p.price, p.unit.name),

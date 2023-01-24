@@ -58,6 +58,11 @@ class ProductForm(forms.ModelForm):
 
 
 class ProductFormWithoutPurchase(ProductForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not get_local_settings().use_categories:
+            self.fields.pop('category')
+
     class Meta(ProductForm.Meta):
         exclude = ['activated', 'cost_of_purchase']
 
