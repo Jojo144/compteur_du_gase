@@ -47,7 +47,7 @@
         <tr>
             <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
                 [[ _.capitalize(column) ]]
-                [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
+                [[ sortKey == column ? (sortWay === 'asc' ? "⯆" : "⯅") : ""]]
             </th>
             <th></th>
             <th></th>
@@ -75,15 +75,26 @@
       only_visible: true,
       only_alerte: false,
       search: '',
-      reverse: false,
+      sortWay: 'asc',
       columns: {{ columns | safe }},
       raw_data: {{ pdts | safe }}
       },
 
       computed: {
       orderedData: function () {
-          let way = this.reverse ? 'desc' : 'asc';
-          return _.orderBy(this.raw_data, x => x[this.sortKey].toLowerCase(), way);
+          /* extract sort key from row, depending on its type */
+          function sortValue(row){
+              let val = row[this.sortKey]
+              if (! Number.isNaN(Number.parseFloat(val))) {
+                  return Number.parseFloat(val);
+              } else if (_.isString(val)) {
+                  return val.toLowerCase()
+              } else {
+                  return val;
+              }
+
+          };
+          return _.orderBy(this.raw_data, sortValue.bind(this), this.sortWay);
           }
       },
 
@@ -98,7 +109,7 @@
 
       sortBy: function(sortKey) {
           if (this.sortKey === sortKey) {
-              this.reverse = ! this.reverse;
+              this.sortWay = (this.sortWay === 'asc' ? 'desc' : 'asc');
           } else {
               this.sortKey = sortKey;
           }
