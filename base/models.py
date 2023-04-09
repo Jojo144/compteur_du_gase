@@ -52,6 +52,9 @@ class LocalSettings(models.Model):
                                    help_text="Le fichier de logo doit être placé dans le répertoire base/static/base"
                                              " et son nom de fichier doit etre logo.png.")
 
+    use_categories = models.BooleanField(verbose_name="Utilise les catégories de produits",
+                                         help_text="Si désactivé, les catégories ne seront pas proposées dans le formulaire et dans les listings.", default=True)
+
     use_mail = models.BooleanField(verbose_name="Utilisation de la fonction envoi d'email ?", default=True,
                                    help_text="Cette fonction permet d'envoyer les tickets de caisse ou "
                                              "des alertes stocks aux référents des produits.")
@@ -103,7 +106,7 @@ class LocalSettings(models.Model):
         verbose_name_plural = "Réglages divers"
 
 
-def get_local_settings():
+def get_local_settings() -> LocalSettings:
     return LocalSettings.objects.first()
 
 class Category(models.Model):
@@ -259,7 +262,7 @@ class Member(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=200, verbose_name="nom")
     provider = models.ForeignKey(Provider, verbose_name="fournisseur", on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, verbose_name="catégorie", on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, verbose_name="catégorie", on_delete=models.SET_NULL, null=True)
     unit = models.ForeignKey(Unit, verbose_name="unité", on_delete=models.CASCADE)
     # current price, can vary in the time ...
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="prix de vente",
