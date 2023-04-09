@@ -47,7 +47,7 @@
         <tr>
             <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
                 [[ _.capitalize(column) ]]
-                [[ sortKey == column ? (sortWay === 'asc' ? "⯆" : "⯅") : ""]]
+                [[ sortKey == column ? (sortWay === 'asc' ? "⯅" : "⯆") : ""]]
             </th>
             <th></th>
             <th></th>
