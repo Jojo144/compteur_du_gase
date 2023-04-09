@@ -82,13 +82,9 @@
 
       computed: {
       orderedData: function () {
-          var data = _.orderBy(this.raw_data, this.sortKey);
-          if (this.reverse) {
-          return _.reverse(data)
-          } else {
-          return data
+          let way = this.reverse ? 'desc' : 'asc';
+          return _.orderBy(this.raw_data, x => x[this.sortKey].toLowerCase(), way);
           }
-      }
       },
 
       methods: {
@@ -101,8 +97,11 @@
       },
 
       sortBy: function(sortKey) {
-          this.reverse = (this.sortKey == sortKey) ? ! this.reverse : false;
-          this.sortKey = sortKey
+          if (this.sortKey === sortKey) {
+              this.reverse = ! this.reverse;
+          } else {
+              this.sortKey = sortKey;
+          }
       },
 
       filter: function () {
