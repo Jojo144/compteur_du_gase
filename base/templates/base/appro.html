@@ -1,17 +1,53 @@
 {% extends 'base/base.html' %}
-{% load crispy_forms_tags %}
+{% load bootstrap4 %}
 
 {% block content %}
-<div class="narrow-content">
+<div class="large-content">
     <h4>Approvisionner les stocks à la réception d'une commande</h4>
     <h5>{{ provider }}</h5>
-    Entrez les quantités mises en rayon.
-    Seuls les produits "visibles" sont affichés ici.
-    <br>
-    <br>
-    <form action="" method="post">
+
+
+    <p>
+        Entrez les quantités mises en stock, et mettez éventuellement à jour les prix et la visibilité des produits.
+    </p>
+
+<br>
+    {% bootstrap_formset_errors formset %}
+    <form action="" method="post" class="form-inline">
         {% csrf_token %}
-        {{ form | crispy }}
+        {{ formset.management_form }}
+        <table class="table table-striped table-bordered" id="appro_table">
+            {%  for form in formset %}
+                {%  if forloop.first %}
+                    <tr>
+                        {%  for field in form %}
+                            <th>{{ field.label }}</th>
+                        {% endfor %}
+                    </tr>
+                {% endif %}
+
+                <tr {% if not form.initial.product.visible %}class="masked"{% endif %}>
+                    {% for field in form %}
+
+                        {% if field.name == 'product' %}
+                            <th scope="row">
+                                {{ field }} {# hidden #}
+                                <div class="form-group product_name">
+                                    {{ field.initial }}
+                                </div>
+
+                            </th>
+                        {% else %}
+                            <td class="col_{{ field.name }}">
+                                {% bootstrap_field field show_label="sr-only" layout="horizontal" %}
+                            </td>
+                        {% endif %}
+
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+
         <div class="form-buttons">
             <a class="btn btn-light" href="{% url 'base:pre_appro' %}">Annuler</a> &nbsp;
             <input class="btn btn-info" type="submit" value="Approvisionner">

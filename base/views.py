@@ -1,6 +1,7 @@
 import json
 from datetime import date
 from decimal import Decimal
+from typing import List, Iterable, Tuple
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
@@ -9,6 +10,7 @@ from django.contrib import messages
 from django.views.generic.edit import CreateView, UpdateView
 from django.db import transaction
 from django.db.models import Q, Sum
+from extra_views import FormSetView
 
 from .models import *
 from .forms import *
@@ -379,33 +381,89 @@ def pre_appro(request):
         form = ProviderList()
     return render(request, 'base/pre_appro.html', {'form': form})
 
+class ApproView(FormSetView):
+    """
+    Vue d'appro, permetant également de modifier rapidement les prix des produits approvisionnés
+    """
+    form_class = ProductApproForm
+    template_name = 'base/appro.html'
+    factory_kwargs = {'extra': 0, 'formset': ApproFormSet}
+    success_url = reverse_lazy('base:index')
 
-def appro(request, provider_id):
-    prov = get_object_or_404(Provider, pk=provider_id)
-    pdts = Product.objects.filter(provider=prov, visible=True)
-    if request.method == 'POST':
-        form = ProductList(pdts, request.POST)
-        if form.is_valid():
-            msgs = {}
-            for p, q in form.cleaned_data.items():
-                if q:
-                    pdt = Product.objects.get(pk=p)
-                    op = ChangeStockOp.create_appro_stock(product=pdt, quantity=q)
-                    op.save()
-                    pdt.stock += q
-                    pdt.save()
-                    for ref in pdt.get_email_stock_alert():
-                        msgs[ref] = msgs.get(ref, '') + '{} a été approvisionné de {} unités\n'.format(pdt, q)
-            messages.success(request, '✔ Approvisionnement effectué')
-            for (key, value) in msgs.items():
-                my_send_mail(request, subject='Approvisionnement : {}'.format(prov), message=value, recipients=[key], kind=Mail.APPRO_STOCK)
-            return HttpResponseRedirect(reverse('base:index'))
-    else:
-        form = ProductList(pdts)
-    context = {'provider': prov,
-               'form': form,
-               }
-    return render(request, 'base/appro.html', context)
+    def dispatch(self, request, *args, **kwargs):
+        provider_id = kwargs.pop('provider_id')
+        self.provider = get_object_or_404(Provider, pk=provider_id)
+        return super().dispatch(request, *args, **kwargs)
+
+    def formset_valid(self, formset):
+        """
+        Create appro, update stock and update modified attrs on products.
+        """
+        appro_summary: dict[Product, float] = {}
+
+        for form in formset:
+            if form.has_changed():
+                product = form.cleaned_data["product"]
+
+                for field_name in form.changed_data:
+                    field_value = form.cleaned_data[field_name]
+
+                    # Appro itself:
+                    if (field_name == "quantity") and (field_value != 0):
+                        self._do_appro(product, field_value)
+                        appro_summary[product] = field_value
+                    # Object edit:
+                    else:
+                        setattr(product, field_name, field_value)
+
+                    product.save()
+
+        messages.success(self.request, '✔ Approvisionnement effectué')
+        self._email_about_appro(self.provider, appro_summary.items())
+
+        return super().formset_valid(formset)
+
+    def get_initial(self):
+        products_qs = Product.objects.filter(provider=self.provider)
+        return [
+            {
+                "product": product,
+                "visible": product.visible,
+            }
+            for product in products_qs.all()
+        ]
+
+    def _email_about_appro(self, provider: Provider, appro_summary: Iterable[Tuple[Product, float]]):
+        """
+        Notify referents by email
+
+        For each referent, build a custom message mentioning the appros of the products
+        he/she is responsible for, and sent it.
+        """
+        msgs: dict[str, List[str]] = {}
+        for product, quantity in appro_summary:
+            for email in product.get_email_stock_alert():
+                if not email in msgs:
+                    msgs[email] = []
+                msg = f'{product} a été approvisionné de {quantity} {product.unit}'
+                msgs[email].append(msg)
+
+
+        for (email_addr, msgs) in msgs.items():
+            import ipdb;ipdb.set_trace()
+            my_send_mail(
+                self.request,
+                 subject=f'Approvisionnement : {provider}',
+                 message="\n".join(msgs),
+                 recipients=[email_addr],
+                 kind=Mail.APPRO_STOCK,
+                 )
+
+    @staticmethod
+    def _do_appro(product: Product, quantity: float):
+        ChangeStockOp.create_appro_stock(product=product, quantity=quantity)
+        product.stock += quantity
+
 
 
 def approslist(request):
