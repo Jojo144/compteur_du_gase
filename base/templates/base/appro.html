@@ -11,6 +11,12 @@
         Entrez les quantités mises en stock, et mettez éventuellement à jour les prix et la visibilité des produits.
     </p>
 
+    <div class="filter">
+        <button class="btn btn-secondary" id="toggle-visibility-btn">
+            Cacher les non visibles
+        </button>
+    </div>
+
 <br>
     {% bootstrap_formset_errors formset %}
     <form action="" method="post" class="form-inline">
@@ -54,4 +60,31 @@
         </div>
     </form>
 </div>
+<script>
+    const INVISIBLE_PRODUCT = 'invisible-product-row'
+    let visibleState = true ; // default
+    const elVisibilityBtn = $("#toggle-visibility-btn");
+    const elsVisibleCheckboxes = $(".col_visible input");
+
+    $(function () {
+        // Au chargement : ajoute la bonne classe aux lignes de produits non visibles
+        elsVisibleCheckboxes.not(':checked').parents('tr').addClass(INVISIBLE_PRODUCT);
+
+        // Sur bascule visibilité : ajoute/supprime la classe
+        elsVisibleCheckboxes.change(function(event) {
+            $(event.target).parents('tr').toggleClass(INVISIBLE_PRODUCT);
+        });
+
+        // Sur clic bouton
+        elVisibilityBtn.click(function (event) {
+            $(`.${INVISIBLE_PRODUCT}`).toggle() // show/hide rows
+            visibleState = ! visibleState;
+            if (visibleState) {
+                elVisibilityBtn.text("Masquer les non visibles");
+            } else {
+                elVisibilityBtn.text("Montrer les non visibles");
+            }
+        });
+    })
+</script>
 {% endblock content %}
