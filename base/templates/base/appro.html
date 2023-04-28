@@ -6,6 +6,9 @@
     <h4>Approvisionner les stocks à la réception d'une commande</h4>
     <h5>{{ provider }}</h5>
 
+    <div class='alert alert-warning' role='alert'>
+        ✨ Avez-vous bien <a href="/produit">créé les produits</a> qui n'existent pas encore pour ce fournisseur ?
+    </div>
 
     <p>
         Entrez les quantités mises en stock, et mettez éventuellement à jour les prix et la visibilité des produits.
@@ -65,6 +68,7 @@
     let visibleState = true ; // default
     const elVisibilityBtn = $("#toggle-visibility-btn");
     const elsVisibleCheckboxes = $(".col_visible input");
+    const elsQtyInputs = $(".col_quantity input");
 
     $(function () {
         // Au chargement : ajoute la bonne classe aux lignes de produits non visibles
@@ -85,6 +89,34 @@
                 elVisibilityBtn.text("Montrer les non visibles");
             }
         });
+
+        elsQtyInputs.change(function(event){
+            const row = $(event.target).parents('tr');
+            const productName = row.find(".product_name").text();
+            const elVisibleCheckbox = row.find('.col_visible input');
+
+            if (! elVisibleCheckbox.is(':checked') && (Number.parseFloat(event.target.value) > 0)) {
+                bootbox.confirm({
+                    locale: "fr",
+                    buttons: {
+                        confirm: {label: "Oui, passer en visible"},
+                        cancel: {label: "Non"},
+                    },
+                    message: (
+                     `<strong>Souhaitez-vous rendre le produit « ${productName} » visible ?</strong>`
+                     + "<br /> Il sera alors disponible à l'achat."
+                    ),
+                    callback: function(confirmed) {
+
+                        if (confirmed) {
+                            elVisibleCheckbox.prop('checked', true);
+                            elVisibleCheckbox.change(); // trigger event manually.
+                        }
+                    },
+                });
+            }
+        });
+
     })
 </script>
 {% endblock content %}
