@@ -1,4 +1,5 @@
 django>=3.2,<3.4  # LTS version
 django-crispy-forms>=1.13.0,<1.14
+django-extra-views>=0.14.0,<0.15
 django-easy-select2>=1.5.8,<1.5.9  # careful, compatibility drop happen on patch-level :-(
 openpyxl>=3.0.9,<3.1

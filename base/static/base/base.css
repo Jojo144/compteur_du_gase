@@ -27,6 +27,11 @@
     flex: 1;
 }
 
+/* workaround https://github.com/zostera/django-bootstrap4/issues/290*/
+#appro_table .col_visible label {
+    display: none;
+}
+
 .index-part {
   display: block;
   margin-top: 1em;

@@ -1,6 +1,6 @@
 from django import forms
 from django.conf import settings
-from django.forms import inlineformset_factory, Textarea
+from django.forms import inlineformset_factory, Textarea, BaseFormSet
 from django.utils.safestring import mark_safe
 from easy_select2.widgets import Select2
 
@@ -35,8 +35,10 @@ class ApproCompteFormKind(ApproCompteForm):
 
 
 
-# utilisé pour inventaire ET appro stock
 class ProductList(forms.Form):
+    """
+    Utilisé pour inventaire
+    """
     def __init__(self, pdts, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for p in pdts:
@@ -47,6 +49,67 @@ class ProductList(forms.Form):
                 help_text = "fournisseur : {} <br> prix : {} € / {} <br> stock actuel théorique : {} {}".format(
                     p.provider, p.price, p.unit, round_stock(p.stock), p.unit)
             self.fields[str(p.pk)] = forms.DecimalField(label=p.name, help_text=mark_safe(help_text), required=False)
+
+
+class ProductApproForm(forms.Form):
+    visible = forms.BooleanField(
+        label="Visible",
+        required=False,
+    )
+    product = forms.ModelChoiceField(
+        label="Produit",
+        widget=forms.HiddenInput,
+        queryset=Product.objects.all(),
+    )
+    quantity = forms.DecimalField(
+        label="Quantité réceptionnée",
+        required=False,
+    )
+    cost_of_purchase = forms.DecimalField(
+        label="Changer le prix d'achat (optionnel)",
+        required=False,
+        min_value=0,
+    )
+    price = forms.DecimalField(
+        label="Changer le prix de vente (optionnel)",
+        required=False,
+        min_value=0,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        product = kwargs['initial']['product']
+
+        self.fields['quantity'].help_text = (
+            "stock actuel théorique : "
+            f"{round_stock(product.stock)} {product.unit}"
+        )
+
+        self.fields['cost_of_purchase'].help_text = (
+            f"actuel : {product.cost_of_purchase} € / {product.unit}"
+        )
+        self.fields['cost_of_purchase'].widget.attrs['placeholder'] = (
+            "Nouveau prix d'achat"
+        )
+        self.fields['price'].help_text = (
+            f"actuel : {product.price} € / {product.unit}"
+        )
+        self.fields['price'].widget.attrs['placeholder'] = (
+            "Nouveau prix de vente"
+        )
+        self.fields['visible'].widget.attrs = {"class": "label-hidden"}
+
+        if not get_local_settings().use_cost_of_purchase:
+            del self.fields['cost_of_purchase']
+
+
+class ApproFormSet(BaseFormSet):
+    """
+    Permet de gérer un tableau de ProductApproForm
+    """
+    def clean(self):
+        if not self.has_changed():
+            raise ValidationError("Aucune appro ou modification saisie")
 
 
 # used for details AND creation

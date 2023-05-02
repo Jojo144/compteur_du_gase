@@ -1,21 +1,122 @@
 {% extends 'base/base.html' %}
-{% load crispy_forms_tags %}
+{% load bootstrap4 %}
 
 {% block content %}
-<div class="narrow-content">
+<div class="large-content">
     <h4>Approvisionner les stocks à la réception d'une commande</h4>
     <h5>{{ provider }}</h5>
-    Entrez les quantités mises en rayon.
-    Seuls les produits "visibles" sont affichés ici.
-    <br>
-    <br>
-    <form action="" method="post">
+
+    <div class='alert alert-warning' role='alert'>
+        ✨ Avez-vous bien <a href="/produit">créé les produits</a> qui n'existent pas encore pour ce fournisseur ?
+    </div>
+
+    <p>
+        Entrez les quantités mises en stock, et mettez éventuellement à jour les prix et la visibilité des produits.
+    </p>
+
+    <div class="filter">
+        <button class="btn btn-secondary" id="toggle-visibility-btn">
+            Cacher les non visibles
+        </button>
+    </div>
+
+<br>
+    {% bootstrap_formset_errors formset %}
+    <form action="" method="post" class="form-inline">
         {% csrf_token %}
-        {{ form | crispy }}
+        {{ formset.management_form }}
+        <table class="table table-striped table-bordered" id="appro_table">
+            {%  for form in formset %}
+                {%  if forloop.first %}
+                    <tr>
+                        {%  for field in form %}
+                            <th>{{ field.label }}</th>
+                        {% endfor %}
+                    </tr>
+                {% endif %}
+
+                <tr {% if not form.initial.product.visible %}class="masked"{% endif %}>
+                    {% for field in form %}
+
+                        {% if field.name == 'product' %}
+                            <th scope="row">
+                                {{ field }} {# hidden #}
+                                <div class="form-group product_name">
+                                    {{ field.initial }}
+                                </div>
+
+                            </th>
+                        {% else %}
+                            <td class="col_{{ field.name }}">
+                                {% bootstrap_field field show_label="sr-only" layout="horizontal" %}
+                            </td>
+                        {% endif %}
+
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+
         <div class="form-buttons">
             <a class="btn btn-light" href="{% url 'base:pre_appro' %}">Annuler</a> &nbsp;
             <input class="btn btn-info" type="submit" value="Approvisionner">
         </div>
     </form>
 </div>
+<script>
+    const INVISIBLE_PRODUCT = 'invisible-product-row'
+    let visibleState = true ; // default
+    const elVisibilityBtn = $("#toggle-visibility-btn");
+    const elsVisibleCheckboxes = $(".col_visible input");
+    const elsQtyInputs = $(".col_quantity input");
+
+    $(function () {
+        // Au chargement : ajoute la bonne classe aux lignes de produits non visibles
+        elsVisibleCheckboxes.not(':checked').parents('tr').addClass(INVISIBLE_PRODUCT);
+
+        // Sur bascule visibilité : ajoute/supprime la classe
+        elsVisibleCheckboxes.change(function(event) {
+            $(event.target).parents('tr').toggleClass(INVISIBLE_PRODUCT);
+        });
+
+        // Sur clic bouton
+        elVisibilityBtn.click(function (event) {
+            $(`.${INVISIBLE_PRODUCT}`).toggle() // show/hide rows
+            visibleState = ! visibleState;
+            if (visibleState) {
+                elVisibilityBtn.text("Masquer les non visibles");
+            } else {
+                elVisibilityBtn.text("Montrer les non visibles");
+            }
+        });
+
+        elsQtyInputs.change(function(event){
+            const row = $(event.target).parents('tr');
+            const productName = row.find(".product_name").text();
+            const elVisibleCheckbox = row.find('.col_visible input');
+
+            if (! elVisibleCheckbox.is(':checked') && (Number.parseFloat(event.target.value) > 0)) {
+                bootbox.confirm({
+                    locale: "fr",
+                    buttons: {
+                        confirm: {label: "Oui, passer en visible"},
+                        cancel: {label: "Non"},
+                    },
+                    message: (
+                     `<strong>Souhaitez-vous rendre le produit « ${productName} » visible ?</strong>`
+                     + "<br /> Il sera alors disponible à l'achat."
+                    ),
+                    callback: function(confirmed) {
+
+                        if (confirmed) {
+                            elVisibleCheckbox.prop('checked', true);
+                            elVisibleCheckbox.change(); // trigger event manually.
+                        }
+                    },
+                });
+            }
+        });
+
+    })
+</script>
 {% endblock content %}
