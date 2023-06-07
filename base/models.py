@@ -339,8 +339,7 @@ class ChangeStockOp(Operation):
         price = pwyw if (pwyw is not None) else (product.price * quantity)
         purchase_cost = product.cost_of_purchase * quantity
         newstock = product.stock + quantity
-        return cls(product=product, quantity=quantity, price=price, purchase_cost=purchase_cost, stock=newstock,
-                   **kwargs)
+        return cls.objects.create(product=product, quantity=quantity, price=price, purchase_cost=purchase_cost, stock=newstock, **kwargs)
 
     @classmethod
     def create_appro_stock(cls, **kwargs):

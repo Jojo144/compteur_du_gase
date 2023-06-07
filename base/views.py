@@ -133,7 +133,6 @@ def achats(request, household_id):
                 q = Decimal(q)
                 pwyw = -Decimal(request.POST['basket_price_' + p[13:]]) if pdt.pwyw else None
                 op = PurchaseDetailOp.create(product=pdt, purchase=purchase, quantity=-q, pwyw=pwyw)
-                op.save()
                 household.account += op.price
                 household.save()
                 pdt.stock -= q
@@ -945,7 +944,6 @@ def inventory(request):
                     diff = q - pdt.stock
                     if diff != 0:  # todo check
                         op = ChangeStockOp.create_inventory(product=pdt, quantity=diff)
-                        op.save()
                         pdt.stock = q
                         pdt.save()
             messages.success(request, '✔ Stock mis à jour !')
