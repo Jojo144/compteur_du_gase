@@ -450,7 +450,6 @@ class ApproView(FormSetView):
 
 
         for (email_addr, msgs) in msgs.items():
-            import ipdb;ipdb.set_trace()
             my_send_mail(
                 self.request,
                  subject=f'Approvisionnement : {provider}',
