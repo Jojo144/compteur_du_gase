@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.conf.urls import url
@@ -110,9 +112,37 @@ class RecurringForm(forms.Form):
     )
     days = forms.TypedMultipleChoiceField(label='Jours de la semaine', widget=forms.CheckboxSelectMultiple, choices=DAYS, coerce=int)
 
-# Ajout du formulaire pour activité récurrente à l'interface d'admin
+class WhenFilter(admin.SimpleListFilter):
+    title = "date"
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = "when"
+    def lookups(self, request, model_admin):
+        return (
+            ('future', "À venir uniquement"),
+            ("past", "Passés uniquement"),
+        )
+
+    def queryset(self, request, queryset):
+        """
+        Returns the filtered queryset based on the value
+        provided in the query string and retrievable via
+        `self.value()`.
+        """
+        value = self.value()
+        today = datetime.date.today()
+
+        if value == "future":
+            return queryset.filter(date__gte=today)
+        elif value == "past":
+            return queryset.filter(date__lt=today)
+        else:
+            return queryset
+
+
 class ActivityAdmin(admin.ModelAdmin):
     list_display = ('description', 'date', 'volunteer1', 'volunteer2', 'comment')
+    list_filter = (PastEventFilter,)
 
     def get_urls(self):
         urls = super().get_urls()
