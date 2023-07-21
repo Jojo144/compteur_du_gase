@@ -14,6 +14,10 @@ from .models import *
 
 admin.site.site_header = "Interface d'administration du Compteur du GASE"
 
+def get_week_number(d: datetime.date) -> int:
+    _, weeknumber, _ = d.isocalendar()
+    return weeknumber
+
 class MemberInline(admin.TabularInline):
     model = Member
 
@@ -82,10 +86,19 @@ class ApproCompteOpAdmin(admin.ModelAdmin):
 
 
 # Formulaire pour ajouter une activité récurrente au tableau des permanences
+
+class PeriodicityChoice(models.IntegerChoices):
+    WEEKLY = 1, "chaque semaine"
+    EVERY_2_WEEKS = 2, "toutes les deux semaines"
+    EVERY_3_WEEKS = 3, "toutes les trois semaines"
+    EVERY_4_WEEKS = 4, "toutes les quatres semaines"
+
+
 class RecurringForm(forms.Form):
     description = forms.CharField(label='Description', initial='Permanence', max_length=100)
     begin_date = forms.DateField(label='Date de début (incluse)', widget=AdminDateWidget())
     end_date = forms.DateField(label='Date de fin (incluse)', widget=AdminDateWidget())
+    periodicity = forms.TypedChoiceField(label="Récurrence", choices=PeriodicityChoice.choices, initial=PeriodicityChoice.WEEKLY, coerce=int)
     DAYS = (
         (0, "Lundi"),
         (1, "Mardi"),
@@ -115,13 +128,20 @@ class ActivityAdmin(admin.ModelAdmin):
                 description = form.cleaned_data['description']
                 begin_date = form.cleaned_data['begin_date']
                 end_date = form.cleaned_data['end_date']
+                periodicity = form.cleaned_data['periodicity']
+                valid_week_modulo = get_week_number(begin_date) % periodicity
+
                 delta = end_date - begin_date
-                days = form.cleaned_data['days']
+                valid_days = form.cleaned_data['days']
                 for i in range(delta.days + 1):
                     d = begin_date + timedelta(days=i)
-                    if d.weekday() in days:
-                        a = Activity(description=description, date=d)
-                        a.save()
+
+                    if (
+                        d.weekday() in valid_days
+                        and
+                        (get_week_number(d) % periodicity) == valid_week_modulo
+                    ):
+                        Activity.objects.create(description=description, date=d)
                 return redirect('admin:base_activity_changelist')
         else:
             form = RecurringForm()
