@@ -11,6 +11,8 @@ from django.urls import reverse
 
 from datetime import timedelta
 
+from django.utils.formats import date_format
+
 from .models import *
 
 
@@ -141,8 +143,13 @@ class WhenFilter(admin.SimpleListFilter):
 
 
 class ActivityAdmin(admin.ModelAdmin):
-    list_display = ('description', 'date', 'volunteer1', 'volunteer2', 'comment')
-    list_filter = (PastEventFilter,)
+    list_display = ('description', 'formatted_date', 'volunteer1', 'volunteer2', 'comment')
+    ordering = ("date", "description")
+    list_filter = (WhenFilter,)
+
+    @admin.display(description='Date', ordering="date")
+    def formatted_date(self, obj):
+        return date_format(obj.date, "l j F Y")
 
     def get_urls(self):
         urls = super().get_urls()
