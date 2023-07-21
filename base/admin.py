@@ -95,7 +95,7 @@ class RecurringForm(forms.Form):
         (5, "Samedi"),
         (6, "Dimanche"),
     )
-    days = forms.MultipleChoiceField(label='Jours', widget=forms.CheckboxSelectMultiple, choices=DAYS)
+    days = forms.TypedMultipleChoiceField(label='Jours de la semaine', widget=forms.CheckboxSelectMultiple, choices=DAYS, coerce=int)
 
 # Ajout du formulaire pour activité récurrente à l'interface d'admin
 class ActivityAdmin(admin.ModelAdmin):
@@ -116,7 +116,7 @@ class ActivityAdmin(admin.ModelAdmin):
                 begin_date = form.cleaned_data['begin_date']
                 end_date = form.cleaned_data['end_date']
                 delta = end_date - begin_date
-                days = [int(d) for d in form.cleaned_data['days']]
+                days = form.cleaned_data['days']
                 for i in range(delta.days + 1):
                     d = begin_date + timedelta(days=i)
                     if d.weekday() in days:
