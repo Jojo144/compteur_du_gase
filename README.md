@@ -41,6 +41,7 @@ Il n'y avait pas de statistiques dans la version de base, cela a probablement é
 | Le GASE à Roulettes       | GASE 100% bénévole et autogéré à Nantes centre                                                                                                                            | mai 2020                   | commission informatique : informatique (puis un arobase puis) roulettes.eu.org |
 | Petite Epicerie Pell'Mêle | La Petite Epicerie Pell’Mêle est une épicerie associative de produits bio (et locaux si possible) en vrac, créée en octobre 2019. https://pellmele.fr/la-petite-epicerie/ | septembre 2019             | pellmele-epicerie (arrobase) retzien.fr                                        |
 | Le Gasouillis             | Une épicerie associative à Guénouvry (44 Guémené-Penfao)                                                                                                                  | septembre 2021             | gasouillis (arrobase) tutanota.com                                             |
+| La compagnie du Gase      | L'épicerie autogérée de Rezé ! https://lacompagniedugase.wordpress.com                                                                                                    | 2021                       | compagniedugase (arobase) gmail.com                                            |
 
 Si vous utilisez le Compteur du Gase et que vous acceptez d'apparaître sur cette liste, merci d'envoyer un mail à jojo144@girole.fr .
 
