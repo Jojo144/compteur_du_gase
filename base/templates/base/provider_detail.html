@@ -1,0 +1,14 @@
+{% extends 'base/provider_base.html' %}
+{% load crispy_forms_tags %}
+
+{%block tab_content %}
+	<h5>Informations fournisseur</h5>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form | crispy }}
+        <div class="text-right">
+            <input class="btn btn-info" type="submit" value="Enregister">
+            <a class="btn btn-light" href="{% url 'base:providers' %}">Annuler</a>
+        </div>
+    </form>
+{% endblock %}

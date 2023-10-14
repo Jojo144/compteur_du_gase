@@ -819,7 +819,7 @@ def create_provider(request):
             return HttpResponseRedirect(reverse('base:providers'))
     else:
         form = ProviderForm()
-    return render(request, 'base/provider.html', {'form': form})
+    return render(request, 'base/provider_create.html', {'form': form})
 
 
 def detail_provider(request, provider_id):
@@ -832,7 +832,7 @@ def detail_provider(request, provider_id):
             return HttpResponseRedirect(reverse('base:providers'))
     else:
         form = ProviderForm(instance=provider)
-    return render(request, 'base/provider.html', {'form': form})
+    return render(request, 'base/provider_detail.html', {'form': form, 'provider': provider})
 
 
 # ----------------------------------------------------------------------------------------------------------------------

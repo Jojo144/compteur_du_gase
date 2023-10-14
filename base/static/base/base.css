@@ -73,34 +73,34 @@
   margin-bottom: 0rem;
 }
 
-nav {
+header nav {
     background-color: #c0fcdf;
     font-weight: bold;
 }
 
-.nav.nav-tabs{
+header .nav.nav-tabs{
     display: inline-flex;
     border: 2px solid #c0fcdf !important;
 }
 
-.nav-item
+header .nav-item
 {
     border-bottom: 2px solid #c0fcdf !important;
 }
 
-.nav-item.nav-link {
+header .nav-item.nav-link {
     color: #6d7985;
     padding-left: 5px;
     padding-right: 5px;
 }
 
-ul.nav a:hover {
+header ul.nav a:hover {
   color: #495057; !important;
   border-color: #c0fcdf !important;
   border-width: -2px !important;
 }
 
-.nav-item
+header .nav-item
 {
  border-bottom: 2px solid #c0fcdf !important;
 }
