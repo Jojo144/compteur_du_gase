@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.list import ListView
 from django.db import transaction
 from django.db.models import Q, Sum
 from extra_views import FormSetView
@@ -338,33 +339,51 @@ def product_history(request, product_id):
     return render(request, 'base/product_history.html', {'operations': operations, 'pdt': pdt, 'unit': plural_unit})
 
 
+class ProductsListView(ListView):
+    model = Product
+    template_name = "base/products.html"
 
-def products(request):
-    local_settings = get_local_settings()
-    all_columns = ['nom', 'catégorie', 'fournisseur', "prix d'achat", 'prix de vente', 'vrac',
-     'visible',
-     'alerte stock', 'stock']
-    columns = []
-    for column in all_columns:
-        if not (
-                (column == "prix d'achat" and not local_settings.use_cost_of_purchase)
-                or
-                (column == "catégorie" and not local_settings.use_cost_of_purchase)
-        ):
-            columns.append(column)
+    def get_columns(self, local_settings) -> List[str]:
+        local_settings = get_local_settings()
+        all_columns = ['nom', 'catégorie', 'fournisseur', "prix d'achat", 'prix de vente', 'vrac',
+         'visible',
+         'alerte stock', 'stock']
+        columns = []
+        for column in all_columns:
+            if not (
+                    (column == "prix d'achat" and not local_settings.use_cost_of_purchase)
+                    or
+                    (column == "catégorie" and not local_settings.use_cost_of_purchase)
+            ):
+                columns.append(column)
+        return columns
 
-    pdts = [{"id": p.id, "nom": p.name, "catégorie": str(p.category), "fournisseur": str(p.provider),
-             "prix d'achat": '{} € / {}'.format(p.cost_of_purchase, p.unit.name),
-             "prix de vente": '{} € / {}'.format(p.price, p.unit.name), "prix": '{} € / {}'.format(p.price, p.unit.name),
-             "visible": bool_to_utf8(p.visible), "vrac": bool_to_utf8(p.unit.vrac),
-             "alerte stock": '{} [{}]'.format(bool_to_utf8(p.stock < p.stock_alert), round_stock(p.stock_alert)) if (p.stock_alert) else '',
-             "stock": round_stock(p.stock)}
-            for p in Product.objects.all()]
-    columns = json.dumps(columns)
-    pdts = json.dumps(pdts)
-    return render(request, 'base/products.html', {'columns': columns,
-                                                  'pdts': pdts,
-                                                  'use_exports': local_settings.use_exports})
+    def get_context_data(self, **kwargs):
+        local_settings = get_local_settings()
+
+        pdts = [
+            {
+                "id": p.id,
+                "nom": p.name,
+                "catégorie": str(p.category),
+                "fournisseur": str(p.provider),
+                "prix d'achat": '{} € / {}'.format(p.cost_of_purchase, p.unit.name),
+                "prix de vente": '{} € / {}'.format(p.price, p.unit.name),
+                "visible": bool_to_utf8(p.visible),
+                "vrac": bool_to_utf8(p.unit.vrac),
+                "alerte stock": '{} [{}]'.format(bool_to_utf8(p.stock < p.stock_alert), round_stock(p.stock_alert)) if (p.stock_alert) else '',
+                "stock": round_stock(p.stock)
+            }
+            for p in Product.objects.all()
+        ]
+
+        columns = self.get_columns(local_settings)
+
+        return {
+            'columns': json.dumps(columns),
+            'products': json.dumps(pdts),
+            'use_exports': local_settings.use_exports,
+        }
 
 
 # ----------------------------------------------------------------------------------------------------------------------

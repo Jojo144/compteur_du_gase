@@ -23,7 +23,7 @@
     <a class="btn btn-info" href="{% url 'base:export_products' %}">Exporter la liste des produits</a>
 </div>
 
-{% include "base/partials/products_table.html" with productsList=pdts columns=columns only %}
+{% include "base/partials/products_table.html" with productsList=products columns=columns only %}
 
 
 <script src="{% static "base/common.js" %}"></script>
