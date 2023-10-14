@@ -1,4 +1,5 @@
 {% extends 'base/base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
 {% load my_tags %}
 
@@ -111,7 +112,7 @@
   </div>
 </div>
 
-
+<script src="{% static "base/common.js" %}"></script>
 <script>
 
  {% if alerte_balance %}
@@ -155,38 +156,7 @@
          label: "Exporter l'historique",
          className: 'btn-info',
          callback: function(){
-           var textFile = null;
-           var makeTextFile = function (text) {
-             var data = new Blob([text], {type: 'text/html'});
-
-             // If we are replacing a previously generated file we need to
-             // manually revoke the object URL to avoid memory leaks.
-             if (textFile !== null) {
-               window.URL.revokeObjectURL(textFile);
-             }
-
-             textFile = window.URL.createObjectURL(data);
-
-             return textFile;
-           };
-
-           var link = document.createElement('a');
-           link.setAttribute('download', 'HistoriqueAchats_{{ household }}.html');
-
-           var content = "<!DOCTYPE html>\n";
-           content += "<html>\n";
-           content += "<head>\n";
-           content += "   <title>Ticket de caisse</title>\n";
-           content += "</head>\n";
-           content += "<body>";
-           content += history_content;
-           content += "\n</body>\n";
-           content += "</html>\n";
-
-           link.href = makeTextFile(content);
-           document.body.appendChild(link);
-           link.click();
-           document.body.removeChild(link);
+           downloadHTMLFile(history_content, "Ticket de caisse", 'HistoriqueAchats_{{ household }}.html')
          }
        },
        {% endif %}
