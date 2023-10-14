@@ -40,8 +40,8 @@
             <td v-for="column in columns">
                 [[ x[column] ]]
             </td>
-            <td><a :href="'produit/' + x.id">⌬ Détails</a></td>
-            <td><a :href="'stats/' + x.id">📈 Stats</a></td>
+            <td><a :href="x.details_url">⌬ Détails</a></td>
+            <td><a :href="x.stats_url">📈 Stats</a></td>
         </tr>
         </tbody>
     </table>

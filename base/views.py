@@ -372,7 +372,9 @@ class ProductsListView(ListView):
                 "visible": bool_to_utf8(p.visible),
                 "vrac": bool_to_utf8(p.unit.vrac),
                 "alerte stock": '{} [{}]'.format(bool_to_utf8(p.stock < p.stock_alert), round_stock(p.stock_alert)) if (p.stock_alert) else '',
-                "stock": round_stock(p.stock)
+                "stock": round_stock(p.stock),
+                "details_url": reverse("base:detail_product", args=(p.id,)),
+                "stats_url": reverse("base:stats", args=(p.id,)),
             }
             for p in Product.objects.all()
         ]
@@ -384,6 +386,29 @@ class ProductsListView(ListView):
             'products': json.dumps(pdts),
             'use_exports': local_settings.use_exports,
         }
+
+
+class ProviderProductsListView(ProductsListView):
+    template_name = "base/provider_products_list.html"
+
+    def dispatch(self, request, provider_id, *args, **kwargs):
+        # Add the provider to the view context
+        self.provider = get_object_or_404(Provider, pk=provider_id)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return super().get_queryset().filter(provider=self.provider)
+
+    def get_columns(self, local_settings):
+        return [c for c in super().get_columns(local_settings) if c != 'fournisseur']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "provider": self.provider,
+            "tab": "products",
+        })
+        return context
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -851,7 +876,7 @@ def detail_provider(request, provider_id):
             return HttpResponseRedirect(reverse('base:providers'))
     else:
         form = ProviderForm(instance=provider)
-    return render(request, 'base/provider_detail.html', {'form': form, 'provider': provider})
+    return render(request, 'base/provider_detail.html', {'form': form, 'provider': provider, 'tab': "details"})
 
 
 # ----------------------------------------------------------------------------------------------------------------------
