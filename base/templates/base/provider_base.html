@@ -18,10 +18,32 @@
                 Produits
             </a>
 		</li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle {% if tab == "orders" %}active{% endif %}"
+               data-toggle="dropdown"
+               href="#"
+               role="button"
+               aria-haspopup="true"
+               aria-expanded="false"
+
+            >Commandes</a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item" href="{% url 'base:appro' provider.id %}">
+                        <span aria-hidden="true">🚚 </span>
+                        Réceptionner
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'base:provider_orders_list' provider.id %}">
+                        <span aria-hidden="true">⌚ </span>
+                        Historique
+                    </a>
+                </li>
+            </ul>
+        </li>
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'base:appro' provider.id %}">
-                Réceptionner une commande
-            </a>
+
         </li>
 	</ul>
 </div>

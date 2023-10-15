@@ -171,3 +171,7 @@ hr.gestion-hr {
   text-align: center;
   opacity: 0.5;
 }
+
+table ul {
+  padding-left: 0.75rem; /* align with header padding */
+}

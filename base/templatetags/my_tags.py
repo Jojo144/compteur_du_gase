@@ -22,6 +22,11 @@ def round2(value):
 
 @register.filter
 def round_stock(value):
+    """
+    Dans beaucoup de cas, floatformat pourrait-être préférable
+
+    https://docs.djangoproject.com/en/4.2/ref/templates/builtins/#floatformat
+    """
     v = abs(value)
     if v >= 100:
         return '{0:.0f}'.format(value)

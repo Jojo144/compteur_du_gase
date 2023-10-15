@@ -1,4 +1,5 @@
 import json
+from dataclasses import dataclass, field
 from datetime import date
 from decimal import Decimal
 from typing import List, Iterable, Tuple
@@ -343,6 +344,9 @@ class ProductsListView(ListView):
     model = Product
     template_name = "base/products.html"
 
+    def get_queryset(self):
+        return  Product.objects.all()
+
     def get_columns(self, local_settings) -> List[str]:
         local_settings = get_local_settings()
         all_columns = ['nom', 'catégorie', 'fournisseur', "prix d'achat", 'prix de vente', 'vrac',
@@ -376,7 +380,7 @@ class ProductsListView(ListView):
                 "details_url": reverse("base:detail_product", args=(p.id,)),
                 "stats_url": reverse("base:stats", args=(p.id,)),
             }
-            for p in Product.objects.all()
+            for p in self.get_queryset()
         ]
 
         columns = self.get_columns(local_settings)
@@ -388,9 +392,7 @@ class ProductsListView(ListView):
         }
 
 
-class ProviderProductsListView(ProductsListView):
-    template_name = "base/provider_products_list.html"
-
+class ProviderRelatedViewMixin:
     def dispatch(self, request, provider_id, *args, **kwargs):
         # Add the provider to the view context
         self.provider = get_object_or_404(Provider, pk=provider_id)
@@ -398,6 +400,10 @@ class ProviderProductsListView(ProductsListView):
 
     def get_queryset(self):
         return super().get_queryset().filter(provider=self.provider)
+
+
+class ProviderProductsListView(ProviderRelatedViewMixin, ProductsListView):
+    template_name = "base/provider_products_list.html"
 
     def get_columns(self, local_settings):
         return [c for c in super().get_columns(local_settings) if c != 'fournisseur']
@@ -550,6 +556,50 @@ def get_appros_stats(use_cost_of_purchase):
                      for i in range(len(dates))]
 
     return comptes_stats
+
+
+class ProviderOrdersListView(ProviderRelatedViewMixin, ListView):
+    """ Liste des commandes pour un fournisseur donné
+
+    Le compteur n'a pas de notion de commande, on groupe les appro stock d'une même date+fournisseur
+    """
+
+    template_name = "base/provider_orders_list.html"
+    model = ChangeStockOp
+
+    @dataclass
+    class Order:
+        date: date
+        total_purchase_cost: Decimal = Decimal('0')
+        appros: list[ChangeStockOp] = field(default_factory=list)
+
+    def get_queryset(self):
+        return self.model.objects.filter(product__provider=self.provider).appros_only().order_by('-date')
+
+    def build_orders_list(self) -> Iterable[Order]:
+        """ Regrouppe les appros par date
+
+        Et calcule le coût d'achat de chaque « commande »
+        """
+        order = None
+
+        for appro in self.get_queryset():
+            if not order or (order.date != appro.date.date()):
+                if order:
+                    yield order
+                order = self.Order(date=appro.date.date())
+            order.total_purchase_cost += appro.purchase_cost
+            order.appros.append(appro)
+
+        if order:
+            yield order
+
+    def get_context_data(self, **kwargs):
+        return {
+            "provider": self.provider,
+            "orders": self.build_orders_list(),
+            "tab": "orders",
+        }
 
 
 # ----------------------------------------------------------------------------------------------------------------------

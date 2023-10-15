@@ -316,6 +316,7 @@ class Product(models.Model):
 
 
 class Operation(models.Model):
+    # en dépit du nom, c'est un datetime:
     date = models.DateTimeField(auto_now_add=True)
 
     class Meta:

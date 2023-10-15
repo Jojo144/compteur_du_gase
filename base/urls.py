@@ -26,6 +26,7 @@ urlpatterns = [
     path('export/fournisseurs', views.export_providers, name='export_providers'),
     path('fournisseur/<int:provider_id>', views.detail_provider, name='detail_provider'),
     path('fournisseur/<int:provider_id>/produits', views.ProviderProductsListView.as_view(), name='provider_products_list'),
+    path('fournisseur/<int:provider_id>/orders', views.ProviderOrdersListView.as_view(), name='provider_orders_list'),
     path('fournisseur', views.create_provider, name='create_provider'),
     path('appro', views.pre_appro, name='pre_appro'),
     path('appro/<int:provider_id>', views.ApproView.as_view(), name='appro'),
