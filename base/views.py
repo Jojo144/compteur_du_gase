@@ -94,9 +94,9 @@ def gestion(request):
 def otherstats(request):
     value_appro = sum([p.amount for p in ApproCompteOp.objects.all()])
     if get_local_settings().use_cost_of_purchase:
-        value_purchase = sum([p.cost_of_purchase() for p in ChangeStockOp.objects.filter(label="ApproStock")])
+        value_purchase = sum([p.cost_of_purchase() for p in ChangeStockOp.objects.appros_only()])
     else:
-        value_purchase = sum([p.cost_of_price() for p in ChangeStockOp.objects.filter(label="ApproStock")])
+        value_purchase = sum([p.cost_of_price() for p in ChangeStockOp.objects.appros_only()])
 
     value_purchase_household = -sum([p.price for p in PurchaseDetailOp.objects.all()])
 
@@ -517,7 +517,7 @@ def approslist(request):
                "produit": str(p.product), "coût total (prix d'achat)": '{0:.2f} €'.format(p.cost_of_purchase()),
                "coût total (prix de vente)": '{0:.2f} €'.format(p.cost_of_price()),
                "date": p.date.isoformat()}
-              for p in ChangeStockOp.objects.filter(label="ApproStock")]
+              for p in ChangeStockOp.objects.appros_only()]
     columns = json.dumps(columns)
     appros = json.dumps(appros)
     appros_stats = get_appros_stats(use_cost_of_purchase)
@@ -528,7 +528,7 @@ def approslist(request):
 
 def get_appros_stats(use_cost_of_purchase):
     # dates
-    ops = ChangeStockOp.objects.filter(label="ApproStock")
+    ops = ChangeStockOp.objects.appros_only()
     dates = sorted({ p.date.date() for p in ops } | {date.today()})
 
     # value

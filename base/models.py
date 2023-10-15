@@ -323,7 +323,23 @@ class Operation(models.Model):
         abstract = True
 
 
+class ChangeStockOpQuerySet(models.QuerySet):
+    def appros_only(self):
+        return self.filter(label=ChangeStockOp.TYPE_APPRO_STOCK)
+
+    def inventories_only(self):
+        return self.filter(label=ChangeStockOp.TYPE_INVENTORY)
+
+    def purchases_only(self):
+        # via cette méthode, on accèdera pas à l'attribut de la classe spécifique (household)
+        return self.filter(label=ChangeStockOp.TYPE_PURCHASE)
+
+
 class ChangeStockOp(Operation):
+    TYPE_APPRO_STOCK = "ApproStock"
+    TYPE_INVENTORY = "Ivnentaire"
+    TYPE_PURCHASE = "Achat"
+
     product = models.ForeignKey(Product, null=True,
                                 on_delete=models.SET_NULL)  # null if the product was deleted and no longer exists
     quantity = models.DecimalField(max_digits=15,
@@ -334,6 +350,8 @@ class ChangeStockOp(Operation):
     stock = models.DecimalField(max_digits=15, decimal_places=3)  # stock after the operation
     label = models.CharField(max_length=20)
 
+    objects = ChangeStockOpQuerySet.as_manager()
+
     @classmethod  # constructor computing price and cost_of_purchase
     def create(cls, product=product, quantity=quantity, pwyw=None, **kwargs):
         price = pwyw if (pwyw is not None) else (product.price * quantity)
@@ -343,19 +361,19 @@ class ChangeStockOp(Operation):
 
     @classmethod
     def create_appro_stock(cls, **kwargs):
-        return cls.create(label='ApproStock', **kwargs)
+        return cls.create(label=cls.TYPE_APPRO_STOCK, **kwargs)
 
     @classmethod
     def create_inventory(cls, **kwargs):
-        return cls.create(label='Inventaire', **kwargs)
+        return cls.create(label=cls.TYPE_INVENTORY, **kwargs)
 
     def cost_of_purchase(self):
-        if self.label != "ApproStock":
+        if self.label != self.TYPE_APPRO_STOCK:
             raise TypeError("Operation must be filter with label==ApproStock")
         return self.purchase_cost
 
     def cost_of_price(self):
-        if self.label != "ApproStock":
+        if self.label != self.TYPE_APPRO_STOCK:
             raise TypeError("Operation must be filter with label==ApproStock")
         return self.price
 
@@ -376,7 +394,7 @@ class PurchaseDetailOp(ChangeStockOp):
 
     @classmethod
     def create(cls, **kwargs):
-        return super().create(label='Achat', **kwargs)
+        return super().create(label=cls.TYPE_PURCHASE, **kwargs)
 
 
 class ApproCompteOp(Operation):
