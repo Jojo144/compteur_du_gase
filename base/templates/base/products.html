@@ -1,4 +1,5 @@
 {% extends "base/base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="medium-content">
@@ -22,159 +23,20 @@
     <a class="btn btn-info" href="{% url 'base:export_products' %}">Exporter la liste des produits</a>
 </div>
 
-<div id="vue-table">
+{% include "base/partials/products_table.html" with productsList=products columns=columns only %}
 
-    <div class="row">
-        <div class="text-right filter">
-            <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
-        </div>
-        <div class="text-right filter">
-            <button @click="changeVisible" class="btn btn-secondary">[[ only_visible ? "Montrer " : "Masquer "]] les non
-                visibles
-            </button>
-            <button @click="changeAlerte" class="btn btn-secondary">[[ only_alerte ? "Ne pas filter les alertes" : "Montrer uniquement les alertes"]]
-            </button>
-        </div>
-	{% if use_exports %}
-        <div class="text-right filter">
-            <input type="submit" class="btn btn-info" name="tofile" id="tofile" value="Exporter le tableau"/>
-        </div>
-	{% endif %}
-    </div>
 
-    <table class="table table-striped" id="produits-table">
-        <thead>
-        <tr>
-            <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
-                [[ _.capitalize(column) ]]
-                [[ sortKey == column ? (sortWay === 'asc' ? "⯅" : "⯆") : ""]]
-            </th>
-            <th></th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="x in filter()">
-            <td v-for="column in columns">
-                [[ x[column] ]]
-            </td>
-            <td><a :href="'produit/' + x.id">⌬ Détails</a></td>
-            <td><a :href="'stats/' + x.id">📈 Stats</a></td>
-        </tr>
-        </tbody>
-    </table>
-
-</div>
-
+<script src="{% static "base/common.js" %}"></script>
 <script>
-  new Vue({
-      delimiters: ['[[', ']]'],
-      el: '#vue-table',
-      data: {
-      sortKey: 'nom',
-      only_visible: true,
-      only_alerte: false,
-      search: '',
-      sortWay: 'asc',
-      columns: {{ columns | safe }},
-      raw_data: {{ pdts | safe }}
-      },
-
-      computed: {
-      orderedData: function () {
-          /* extract sort key from row, depending on its type */
-          function sortValue(row){
-              let val = row[this.sortKey]
-              if (! Number.isNaN(Number.parseFloat(val))) {
-                  return Number.parseFloat(val);
-              } else if (_.isString(val)) {
-                  return val.toLowerCase()
-              } else {
-                  return val;
-              }
-
-          };
-          return _.orderBy(this.raw_data, sortValue.bind(this), this.sortWay);
-          }
-      },
-
-      methods: {
-      changeVisible: function() {
-          this.only_visible = !this.only_visible
-      },
-
-      changeAlerte: function() {
-          this.only_alerte = !this.only_alerte
-      },
-
-      sortBy: function(sortKey) {
-          if (this.sortKey === sortKey) {
-              this.sortWay = (this.sortWay === 'asc' ? 'desc' : 'asc');
-          } else {
-              this.sortKey = sortKey;
-          }
-      },
-
-      filter: function () {
-          var search = this.search;
-          var only_visible = this.only_visible;
-          var only_alerte = this.only_alerte;
-          return _.pickBy(this.orderedData, (function (row) {
-          var b = (!only_visible) || (row.visible == "✔");
-          var c = !((only_alerte) && (!row["alerte stock"].includes("✔")));
-          return b && c && (myContains(row.nom, search) || myContains(row.catégorie, search) || myContains(row.fournisseur, search))
-          }))
-      }
-      }
-  })
-
   $(function(){
-    var textFile = null;
-    var makeTextFile = function (text) {
-        var data = new Blob([text], {type: 'text/html'});
-
-        // If we are replacing a previously generated file we need to
-        // manually revoke the object URL to avoid memory leaks.
-        if (textFile !== null) {
-          window.URL.revokeObjectURL(textFile);
-        }
-
-        textFile = window.URL.createObjectURL(data);
-
-        return textFile;
-    };
-
     var create = document.getElementById('tofile');
     var arrayContent = document.getElementById('produits-table');
+     create.addEventListener('click', function ()  {
 
-    create.addEventListener('click', function () {
-        var link = document.createElement('a');
-        var household = '{{ household }}';
-        link.setAttribute('download', 'Produits.html');
+         let data = `<table border="1">${arrayContent.innerHTML}</table>`;
+         downloadHTMLFile(data, "Produits", "Produits.html");
 
-        var content = "<!DOCTYPE html>\n";
-        content += "<html>\n";
-        content += "<head>\n";
-        content += "   <title>Produits</title>\n";
-        content += "</head>\n";
-        content += "<body>\n";
-
-        content += '<table border="1">\n';
-        content += arrayContent.innerHTML;
-        content += "</table>\n";
-
-        content += "</body>\n";
-        content += "</html>\n";
-
-        link.href = makeTextFile(content);
-        document.body.appendChild(link);
-
-        // wait for the link to be added to the document
-        window.requestAnimationFrame(function () {
-          var event = new MouseEvent('click');
-          link.dispatchEvent(event);
-          document.body.removeChild(link);
-        });}, false);
+     }, false);
 })();
 
 </script>

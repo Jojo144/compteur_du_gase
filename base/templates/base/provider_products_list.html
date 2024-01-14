@@ -1,0 +1,7 @@
+{% extends 'base/provider_base.html' %}
+{% load static %}
+
+{%block tab_content %}
+	<h5>Produits de ce fournisseur</h5>
+    {% include "base/partials/products_table.html" with productsList=products columns=columns only %}
+{% endblock %}

@@ -98,7 +98,7 @@ def generate_export_providers(filename):
 
 
 def generate_ecarts_data():
-    ope = ChangeStockOp.objects.filter(label='Inventaire')
+    ope = ChangeStockOp.objects.inventories_only()
     stats = ope.annotate(
         calendar_date=F('date__date')
     ).values(

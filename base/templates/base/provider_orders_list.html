@@ -1,0 +1,35 @@
+{% extends 'base/provider_base.html' %}
+{% load static %}
+{% load my_tags %}
+
+{%block tab_content %}
+	<h5><span aria-hidden="true">⌚ </span>Historique d'approvisionnement</h5>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Date</th><th>Prix commande</th><th>Produits</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td>{{ order.date }}</td>
+                    <td>{{ order.total_purchase_cost|floatformat:-2 }} €</td>
+                    <td>
+                        <ul>
+                        {% for appro in order.appros %}
+                            <li>
+                                <a href="{% url 'base:detail_product' appro.product.id %}">
+                                   {{ appro.product.name }}
+                                </a>
+                                : {{ appro|print_quantity_op }}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+            {% empty %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

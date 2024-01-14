@@ -1,4 +1,5 @@
 import json
+from dataclasses import dataclass, field
 from datetime import date
 from decimal import Decimal
 from typing import List, Iterable, Tuple
@@ -8,6 +9,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.list import ListView
 from django.db import transaction
 from django.db.models import Q, Sum
 from extra_views import FormSetView
@@ -93,9 +95,9 @@ def gestion(request):
 def otherstats(request):
     value_appro = sum([p.amount for p in ApproCompteOp.objects.all()])
     if get_local_settings().use_cost_of_purchase:
-        value_purchase = sum([p.cost_of_purchase() for p in ChangeStockOp.objects.filter(label="ApproStock")])
+        value_purchase = sum([p.cost_of_purchase() for p in ChangeStockOp.objects.appros_only()])
     else:
-        value_purchase = sum([p.cost_of_price() for p in ChangeStockOp.objects.filter(label="ApproStock")])
+        value_purchase = sum([p.cost_of_price() for p in ChangeStockOp.objects.appros_only()])
 
     value_purchase_household = -sum([p.price for p in PurchaseDetailOp.objects.all()])
 
@@ -338,33 +340,81 @@ def product_history(request, product_id):
     return render(request, 'base/product_history.html', {'operations': operations, 'pdt': pdt, 'unit': plural_unit})
 
 
+class ProductsListView(ListView):
+    model = Product
+    template_name = "base/products.html"
 
-def products(request):
-    local_settings = get_local_settings()
-    all_columns = ['nom', 'catégorie', 'fournisseur', "prix d'achat", 'prix de vente', 'vrac',
-     'visible',
-     'alerte stock', 'stock']
-    columns = []
-    for column in all_columns:
-        if not (
-                (column == "prix d'achat" and not local_settings.use_cost_of_purchase)
-                or
-                (column == "catégorie" and not local_settings.use_cost_of_purchase)
-        ):
-            columns.append(column)
+    def get_queryset(self):
+        return  Product.objects.all()
 
-    pdts = [{"id": p.id, "nom": p.name, "catégorie": str(p.category), "fournisseur": str(p.provider),
-             "prix d'achat": '{} € / {}'.format(p.cost_of_purchase, p.unit.name),
-             "prix de vente": '{} € / {}'.format(p.price, p.unit.name), "prix": '{} € / {}'.format(p.price, p.unit.name),
-             "visible": bool_to_utf8(p.visible), "vrac": bool_to_utf8(p.unit.vrac),
-             "alerte stock": '{} [{}]'.format(bool_to_utf8(p.stock < p.stock_alert), round_stock(p.stock_alert)) if (p.stock_alert) else '',
-             "stock": round_stock(p.stock)}
-            for p in Product.objects.all()]
-    columns = json.dumps(columns)
-    pdts = json.dumps(pdts)
-    return render(request, 'base/products.html', {'columns': columns,
-                                                  'pdts': pdts,
-                                                  'use_exports': local_settings.use_exports})
+    def get_columns(self, local_settings) -> List[str]:
+        local_settings = get_local_settings()
+        all_columns = ['nom', 'catégorie', 'fournisseur', "prix d'achat", 'prix de vente', 'vrac',
+         'visible',
+         'alerte stock', 'stock']
+        columns = []
+        for column in all_columns:
+            if not (
+                    (column == "prix d'achat" and not local_settings.use_cost_of_purchase)
+                    or
+                    (column == "catégorie" and not local_settings.use_cost_of_purchase)
+            ):
+                columns.append(column)
+        return columns
+
+    def get_context_data(self, **kwargs):
+        local_settings = get_local_settings()
+
+        pdts = [
+            {
+                "id": p.id,
+                "nom": p.name,
+                "catégorie": str(p.category),
+                "fournisseur": str(p.provider),
+                "prix d'achat": '{} € / {}'.format(p.cost_of_purchase, p.unit.name),
+                "prix de vente": '{} € / {}'.format(p.price, p.unit.name),
+                "visible": bool_to_utf8(p.visible),
+                "vrac": bool_to_utf8(p.unit.vrac),
+                "alerte stock": '{} [{}]'.format(bool_to_utf8(p.stock < p.stock_alert), round_stock(p.stock_alert)) if (p.stock_alert) else '',
+                "stock": round_stock(p.stock),
+                "details_url": reverse("base:detail_product", args=(p.id,)),
+                "stats_url": reverse("base:stats", args=(p.id,)),
+            }
+            for p in self.get_queryset()
+        ]
+
+        columns = self.get_columns(local_settings)
+
+        return {
+            'columns': json.dumps(columns),
+            'products': json.dumps(pdts),
+            'use_exports': local_settings.use_exports,
+        }
+
+
+class ProviderRelatedViewMixin:
+    def dispatch(self, request, provider_id, *args, **kwargs):
+        # Add the provider to the view context
+        self.provider = get_object_or_404(Provider, pk=provider_id)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return super().get_queryset().filter(provider=self.provider)
+
+
+class ProviderProductsListView(ProviderRelatedViewMixin, ProductsListView):
+    template_name = "base/provider_products_list.html"
+
+    def get_columns(self, local_settings):
+        return [c for c in super().get_columns(local_settings) if c != 'fournisseur']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "provider": self.provider,
+            "tab": "products",
+        })
+        return context
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -473,7 +523,7 @@ def approslist(request):
                "produit": str(p.product), "coût total (prix d'achat)": '{0:.2f} €'.format(p.cost_of_purchase()),
                "coût total (prix de vente)": '{0:.2f} €'.format(p.cost_of_price()),
                "date": p.date.isoformat()}
-              for p in ChangeStockOp.objects.filter(label="ApproStock")]
+              for p in ChangeStockOp.objects.appros_only()]
     columns = json.dumps(columns)
     appros = json.dumps(appros)
     appros_stats = get_appros_stats(use_cost_of_purchase)
@@ -484,7 +534,7 @@ def approslist(request):
 
 def get_appros_stats(use_cost_of_purchase):
     # dates
-    ops = ChangeStockOp.objects.filter(label="ApproStock")
+    ops = ChangeStockOp.objects.appros_only()
     dates = sorted({ p.date.date() for p in ops } | {date.today()})
 
     # value
@@ -506,6 +556,50 @@ def get_appros_stats(use_cost_of_purchase):
                      for i in range(len(dates))]
 
     return comptes_stats
+
+
+class ProviderOrdersListView(ProviderRelatedViewMixin, ListView):
+    """ Liste des commandes pour un fournisseur donné
+
+    Le compteur n'a pas de notion de commande, on groupe les appro stock d'une même date+fournisseur
+    """
+
+    template_name = "base/provider_orders_list.html"
+    model = ChangeStockOp
+
+    @dataclass
+    class Order:
+        date: date
+        total_purchase_cost: Decimal = Decimal('0')
+        appros: list[ChangeStockOp] = field(default_factory=list)
+
+    def get_queryset(self):
+        return self.model.objects.filter(product__provider=self.provider).appros_only().order_by('-date')
+
+    def build_orders_list(self) -> Iterable[Order]:
+        """ Regrouppe les appros par date
+
+        Et calcule le coût d'achat de chaque « commande »
+        """
+        order = None
+
+        for appro in self.get_queryset():
+            if not order or (order.date != appro.date.date()):
+                if order:
+                    yield order
+                order = self.Order(date=appro.date.date())
+            order.total_purchase_cost += appro.purchase_cost
+            order.appros.append(appro)
+
+        if order:
+            yield order
+
+    def get_context_data(self, **kwargs):
+        return {
+            "provider": self.provider,
+            "orders": self.build_orders_list(),
+            "tab": "orders",
+        }
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -819,7 +913,7 @@ def create_provider(request):
             return HttpResponseRedirect(reverse('base:providers'))
     else:
         form = ProviderForm()
-    return render(request, 'base/provider.html', {'form': form})
+    return render(request, 'base/provider_create.html', {'form': form})
 
 
 def detail_provider(request, provider_id):
@@ -832,7 +926,7 @@ def detail_provider(request, provider_id):
             return HttpResponseRedirect(reverse('base:providers'))
     else:
         form = ProviderForm(instance=provider)
-    return render(request, 'base/provider.html', {'form': form})
+    return render(request, 'base/provider_detail.html', {'form': form, 'provider': provider, 'tab': "details"})
 
 
 # ----------------------------------------------------------------------------------------------------------------------

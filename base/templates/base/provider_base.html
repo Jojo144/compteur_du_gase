@@ -1,0 +1,58 @@
+{% extends 'base/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <h2>{{ provider.name }} <small class="text-secondary">(fournisseur)</small></h2>
+    <ul class="nav nav-tabs">
+		<li class="nav-item">
+			<a class="nav-link {% if tab == "details" %}active{% endif %}"
+               href="{% url 'base:detail_provider' provider.pk %}"
+            >
+                Fiche contact
+            </a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link {% if tab == "products" %}active{% endif %}"
+               href="{% url 'base:provider_products_list' provider.pk %}"
+            >
+                Produits
+            </a>
+		</li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle {% if tab == "orders" %}active{% endif %}"
+               data-toggle="dropdown"
+               href="#"
+               role="button"
+               aria-haspopup="true"
+               aria-expanded="false"
+
+            >Commandes</a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item" href="{% url 'base:appro' provider.id %}">
+                        <span aria-hidden="true">🚚 </span>
+                        Réceptionner
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'base:provider_orders_list' provider.id %}">
+                        <span aria-hidden="true">⌚ </span>
+                        Historique
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="nav-item">
+
+        </li>
+	</ul>
+</div>
+<div class="col-sm-12">
+	<div class="tab-content">
+		<div class="mt-3 ml-2 tab-pane fade show active" >
+            {% block tab_content %}
+
+            {% endblock %}
+		</div>
+	</div>
+{% endblock content %}

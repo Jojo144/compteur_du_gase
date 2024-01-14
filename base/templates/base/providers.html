@@ -38,8 +38,13 @@
         </thead>
         <tbody>
         <tr v-for="x in filter()">
-            <td v-for="column in columns">
-                [[ x[column] ]]
+            <td v-for="(column, colIndex) in columns">
+                <a v-if="colIndex == 0" :href="'fournisseur/' + x.id">
+                    [[ x[column] ]]
+                </a>
+                <template v-else>
+                    [[ x[column] ]]
+                </template>
             </td>
             <td><a :href="'fournisseur/' + x.id">⌬ Détails</a></td>
         </tr>

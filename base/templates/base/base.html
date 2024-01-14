@@ -32,7 +32,7 @@
 <body>
 
 <div class="container">
-    <div class="row justify-content-center">
+    <header class="row justify-content-center">
         <nav class="navbar navbar-expand-lg navbar-light justify-content-center">
             <ul class="nav nav-tabs">
                 <li><a class="nav-item nav-link" href="{% url 'base:index' %}">Accueil</a></li>
@@ -53,7 +53,7 @@
                 {% endif %}
             </ul>
         </nav>
-    </div>
+    </header>
 
     <div class="row justify-content-center">
         {% for message in messages %}
