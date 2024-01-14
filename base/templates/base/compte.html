@@ -19,7 +19,7 @@
     <br>
     <br>
     <div class="row justify-content-center">
-        <form action="{% url 'base:compte' household.pk %}" method="post">
+        <form action="{% url 'base:compte' household.pk %}" method="post" id="appro_form">
             {% csrf_token %}
             {{ form | crispy }}
             <div class="form-buttons">
@@ -54,4 +54,10 @@
         </table>
     </div>
 </div>
+<script>
+    $('#appro_form').submit(function(e){
+        // Prevent double-click https://github.com/Jojo144/compteur_du_gase/issues/87
+        $("#appro_form input[type=submit]").attr("disabled", "true");
+    })
+</script>
 {% endblock content %}

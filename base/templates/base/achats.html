@@ -105,7 +105,7 @@
           <strong>Montant total : [[ _.round(totalAmount(), 2) ]] €</strong>
         </div>
         <div class="col text-right">
-          <input class="btn btn-info" type="submit" value="Payer">
+          <input class="btn btn-info" type="submit" value="Payer" :disabled="isSubmiting">
         </div>
       </div>
     </form>
@@ -177,7 +177,8 @@
      search: '',
      category: 'Toutes catégories',
      pdts: {{ pdts | safe }},
-     basket: {}
+     basket: {},
+     isSubmiting: false,
    },
 
    methods: {
@@ -243,21 +244,29 @@
      },
 
      validateForm: function(e) {
+       let prevent = false;
+
+       if (this.isSubmiting) {
+           e.preventDefault();
+           return;
+       }
+       this.isSubmiting = true;
+       e.target.setAttribute("disabled", "");
        if (Object.keys(this.basket).length == 0) {
          alert ("Votre panier est vide");
-         e.preventDefault()
+         prevent = true;
        }
        if (! {{ on_the_flight | yesno:"true,false" }}){
          var account_diff = {{ max_amount | comma_to_dot }} - this.totalAmount();
          if (account_diff < 0) {
            if ( {{ min_account_allow | yesno:"true,false" }}) {
              if (! confirm("Vous n'avez pas assez de sous dans votre cagnotte ! Il manque " + -account_diff.toFixed(2) + " €. Voulez-vous quand même effectuer l'achat ?") ) {
-               e.preventDefault()
+               prevent = true;
              }
            }
            else{
              alert ("Vous n'avez pas assez de sous dans votre cagnotte ! Il manque " + -account_diff.toFixed(2) + " €.");
-             e.preventDefault()
+             prevent = true;
            }
          }
          else
@@ -265,15 +274,20 @@
              var balance_end = {{ balance_amount | comma_to_dot }} - this.totalAmount();
              if (balance_end < 0) {
                if (! confirm("Ce compte sera en négatif de " + -balance_end.toFixed(2) + " € à la fin la transaction ! Voulez-vous quand même effectuer l'achat ?")) {
-                 e.preventDefault()
+                 prevent = true;
                }
              }
            }
        }
        else {
          if (! confirm("Cette cagnotte est configurée pour que le client paye la somme exacte après un achat sans approvisionner cagnotte. Voulez-vous quand même effectuer l'achat ? Si vous acceptez, vous devez encaisser la somme du ticket de caisse qui est de " + this.totalAmount().toFixed(2) + " €")) {
-           e.preventDefault()
+           prevent = true
          }
+       }
+       // Prevent double-click https://github.com/Jojo144/compteur_du_gase/issues/87
+       if (prevent) {
+           e.preventDefault();
+           this.isSubmiting = false;
        }
      },
      onKeyUp(event){
