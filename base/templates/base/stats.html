@@ -33,9 +33,8 @@ Prix : {{ pdt.price }} € / {{ pdt.unit.name }}<br>
 
  var ctx = document.getElementById('myChart').getContext('2d');
  var init_date = new Date();
- init_date.setMonth(init_date.getMonth() - 6);
- var end_date = new Date();
- end_date.setMonth(end_date.getMonth() + 1);
+ init_date.setMonth(init_date.getMonth() - 14); // il y a un an
+ var end_date = new Date(); // today
  var chart = new Chart(ctx, {
      type: 'line',
 
