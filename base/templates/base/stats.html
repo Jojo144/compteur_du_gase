@@ -10,10 +10,13 @@ Stock actuel : {{ pdt.stock | print_quantity:pdt.unit }}<br>
 Prix : {{ pdt.price }} € / {{ pdt.unit.name }}<br>
 
 <canvas id="myChart"></canvas>
-<br>
-<br>
-<button id="removeData">Zoomer</button>
-<button id="addData">Dézoomer</button>
+
+<div style="text-align:center">
+    <button class="btn btn-secondary" id="goToLeft" title="Voir avant">⬅</button>
+    <button class="btn btn-secondary" id="addData">Dézoomer</button>
+    <button class="btn btn-secondary" id="removeData">Zoomer</button>
+    <button class="btn btn-secondary" id="goToRight" title="Voir après">➡</button>
+</div>
 
 <script src="{% static 'base/moment-with-locales.js' %}"></script>
 <script src="{% static 'base/Chart.js' %}"></script>
@@ -96,11 +99,19 @@ Prix : {{ pdt.price }} € / {{ pdt.unit.name }}<br>
  }
 
  document.getElementById('removeData').addEventListener('click', function() {
-     changeMonthSpan(1, 0)
+     changeMonthSpan(2, -2)
  });
 
  document.getElementById('addData').addEventListener('click', function() {
-     changeMonthSpan(-1, 0)
+     changeMonthSpan(-2, 2)
+ });
+
+  document.getElementById('goToLeft').addEventListener('click', function() {
+     changeMonthSpan(-3, -3)
+ });
+
+  document.getElementById('goToRight').addEventListener('click', function() {
+     changeMonthSpan(3, 3)
  });
 
 </script>
