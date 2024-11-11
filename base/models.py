@@ -338,7 +338,7 @@ class ChangeStockOpQuerySet(models.QuerySet):
 
 class ChangeStockOp(Operation):
     TYPE_APPRO_STOCK = "ApproStock"
-    TYPE_INVENTORY = "Ivnentaire"
+    TYPE_INVENTORY = "Inventaire"
     TYPE_PURCHASE = "Achat"
 
     product = models.ForeignKey(Product, null=True,
