@@ -420,7 +420,8 @@ class ApproCompteOp(Operation):
         return 'ApproCompteOp {} - {} - {}'.format(self.household, self.amount, self.get_kind_display())
 
     class Meta:
-        verbose_name = "Opération d'appro de compte"
+        verbose_name = "Opération d'appro de cagnotte"
+        verbose_name_plural = "Opérations d'appro de cagnotte"
 
 
 # message

@@ -273,7 +273,7 @@
            {
              var balance_end = {{ balance_amount | comma_to_dot }} - this.totalAmount();
              if (balance_end < 0) {
-               if (! confirm("Ce compte sera en négatif de " + -balance_end.toFixed(2) + " € à la fin la transaction ! Voulez-vous quand même effectuer l'achat ?")) {
+               if (! confirm("Cette cagnotte sera en négatif de " + -balance_end.toFixed(2) + " € à la fin la transaction ! Voulez-vous quand même effectuer l'achat ?")) {
                  prevent = true;
                }
              }
