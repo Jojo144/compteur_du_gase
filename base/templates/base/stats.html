@@ -85,18 +85,22 @@ Prix : {{ pdt.price }} € / {{ pdt.unit.name }}<br>
      }
  });
 
- document.getElementById('addData').addEventListener('click', function() {
-     var date = new Date(chart.options.scales.xAxes[0].time.min);
-     date.setMonth(date.getMonth() - 1);
-     chart.options.scales.xAxes[0].time.min = date;
-     chart.update();
- });
+ function changeMonthSpan(start_month_offset, stop_month_offset) {
+     const date_start = new Date(chart.options.scales.xAxes[0].time.min);
+     const date_stop = new Date(chart.options.scales.xAxes[0].time.max);
+     date_start.setMonth(date_start.getMonth() + start_month_offset)
+     date_stop.setMonth(date_stop.getMonth() + stop_month_offset)
+     chart.options.scales.xAxes[0].time.min = date_start
+     chart.options.scales.xAxes[0].time.max = date_stop
+     chart.update()
+ }
 
  document.getElementById('removeData').addEventListener('click', function() {
-     var date = new Date(chart.options.scales.xAxes[0].time.min);
-     date.setMonth(date.getMonth() + 1);
-     chart.options.scales.xAxes[0].time.min = date;
-     chart.update();
+     changeMonthSpan(1, 0)
+ });
+
+ document.getElementById('addData').addEventListener('click', function() {
+     changeMonthSpan(-1, 0)
  });
 
 </script>
