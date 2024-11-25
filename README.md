@@ -191,6 +191,22 @@ vous pouvez utiliser [cron](https://fr.wikipedia.org/wiki/Cron).
 Si vous utilisez YunoHost vous pouvez utiliser le script `backup` fourni mais un
 petit `cp` de la base de donnée supplémentaire ne peut pas faire de mal.
 
+### Restauration d'une sauvegarde
+
+* Il faut écraser le fichier `db.sqlite3` de l'instance installée par celui que
+vous avez sauvegardé.
+
+* Si vous utilisez une version du logiciel plus récente que celle sauvegardée, il
+faut ensuite jouer les migrations avec :
+```
+sudo sudo -u compteur_du_gase /opt/compteur_gase/venv/bin/python /opt/compteur_gase/compteur_du_gase/manage.py migrate
+```
+
+* Et enfin, redémarrer le service :
+```
+systemctl restart compteur_du_gase
+```
+
 
 ## Mise à jour
 
