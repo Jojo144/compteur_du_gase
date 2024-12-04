@@ -10,10 +10,13 @@ Stock actuel : {{ pdt.stock | print_quantity:pdt.unit }}<br>
 Prix : {{ pdt.price }} € / {{ pdt.unit.name }}<br>
 
 <canvas id="myChart"></canvas>
-<br>
-<br>
-<button id="removeData">Zoomer</button>
-<button id="addData">Dézoomer</button>
+
+<div style="text-align:center">
+    <button class="btn btn-secondary" id="goToLeft" title="Voir avant">⬅</button>
+    <button class="btn btn-secondary" id="addData">Dézoomer</button>
+    <button class="btn btn-secondary" id="removeData">Zoomer</button>
+    <button class="btn btn-secondary" id="goToRight" title="Voir après">➡</button>
+</div>
 
 <script src="{% static 'base/moment-with-locales.js' %}"></script>
 <script src="{% static 'base/Chart.js' %}"></script>
@@ -33,9 +36,8 @@ Prix : {{ pdt.price }} € / {{ pdt.unit.name }}<br>
 
  var ctx = document.getElementById('myChart').getContext('2d');
  var init_date = new Date();
- init_date.setMonth(init_date.getMonth() - 6);
- var end_date = new Date();
- end_date.setMonth(end_date.getMonth() + 1);
+ init_date.setMonth(init_date.getMonth() - 14); // il y a un an
+ var end_date = new Date(); // today
  var chart = new Chart(ctx, {
      type: 'line',
 
@@ -86,18 +88,30 @@ Prix : {{ pdt.price }} € / {{ pdt.unit.name }}<br>
      }
  });
 
- document.getElementById('addData').addEventListener('click', function() {
-     var date = new Date(chart.options.scales.xAxes[0].time.min);
-     date.setMonth(date.getMonth() - 1);
-     chart.options.scales.xAxes[0].time.min = date;
-     chart.update();
- });
+ function changeMonthSpan(start_month_offset, stop_month_offset) {
+     const date_start = new Date(chart.options.scales.xAxes[0].time.min);
+     const date_stop = new Date(chart.options.scales.xAxes[0].time.max);
+     date_start.setMonth(date_start.getMonth() + start_month_offset)
+     date_stop.setMonth(date_stop.getMonth() + stop_month_offset)
+     chart.options.scales.xAxes[0].time.min = date_start
+     chart.options.scales.xAxes[0].time.max = date_stop
+     chart.update()
+ }
 
  document.getElementById('removeData').addEventListener('click', function() {
-     var date = new Date(chart.options.scales.xAxes[0].time.min);
-     date.setMonth(date.getMonth() + 1);
-     chart.options.scales.xAxes[0].time.min = date;
-     chart.update();
+     changeMonthSpan(2, -2)
+ });
+
+ document.getElementById('addData').addEventListener('click', function() {
+     changeMonthSpan(-2, 2)
+ });
+
+  document.getElementById('goToLeft').addEventListener('click', function() {
+     changeMonthSpan(-3, -3)
+ });
+
+  document.getElementById('goToRight').addEventListener('click', function() {
+     changeMonthSpan(3, 3)
  });
 
 </script>
