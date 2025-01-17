@@ -1,5 +1,5 @@
 <tr>
-  <th scope="row">{{ activity.description }} {{ activity.date|date:"D d M" }}</th>
+  <th scope="row">{{ activity.date|date:"D d M" }}<br />{{ activity.description }}</th>
 
   {% for person in activity.volunteers %}
   <td>
@@ -36,5 +36,5 @@
   {% endfor %}
 
   <td><div style="width:100%; overflow:auto">{{ activity.comment }}</div></td>
-  <td><a class="btn btn-success" href="{% url 'base:activity_details' activity.id %}" role="button">S'inscrire</a></td>
+  <td class="text-center align-middle"><a class="btn btn-success" href="{% url 'base:activity_details' activity.id %}" role="button">S'inscrire</a></td>
 </tr>
