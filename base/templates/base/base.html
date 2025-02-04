@@ -51,7 +51,7 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'base:gestion' %}">☭ Gestion</a></li>
                     {% if request.user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}">
+                            <a class="nav-link" href="{% url 'admin:logout' %}">
                                 🚪 Se déconnecter
                             </a>
                         </li>
