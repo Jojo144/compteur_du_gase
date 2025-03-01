@@ -21,7 +21,7 @@
         <tr>
             <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
                 [[ _.capitalize(column) ]]
-                [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
+                [[ sortKey == column ? (sortWay === 'asc' ? "⯅" : "⯆") : ""]]
             </th>
 	    <th></th>
 	    <th></th>
@@ -45,52 +45,61 @@
       delimiters: ['[[', ']]'],
       el: '#vue-table',
       data: {
-      sortKey: 'id',
-      selected_year: '',
-      selected_month: '',
-      selected_day: '',
-      search: '',
-      reverse: false,
-      total: 0,
-      total_referent: 0,
-      total_receipt: 0,
-      columns: {{ columns | safe }},
-      
-      raw_data: {{ mails | safe }}
+         sortKey: 'id',
+         selected_year: '',
+         selected_month: '',
+         selected_day: '',
+         search: '',
+         sortWay: 'asc',
+         total: 0,
+         total_referent: 0,
+         total_receipt: 0,
+         columns: {{ columns | safe }},
+         raw_data: {{ mails | safe }}
       },
 
       computed: {
-      orderedData: function () {
-          var data = _.orderBy(this.raw_data, this.sortKey);
-          if (this.reverse) {
-          return _.reverse(data)
-          } else {
-          return data
-          }
-      }
+         orderedData: function () {
+             /* extract sort key from row, depending on its type */
+             function sortValue(row){
+                 let val = row[this.sortKey]
+                 if (! Number.isNaN(Number.parseFloat(val))) {
+                     return Number.parseFloat(val);
+                 } else if (_.isString(val)) {
+                     return val.toLowerCase()
+                 } else {
+                     return val;
+                 }
+
+             };
+             return _.orderBy(this.raw_data, sortValue.bind(this), this.sortWay);
+         }
       },
 
       methods: {
-      sortBy: function(sortKey) {
-          this.reverse = (this.sortKey == sortKey) ? ! this.reverse : false;
-          this.sortKey = sortKey
-      },
+         sortBy: function(sortKey) {
+             if (this.sortKey === sortKey) {
+                 this.sortWay = (this.sortWay === 'asc' ? 'desc' : 'asc');
+             } else {
+                 this.sortKey = sortKey;
+             }
+         },
 
-      filter: function () {
-          var filterKey = this.search.toLowerCase();
-          var data = this.orderedData;
-          
-          this.compute_total(data);
-
-          document.getElementById("print-total").innerHTML = "Total des mails non envoyés : <b>" + this.total + "</b></br>";
-          return data
-      },
-      
-      compute_total: function(data){
-          let data_ns = data.filter(function (row) {return row['envoyé ?'] == "✘"});
-          
-          this.total = data_ns.length;
-      }      
+         filter: function () {
+             var filterKey = this.search.toLowerCase();
+             var data = this.orderedData;
+             
+             this.compute_total(data);
+    
+             document.getElementById("print-total").innerHTML = "Total des mails non envoyés : <b>" + this.total + "</b></br>";
+             return data
+         },
+         
+         compute_total: function(data){
+             let data_ns = data.filter(function (row) {return row['envoyé ?'] == "✘"});
+             
+             this.total = data_ns.length;
+         }      
       }
   })
   
