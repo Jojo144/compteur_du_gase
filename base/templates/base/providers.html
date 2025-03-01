@@ -31,8 +31,8 @@
         <tr>
             <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
                 [[ _.capitalize(column) ]]
-                [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
-            </th>
+                [[ sortKey == column ? (sortWay === 'asc' ? "⯅" : "⯆") : ""]]
+          </th>
             <th></th>
         </tr>
         </thead>
@@ -55,44 +55,53 @@
 
 <script>
   new Vue({
-      delimiters: ['[[', ']]'],
-      el: '#vue-table',
-      data: {
-      sortKey: 'nom',
-      search: '',
-      reverse: false,
-      columns: {{ columns | safe }},
-      
-      raw_data: {{ providers | safe }}
+         delimiters: ['[[', ']]'],
+         el: '#vue-table',
+         data: {
+         sortKey: 'nom',
+         search: '',
+         sortWay: 'asc',
+         columns: {{ columns | safe }},
+         raw_data: {{ providers | safe }}
       },
 
       computed: {
-      orderedData: function () {
-          var data = _.orderBy(this.raw_data, this.sortKey);
-          if (this.reverse) {
-          return _.reverse(data)
-          } else {
-          return data
-          }
-      }
+         orderedData: function () {
+             /* extract sort key from row, depending on its type */
+             function sortValue(row){
+                 let val = row[this.sortKey]
+                 if (! Number.isNaN(Number.parseFloat(val))) {
+                     return Number.parseFloat(val);
+                 } else if (_.isString(val)) {
+                     return val.toLowerCase()
+                 } else {
+                     return val;
+                 }
+
+             };
+             return _.orderBy(this.raw_data, sortValue.bind(this), this.sortWay);
+         }
       },
 
       methods: {
-      sortBy: function(sortKey) {
-          this.reverse = (this.sortKey == sortKey) ? ! this.reverse : false;
-          this.sortKey = sortKey
-      },
+         sortBy: function(sortKey) {
+             if (this.sortKey === sortKey) {
+                 this.sortWay = (this.sortWay === 'asc' ? 'desc' : 'asc');
+             } else {
+                 this.sortKey = sortKey;
+             }
+         },
 
-      filter: function () {
-          var filterKey = this.search.toLowerCase();
-          var data = this.orderedData;
-          data = data.filter(function (row) {
-          return Object.keys(row).some(function (key) {
-              return String(row[key]).toLowerCase().indexOf(filterKey) > -1
-          })
-              });
-          return data
-      }
+         filter: function () {
+             var filterKey = this.search.toLowerCase();
+             var data = this.orderedData;
+             data = data.filter(function (row) {
+             return Object.keys(row).some(function (key) {
+                 return String(row[key]).toLowerCase().indexOf(filterKey) > -1
+             })
+                 });
+             return data
+         }
       }
   })
 

@@ -42,7 +42,7 @@
         <tr>
             <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
                 [[ _.capitalize(column) ]]
-                [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
+                [[ sortKey == column ? (sortWay === 'asc' ? "⯅" : "⯆") : ""]]
             </th>
             <th></th>
         </tr>
@@ -64,50 +64,64 @@
       delimiters: ['[[', ']]'],
       el: '#vue-table',
       data: {
-      sortKey: 'name',
-      only_not_read: false,
-      only_not_done: false,
-      search: '',
-      reverse: false,
-      columns: {{ columns | safe }},
-      raw_data: {{ notes | safe }}
+         sortKey: 'name',
+         only_not_read: false,
+         only_not_done: false,
+         search: '',
+         sortWay: 'asc',
+         columns: {{ columns | safe }},
+         raw_data: {{ notes | safe }}
       },
 
       computed: {
-      orderedData: function () {
-          var data = _.orderBy(this.raw_data, this.sortKey);
-          if (this.reverse) {
-          return _.reverse(data)
-          } else {
-          return data
-          }
-      }
+         orderedData: function () {
+             /* extract sort key from row, depending on its type */
+             function sortValue(row) {
+                 let val = row[this.sortKey]
+                 if (this.sortKey == "date") {
+                     // expect val formatted like DD/MM/YYYY
+		     return [val.substring(6,10), val.substring(3,5), val.substring(0,2)];
+		 } else {
+                     if (! Number.isNaN(Number.parseFloat(val))) {
+                         return Number.parseFloat(val);
+                     } else if (_.isString(val)) {
+                         return val.toLowerCase()
+                     } else {
+                         return val;
+                     }
+		 }
+             };
+             return _.orderBy(this.raw_data, sortValue.bind(this), this.sortWay);
+         }
       },
 
       methods: {
-      changeRead: function() {
-          this.only_not_read = !this.only_not_read
-      },
-      
-      changeDone: function() {
-          this.only_not_done = !this.only_not_done
-      },
+         changeRead: function() {
+             this.only_not_read = !this.only_not_read
+         },
 
-      sortBy: function(sortKey) {
-          this.reverse = (this.sortKey == sortKey) ? ! this.reverse : false;
-          this.sortKey = sortKey
-      },
+         changeDone: function() {
+             this.only_not_done = !this.only_not_done
+         },
 
-      filter: function () {
-          var search = this.search;
-          var only_not_read = !this.only_not_read;
-          var only_not_done = !this.only_not_done;
-          return _.pickBy(this.orderedData, (function (row) {
-          var b1 = (only_not_read) || (row["message lu ?"] == "✘");
-          var b2 = (only_not_done) || (row["action(s) réalisée(s) ?"] == "✘");
-          return b1 && b2 && (myContains(row.who, search) || myContains(row.message, search))
-          }))
-      }
+         sortBy: function(sortKey) {
+             if (this.sortKey === sortKey) {
+                 this.sortWay = (this.sortWay === 'asc' ? 'desc' : 'asc');
+             } else {
+                 this.sortKey = sortKey;
+             }
+         },
+
+         filter: function () {
+             var search = this.search;
+             var only_not_read = !this.only_not_read;
+             var only_not_done = !this.only_not_done;
+             return _.pickBy(this.orderedData, (function (row) {
+             var b1 = (only_not_read) || (row["message lu ?"] == "✘");
+             var b2 = (only_not_done) || (row["action(s) réalisée(s) ?"] == "✘");
+             return b1 && b2 && (myContains(row.who, search) || myContains(row.message, search))
+             }))
+         }
       }
   })
 
