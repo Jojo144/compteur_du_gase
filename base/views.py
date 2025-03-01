@@ -147,7 +147,8 @@ def achats(request, household_id):
                                  recipients=pdt.get_email_stock_alert(),
                                  kind=Mail.ALERTE_STOCK)
         if household.on_the_flight:
-            opa = ApproCompteOp(household=household, amount=s, kind=ApproCompteOp.ONTHEFLIGHT)
+            ontheflight, _ = PaymentType.objects.get_or_create(name="À la volée")
+            opa = ApproCompteOp(household=household, amount=s, paymenttype=ontheflight)
             opa.save()
             household.account += s
             household.save()
@@ -208,13 +209,13 @@ def compte(request, household_id):
     household = get_object_or_404(Household, pk=household_id)
     history = ApproCompteOp.objects.filter(household_id=household_id).order_by('-date')[:5]
     local_settings = get_local_settings()
-    use_appro_kind = local_settings.use_appro_kind
+    use_paymenttype = local_settings.use_paymenttype
     if request.method == 'POST':
-        form = ApproCompteFormKind(request.POST) if use_appro_kind else ApproCompteForm(request.POST)
+        form = ApproCompteFormKind(request.POST) if use_paymenttype else ApproCompteForm(request.POST)
         if form.is_valid():
             q = form.cleaned_data['amount']
-            k = form.cleaned_data.get('kind')  # None if kinds are not used
-            op = ApproCompteOp(household=household, amount=q, kind=k)
+            pt = form.cleaned_data.get('paymenttype')  # None if paymenttypes are not used
+            op = ApproCompteOp(household=household, amount=q, paymenttype=pt)
             op.save()
             household.account += q
             household.save()
@@ -224,7 +225,7 @@ def compte(request, household_id):
                          recipients=household.get_emails_receipt(), kind=Mail.APPRO_CAGNOTTE)
             return HttpResponseRedirect(reverse('base:index'))
     else:
-        form = ApproCompteFormKind() if use_appro_kind else ApproCompteForm()
+        form = ApproCompteFormKind() if use_paymenttype else ApproCompteForm()
     context = {'household': household,
                'form': form,
                'history': history,
@@ -236,10 +237,10 @@ def compte(request, household_id):
 
 def compteslist(request):
     columns = ['jour', 'mois', 'année', 'foyer', 'approvisionnement']
-    if get_local_settings().use_appro_kind:
+    if get_local_settings().use_paymenttype:
         columns.append("type")
     comptes = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "foyer": str(p.household),
-                "approvisionnement": '{} €'.format(p.amount), "type": p.get_kind_display(), "date": p.date.isoformat()}
+                "approvisionnement": '{} €'.format(p.amount), "type": str(p.paymenttype), "date": p.date.isoformat()}
                for p in ApproCompteOp.objects.all()]
     columns = json.dumps(columns)
     comptes = json.dumps(comptes)

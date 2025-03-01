@@ -43,7 +43,7 @@
                 <td> {{ o.date | date:"D d M Y" | capfirst }}</td>
                 <td> {{ o.date | date:"H \h i" }}</td>
                 <td class="text-right"> {{ o.amount }} €</td>
-                {% if o.get_kind_display %}<td class="text-right"> {{ o.get_kind_display }}</td> {% endif %}
+                {% if o.paymenttype %}<td class="text-right"> {{ o.paymenttype }}</td> {% endif %}
             </tr>
             {% empty %}
             <tr>

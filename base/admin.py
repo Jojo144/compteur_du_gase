@@ -84,8 +84,8 @@ class ChangeStockOpAdmin(admin.ModelAdmin):
 
 
 class ApproCompteOpAdmin(admin.ModelAdmin):
-    list_display = ('id', 'date', 'household', 'kind')
-    list_filter = ('kind','household')
+    list_display = ('id', 'date', 'household', 'paymenttype')
+    list_filter = ('paymenttype','household')
     list_display_links = ('household',)
 
 
@@ -218,6 +218,7 @@ admin.site.register(Note)
 admin.site.register(LocalSettings, LocalSettingsAdmin)
 admin.site.register(Mail)
 admin.site.register(Activity, ActivityAdmin)
+admin.site.register(PaymentType)
 
 admin.site.register(ChangeStockOp, ChangeStockOpAdmin)
 admin.site.register(ApproCompteOp, ApproCompteOpAdmin)
