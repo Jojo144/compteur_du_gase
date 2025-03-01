@@ -411,8 +411,8 @@ class PaymentType(models.Model):
 
 class ApproCompteOp(Operation):
     household = models.ForeignKey(Household, null=True,
-                                  on_delete=models.SET_NULL)  # null if the household was deleted and no longer exists
-    amount = models.DecimalField(max_digits=15, decimal_places=2)  # positif for a regular appro
+                                  on_delete=models.SET_NULL, verbose_name="Foyer")  # null if the household was deleted and no longer exists
+    amount = models.DecimalField(max_digits=15, decimal_places=2, verbose_name="Montant")  # positif for a regular appro
     paymenttype = models.ForeignKey(PaymentType, null=True,
                                     on_delete=models.SET_NULL, verbose_name="Type de paiement")
 

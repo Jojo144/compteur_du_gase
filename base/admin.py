@@ -84,7 +84,7 @@ class ChangeStockOpAdmin(admin.ModelAdmin):
 
 
 class ApproCompteOpAdmin(admin.ModelAdmin):
-    list_display = ('id', 'date', 'household', 'paymenttype')
+    list_display = ('id', 'date', 'household', 'amount', 'paymenttype')
     list_filter = ('paymenttype','household')
     list_display_links = ('household',)
 
