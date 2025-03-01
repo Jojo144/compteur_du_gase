@@ -151,12 +151,11 @@ def achats(request, household_id):
             opa.save()
             household.account += s
             household.save()
-            messages.success(request, '✔ Approvisionnement de la cagnotte de {0:.2f} € effectué'.format(s))
+            messages.success(request, '✔ Approvisionnement de la cagnotte de {} € effectué'.format(s))
 
         msg += "Ce qui nous donne un total de {} €.\n\nCiao!".format(s)
         balance = household.account
-        messages.success(request, '✔ Votre cagnotte a été débitée de {} €<br>Solde restant : {} €'.format(round2(s),
-                                                                                                       round2(balance)))
+        messages.success(request, '✔ Votre cagnotte a été débitée de {} €<br>Solde restant : {} €'.format(s, round2(balance)))
         my_send_mail(request, subject='Ticket de caisse', message=msg, recipients=household.get_emails_receipt(), kind=Mail.TICKET)
         return HttpResponseRedirect(reverse('base:index'))
     else:
@@ -218,7 +217,7 @@ def compte(request, household_id):
             op.save()
             household.account += q
             household.save()
-            messages.success(request, '✔ Approvisionnement de la cagnotte de {0:.2f} € effectué'.format(q))
+            messages.success(request, '✔ Approvisionnement de la cagnotte de {} € effectué'.format(q))
             my_send_mail(request, subject="Approvisionnement de votre cagnotte",
                          message='Votre cagnotte a été approvisionnée de {} €'.format(q),
                          recipients=household.get_emails_receipt(), kind=Mail.APPRO_CAGNOTTE)
