@@ -16,5 +16,13 @@
     {"model": "base.category", "pk": 6, "fields": {"name": "SUCR\u00c9"}},
     {"model": "base.category", "pk": 7, "fields": {"name": "INFUSIONS"}},
     {"model": "base.category", "pk": 8, "fields": {"name": "PRODUITS D'ENTRETIEN"}},
-    {"model": "base.category", "pk": 9, "fields": {"name": "FRAIS"}}
+    {"model": "base.category", "pk": 9, "fields": {"name": "FRAIS"}},
+
+    {"model": "base.paymenttype", "pk": 1, "fields": {"name": "Espèces"}},
+    {"model": "base.paymenttype", "pk": 2, "fields": {"name": "Virement"}},
+    {"model": "base.paymenttype", "pk": 3, "fields": {"name": "Chèque"}},
+    {"model": "base.paymenttype", "pk": 4, "fields": {"name": "Annulation/correction"}},
+    {"model": "base.paymenttype", "pk": 5, "fields": {"name": "Remboursement"}},
+    {"model": "base.paymenttype", "pk": 6, "fields": {"name": "À la volée"}}
+
 ]

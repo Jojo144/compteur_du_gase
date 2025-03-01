@@ -32,7 +32,7 @@ class LocalSettings(models.Model):
                                        help_text="La fonction messages/actions sert à laisser des messages "
                                                  "entre les différentes permanences ou lister des actions à faire.")
 
-    use_appro_kind = models.BooleanField(verbose_name="Utilisation de la fonction type de paiement ?", default=False,
+    use_paymenttype = models.BooleanField(verbose_name="Utilisation de la fonction type de paiement ?", default=False,
                                          help_text="La fonction type de paiement permet de sauvegarder le moyen "
                                                    "de paiement utilisé.")
 
@@ -398,26 +398,26 @@ class PurchaseDetailOp(ChangeStockOp):
         return super().create(label=cls.TYPE_PURCHASE, **kwargs)
 
 
+class PaymentType(models.Model):
+    name = models.CharField(max_length=200, verbose_name="Nom")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Type de paiement'
+        ordering = ['name']
+
+
 class ApproCompteOp(Operation):
     household = models.ForeignKey(Household, null=True,
                                   on_delete=models.SET_NULL)  # null if the household was deleted and no longer exists
     amount = models.DecimalField(max_digits=15, decimal_places=2)  # positif for a regular appro
-    CASH = 'cash'
-    CHEQUE = 'cheque'
-    CANCELLATION = 'cancellation'
-    REPAYMENT = 'repayment'
-    ONTHEFLIGHT = 'ontheflight'
-    KIND_CHOICES = [
-        (CASH, 'Espèces'),
-        (CHEQUE, 'Chèque'),
-        (CANCELLATION, 'Annulation/Correction'),
-        (REPAYMENT, 'Remboursement'),
-        (ONTHEFLIGHT, 'À la volée'),
-    ]
-    kind = models.CharField(max_length=12, choices=KIND_CHOICES, default=CASH, null=True)
+    paymenttype = models.ForeignKey(PaymentType, null=True,
+                                    on_delete=models.SET_NULL, verbose_name="Type de paiement")
 
     def __str__(self):
-        return 'ApproCompteOp {} - {} - {}'.format(self.household, self.amount, self.get_kind_display())
+        return 'ApproCompteOp {} - {} - {}'.format(self.household, self.amount, self.paymenttype)
 
     class Meta:
         verbose_name = "Opération d'appro de cagnotte"
