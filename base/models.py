@@ -18,7 +18,7 @@ class LocalSettings(models.Model):
     min_balance = models.DecimalField(max_digits=10, decimal_places=2, default=10,
                                       verbose_name="seuil en dessous duquel une alerte est lancée au moment de commencer un achat (en €)")
 
-    txt_home = models.TextField(blank=True, default="<i>Bienvenu·e au GASE</i><br><br>",
+    txt_home = models.TextField(blank=True, default="<i>Bienvenue au GASE</i><br><br>",
                                 verbose_name="texte en haut de la page d'accueil (doit être donnée en code html)")
 
     txt_home2 = models.TextField(blank=True, default="Infos utiles genre :\nlocalisation des clés du GASE\nhoraires des permanences\n...\n(ou rien)",
