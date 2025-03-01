@@ -64,13 +64,13 @@
       delimiters: ['[[', ']]'],
       el: '#vue-table',
       data: {
-      sortKey: 'name',
-      only_not_read: false,
-      only_not_done: false,
-      search: '',
+         sortKey: 'name',
+         only_not_read: false,
+         only_not_done: false,
+         search: '',
          sortWay: 'asc',
-      columns: {{ columns | safe }},
-      raw_data: {{ notes | safe }}
+         columns: {{ columns | safe }},
+         raw_data: {{ notes | safe }}
       },
 
       computed: {
@@ -99,7 +99,7 @@
          changeRead: function() {
              this.only_not_read = !this.only_not_read
          },
-         
+
          changeDone: function() {
              this.only_not_done = !this.only_not_done
          },

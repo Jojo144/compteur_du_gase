@@ -88,23 +88,23 @@
          filter: function () {
              var filterKey = this.search.toLowerCase();
              var data = this.orderedData;
-             
+
              this.compute_total(data);
-    
+
              document.getElementById("print-total").innerHTML = "Total des mails non envoyés : <b>" + this.total + "</b></br>";
              return data
          },
-         
+
          compute_total: function(data){
              let data_ns = data.filter(function (row) {return row['envoyé ?'] == "✘"});
-             
+
              this.total = data_ns.length;
-         }      
+         }
       }
   })
-  
+
   vue.filter();
-  
+
 
 </script>
 {% endblock %}
