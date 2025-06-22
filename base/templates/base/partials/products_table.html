@@ -1,7 +1,6 @@
 {% comment "Liste de produits ré-utilisable, en vueJS" %}
-
-    @param products : liste de produits, sous forme d'un Array JSON encodé dans une string
-    @param colums : Liste des titres de colonnes à afficher, sous forme d'un Array JSON encodé dans une string
+    @param productsList : liste de produits, sous forme d'un Array JSON encodé dans une string
+    @param columns : Liste des titres de colonnes à afficher, sous forme d'un Array JSON encodé dans une string
 {% endcomment %}
 
 <div id="vue-table">
@@ -104,7 +103,7 @@
              var only_alerte = this.only_alerte;
              return _.pickBy(this.orderedData, (function (row) {
                  var b = (!only_visible) || (row.visible == "✔");
-                 var c = !((only_alerte) && (!row["alerte stock"].includes("✔")));
+                 var c = !((only_alerte) && (!row["is_in_alert"]));
                  return b && c && (myContains(row.nom, search) || myContains(row.catégorie, search) || myContains(row.fournisseur, search))
              }))
          }
