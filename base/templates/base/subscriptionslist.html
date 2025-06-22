@@ -85,7 +85,7 @@
         <tr>
             <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
                 [[ _.capitalize(column) ]]
-                [[ sortKey == column ? (reverse ? "⯅" : "⯆") : ""]]
+                [[ sortKey == column ? (sortWay === 'asc' ? "⯅" : "⯆") : ""]]
             </th>
         </tr>
         </thead>
@@ -102,91 +102,101 @@
 
 <script>
   var vue = new Vue({
-      delimiters: ['[[', ']]'],
-      el: '#vue-table',
-      data: {
-      sortKey: 'date',
-      selected_year: '',
-      selected_month: '',
-      selected_day: '',
-      search: '',
-      reverse: false,
-      columns: {{ columns | safe }},
-      total: 0,
+         delimiters: ['[[', ']]'],
+         el: '#vue-table',
+         data: {
+         sortKey: 'date',
+         selected_year: '',
+         selected_month: '',
+         selected_day: '',
+         search: '',
+         sortWay: 'asc',
+         columns: {{ columns | safe }},
+         total: 0,
 
-      raw_data: {{ subscriptions | safe }}
+         raw_data: {{ subscriptions | safe }}
       },
 
       computed: {
-      orderedData: function () {
-          var data = _.orderBy(this.raw_data, this.sortKey);
-          if (this.reverse) {
-          return _.reverse(data)
-          } else {
-          return data
-          }
-      }
+         orderedData: function () {
+             /* extract sort key from row, depending on its type */
+             function sortValue(row){
+                 let val = row[this.sortKey]
+                 if (! Number.isNaN(Number.parseFloat(val))) {
+                     return Number.parseFloat(val);
+                 } else if (_.isString(val)) {
+                     return val.toLowerCase()
+                 } else {
+                     return val;
+                 }
+
+             };
+             return _.orderBy(this.raw_data, sortValue.bind(this), this.sortWay);
+         }
       },
 
       methods: {
-      sortBy: function(sortKey) {
-          this.reverse = (this.sortKey == sortKey) ? ! this.reverse : false;
-          this.sortKey = sortKey
-      },
+         sortBy: function(sortKey) {
+             if (this.sortKey === sortKey) {
+                 this.sortWay = (this.sortWay === 'asc' ? 'desc' : 'asc');
+             } else {
+                 this.sortKey = sortKey;
+             }
+         },
 
-      filter: function () {
-          var filterKey = this.search.toLowerCase();
-          var data = this.orderedData;
+         filter: function () {
+             var filterKey = this.search.toLowerCase();
+             var data = this.orderedData;
 
-          if (this.selected_year.length > 0 ){
-            var selected_year_int = parseInt(this.selected_year);
+             if (this.selected_year.length > 0 ){
+               var selected_year_int = parseInt(this.selected_year);
 
-            data = data.filter(function (row) {
-            return Object.keys(row).some(function (key) {
-                return row["année"] == selected_year_int
-            })
-            });
-          }
+               data = data.filter(function (row) {
+               return Object.keys(row).some(function (key) {
+                   return row["année"] == selected_year_int
+               })
+               });
+             }
 
-          if (this.selected_month.length > 0 ){
-            var selected_month_int = parseInt(this.selected_month);
+             if (this.selected_month.length > 0 ){
+               var selected_month_int = parseInt(this.selected_month);
 
-            data = data.filter(function (row) {
-            return Object.keys(row).some(function (key) {
-                return row["mois"] == selected_month_int
-            })
-            });
-          }
+               data = data.filter(function (row) {
+               return Object.keys(row).some(function (key) {
+                   return row["mois"] == selected_month_int
+               })
+               });
+             }
 
-          if (this.selected_day.length > 0 ){
-            var selected_day_int = parseInt(this.selected_day);
+             if (this.selected_day.length > 0 ){
+               var selected_day_int = parseInt(this.selected_day);
 
-            data = data.filter(function (row) {
-            return Object.keys(row).some(function (key) {
-                return row["jour"] == selected_day_int
-            })
-            });
-          }
+               data = data.filter(function (row) {
+               return Object.keys(row).some(function (key) {
+                   return row["jour"] == selected_day_int
+               })
+               });
+             }
 
-          data = data.filter(function (row) {
-          return Object.keys(row).some(function (key) {
-              return String(row[key]).toLowerCase().indexOf(filterKey) > -1
-          })
-          });
+             data = data.filter(function (row) {
+             return Object.keys(row).some(function (key) {
+                 return String(row[key]).toLowerCase().indexOf(filterKey) > -1
+             })
+             });
 
-          this.total = this.total_sum(data);
+             this.total = this.total_sum(data);
 
-          return data;
-      },
+             return data;
+         },
 
-      total_sum: function(data){
-          let sum = 0;
-          data.forEach(function(element) {
-              sum += parseFloat(element["adhesion"].replace('€', ''));
-          });
-          console.log(sum);
-         return sum;
-      }
+         total_sum: function(data){
+             let sum = 0;
+             data.forEach(function(element) {
+                 sum += parseFloat(element["adhesion"].replace('€', ''));
+             });
+             console.log(sum);
+            return sum;
+         }
       }
   })
 
