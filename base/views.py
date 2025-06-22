@@ -230,7 +230,8 @@ def compte(request, household_id):
                'form': form,
                'history': history,
                'use_subscription': local_settings.use_subscription,
-               'number': household.get_formated_number()
+               'use_paymenttype': local_settings.use_paymenttype,
+               'number': household.get_formated_number(),
                }
     return render(request, 'base/compte.html', context)
 
