@@ -5,79 +5,93 @@
 
 {% block content %}
 
-<div class="row" id="household">
+<div id="household">
   <h2>{{ household }} - <small>Solde : {{ household.account }} € </small></h2>
 </div>
-<div class="row">
-  <button type="button" class="show-history btn btn-info">
-    Historique de vos achats
-  </button>
-</div>
+
+<button type="button" class="show-history btn btn-info">
+  Historique de vos achats
+</button>
+
 <div id="vue-table" class="row"
      @keyup="onKeyUp"
      @keyup.up="moveSelectionUp"
      @keyup.down="moveSelectionDown"
 >
-  <div class="col col-6">
+  <!-- Colonne gauche : produits et filtres -->
+
+  <div class="col">
+    <!-- Filtres -->
+
     <div class="row">
       <div class="col">
         <!-- pas dans un form pour ne pas que ça recharge la page quand on fait Entrée -->
-        <input autofocus type="text" v-model="search" class="form-control search"  placeholder="Tapez pour filtrer ..."
+        <input autofocus type="text" v-model="search" class="form-control search"  placeholder="Tapez pour filtrer..."
                @keydown.enter="moveSelectionDown"
         >
       </div>
-      <div class="col text-right">
-          {% if use_categories %}
-              <div class="dropdown">
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
-                          data-toggle="dropdown">
-                      [[ category ]]
-                  </button>
-                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                      <button class="dropdown-item" @click="category='Toutes catégories'">Toutes catégories
-                      </button>
-                      {% for cat in cats %}
-                          <button class="dropdown-item"
-                                  @click="category='{{ cat | escapejs }}'">{{ cat.name | escape }}</button>
-                      {% endfor %}
+      {% if use_categories %}
+        <div class="col text-right">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown">
+                    [[ category ]]
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <button class="dropdown-item" @click="category='Toutes catégories'">Toutes catégories
+                    </button>
+                    {% for cat in cats %}
+                        <button class="dropdown-item"
+                                @click="category='{{ cat | escapejs }}'">{{ cat.name | escape }}</button>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Liste des produits -->
+
+    <div class="row mt-4">
+      <div class="col">
+        <table class="table table-striped" id="catalog">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Prix unitaire</th>
+              <th>Quantité</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(pdt, id) in pdts" v-show="matchFilter(pdt)">
+              <td>[[ pdt.name ]]</td>
+              <td>[[ pdt.pwyw ? "prix libre !" : pdt.price + " €" ]]</td>
+              <td>
+                <div class="input-group">
+                  <input type="text" class="form-control"
+                        :id="'input_pdt_' + id"
+                        @keydown.enter="inBasket"
+                        @input="forceNumericValue"
+                  >
+                  <div class="input-group-append">
+                    <span class="input-group-text"> [[ pdt.unit ]] </span>
                   </div>
-              </div>
-          {% endif %}
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-    <table class="table table-striped" id="catalog">
-      <thead>
-        <tr>
-          <th>Nom</th>
-          <th>Prix unitaire</th>
-          <th>Quantité</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(pdt, id) in pdts" v-show="matchFilter(pdt)">
-          <td>[[ pdt.name ]]</td>
-          <td>[[ pdt.pwyw ? "prix libre !" : pdt.price + " €" ]]</td>
-          <td>
-            <div class="input-group">
-              <input type="text" class="form-control"
-                     :id="'input_pdt_' + id"
-                     @keydown.enter="inBasket"
-                     @input="forceNumericValue"
-              >
-              <div class="input-group-append">
-                <span class="input-group-text"> [[ pdt.unit ]] </span>
-              </div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+
     <div class="text-right list-overlay-actions">
       <button class="btn btn-info" @click="inBasket">Dans panier ⇒</button>
     </div>
   </div>
 
-  <div class="col col-6">
+  <!-- Colonne droite : panier et total -->
+
+  <div class="col pt-4 pt-md-0">
     <form action="" @submit="validateForm" method="post">
       {% csrf_token %}
       <table class="table table-striped">
@@ -117,7 +131,7 @@
 
  {% if alerte_balance %}
  $(window).on('load',function(){
-   bootbox.alert('<p>Votre solde est inférieur a {{ alerte_balance_amount }} €.</p>')
+   bootbox.alert('<p>Votre solde est inférieur à {{ alerte_balance_amount }} €.</p>')
  });
  {% endif %}
 
