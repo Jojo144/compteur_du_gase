@@ -26,12 +26,16 @@ class ApproCompteForm(forms.Form):
                                 decimal_places=2)
 
 class ApproCompteFormKind(ApproCompteForm):
-    kind = forms.ChoiceField(label="Type d'approvisionnement", choices=ApproCompteOp.KIND_CHOICES,
-                             help_text="Chèque ou espèces pour un approvisionnement normal (valeur positive)."
-                                       "</br>Annulation/correction pour corriger une erreur "
-                                       "de saisie (valeur positive ou négative)."
-                                       "</br>Remboursement pour un remboursement ou "
-                                       "lorsque le foyer clotûre sa cagnotte (valeur négative).")
+    paymenttype = forms.ModelChoiceField(label="Type de paiement",
+                                         required=False,
+                                         queryset=PaymentType.objects.all(),
+                                         help_text="Chèque/espèces/virement pour un approvisionnement normal."
+                                                   "Annulation/correction pour corriger une erreur "
+                                                   "de saisie (valeur positive ou négative)."
+                                                   "Remboursement pour un remboursement ou "
+                                                   "lorsque le foyer clotûre sa cagnotte (valeur négative).",
+                                         empty_label="(non renseigné)"
+                                         )
 
 
 

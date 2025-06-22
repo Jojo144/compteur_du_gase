@@ -42,8 +42,12 @@
             <tr>
                 <td> {{ o.date | date:"D d M Y" | capfirst }}</td>
                 <td> {{ o.date | date:"H \h i" }}</td>
-                <td class="text-right"> {{ o.amount }} €</td>
-                {% if o.get_kind_display %}<td class="text-right"> {{ o.get_kind_display }}</td> {% endif %}
+                <td class="text-right"> {{ o.amount }} €
+                {% if use_paymenttype %}
+                    <td class="text-right{% if not o.paymenttype %} text-muted{% endif %}">
+                        {{ o.get_paymenttype_display }}
+                    </td>
+                {% endif %}
             </tr>
             {% empty %}
             <tr>
