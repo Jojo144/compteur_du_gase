@@ -416,6 +416,12 @@ class ApproCompteOp(Operation):
     paymenttype = models.ForeignKey(PaymentType, null=True,
                                     on_delete=models.SET_NULL, verbose_name="Type de paiement")
 
+    def get_paymenttype_display(self):
+        if self.paymenttype:
+            return self.paymenttype.name
+        else:
+            return "(non renseigné)"
+
     def __str__(self):
         return 'ApproCompteOp {} - {} - {}'.format(self.household, self.amount, self.paymenttype)
 

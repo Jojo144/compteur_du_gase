@@ -33,7 +33,9 @@ class ApproCompteFormKind(ApproCompteForm):
                                                    "Annulation/correction pour corriger une erreur "
                                                    "de saisie (valeur positive ou négative)."
                                                    "Remboursement pour un remboursement ou "
-                                                   "lorsque le foyer clotûre sa cagnotte (valeur négative).")
+                                                   "lorsque le foyer clotûre sa cagnotte (valeur négative).",
+                                         empty_label="(non renseigné)"
+                                         )
 
 
 
