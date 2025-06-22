@@ -345,9 +345,9 @@ class ChangeStockOp(Operation):
                                 on_delete=models.SET_NULL)  # null if the product was deleted and no longer exists
     quantity = models.DecimalField(max_digits=15,
                                    decimal_places=3)  # positif for an appro, negative for a normal buying
-    price = models.DecimalField(max_digits=15, decimal_places=3)  # product.price * quantity
+    price = models.DecimalField(max_digits=15, decimal_places=3)  # product.price * quantity // decimal_places should have been set to 2...
     purchase_cost = models.DecimalField(max_digits=15, decimal_places=3,
-                                        default=0)  # product.cost_of_purchase * quantity
+                                        default=0)  # product.cost_of_purchase * quantity // decimal_places should have been set to 2...
     stock = models.DecimalField(max_digits=15, decimal_places=3)  # stock after the operation
     label = models.CharField(max_length=20)
 
@@ -395,7 +395,11 @@ class PurchaseDetailOp(ChangeStockOp):
 
     @classmethod
     def create(cls, **kwargs):
-        return super().create(label=cls.TYPE_PURCHASE, **kwargs)
+        op = super().create(label=cls.TYPE_PURCHASE, **kwargs)
+        price = round(op.price, 2)  # arrondi au centime près
+        purchase_cost = round(op.purchase_cost, 2)
+        op.save() # needed?
+        return op
 
 
 class PaymentType(models.Model):
