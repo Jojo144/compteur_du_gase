@@ -351,9 +351,7 @@ class ProductsListView(ListView):
 
     def get_columns(self, local_settings) -> List[str]:
         local_settings = get_local_settings()
-        all_columns = ['nom', 'catégorie', 'fournisseur', "prix d'achat", 'prix de vente', 'vrac',
-         'visible',
-         'alerte stock', 'stock']
+        all_columns = ['nom', 'catégorie', 'fournisseur', "prix d'achat", 'prix de vente', 'vrac', 'visible', 'alerte stock', 'stock']
         columns = []
         for column in all_columns:
             if not (
@@ -367,23 +365,29 @@ class ProductsListView(ListView):
     def get_context_data(self, **kwargs):
         local_settings = get_local_settings()
 
-        pdts = [
-            {
-                "id": p.id,
-                "nom": p.name,
-                "catégorie": str(p.category),
-                "fournisseur": str(p.provider),
-                "prix d'achat": '{} € / {}'.format(p.cost_of_purchase, p.unit.name),
-                "prix de vente": '{} € / {}'.format(p.price, p.unit.name),
-                "visible": bool_to_utf8(p.visible),
-                "vrac": bool_to_utf8(p.unit.vrac),
-                "alerte stock": '{} [{}]'.format(bool_to_utf8(p.stock < p.stock_alert), round_stock(p.stock_alert)) if (p.stock_alert) else '',
-                "stock": round_stock(p.stock),
-                "details_url": reverse("base:detail_product", args=(p.id,)),
-                "stats_url": reverse("base:stats", args=(p.id,)),
-            }
-            for p in self.get_queryset()
-        ]
+        pdts = []
+
+        for p in self.get_queryset():
+            isAlertDefined = bool(p.stock_alert)
+            isInAlert = (p.stock < p.stock_alert) if isAlertDefined else False
+            pdts.append(
+                {
+                    "id": p.id,
+                    "nom": p.name,
+                    "catégorie": str(p.category),
+                    "fournisseur": str(p.provider),
+                    "prix d'achat": '{} € / {}'.format(p.cost_of_purchase, p.unit.name),
+                    "prix de vente": '{} € / {}'.format(p.price, p.unit.name),
+                    "visible": bool_to_utf8(p.visible),
+                    "vrac": bool_to_utf8(p.unit.vrac),
+                    "is_alert_defined": isAlertDefined,
+                    "is_in_alert": isInAlert,
+                    "stock": round_stock(p.stock),
+                    "stock_alert": round_stock(p.stock_alert) if isAlertDefined else '',
+                    "details_url": reverse("base:detail_product", args=(p.id,)),
+                    "stats_url": reverse("base:stats", args=(p.id,)),
+                }
+            )
 
         columns = self.get_columns(local_settings)
 
