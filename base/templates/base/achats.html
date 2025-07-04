@@ -58,6 +58,7 @@
           <thead>
             <tr>
               <th>Nom</th>
+              <th class="d-none d-lg-table-cell">Stock</th>
               <th>Prix unitaire</th>
               <th>Quantité</th>
             </tr>
@@ -65,6 +66,7 @@
           <tbody>
             <tr v-for="(pdt, id) in pdts" v-show="matchFilter(pdt)">
               <td>[[ pdt.name ]]</td>
+              <td class="d-none d-lg-block">[[ pdt.stock ]]</td>
               <td>[[ pdt.pwyw ? "prix libre !" : pdt.price + " €" ]]</td>
               <td>
                 <div class="input-group">
