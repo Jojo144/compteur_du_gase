@@ -1,0 +1,29 @@
+{% extends 'base/base.html' %}
+{% load crispy_forms_tags %}
+
+{%block content %}
+    <h2>Partager une somme</h2>
+    <form action="" method="post">
+        {% csrf_token %}
+        <br>
+        La somme à partager sera divisée et approvisionnée sur toutes les
+        cagnottes. C'est utile si le GASE a trop de sous et souhaite les partager
+        entre ses adhérents, comme en cas d'inventaire positif par exemple.
+        <br>
+        À l'inverse, on peut se partager une somme négative pour se répartir un
+        déficit, un inventaire négatif ou un dépense ponctuelle comme un
+        investissement ou un loyer. Dans ce cas il suffit d'inscrire la somme en
+        négatif dans le champ <i>Montant</i> (ex : -200 pour un loyer de 200€).
+        <br>
+        L'opération apparaitra dans la liste des approvisionnements de chaque
+        cagnotte.
+        <br>
+        <br>
+        <br>
+        {{ form | crispy }}
+        <div class="text-right">
+            <input class="btn btn-info" type="submit" value="Enregister">
+            <a class="btn btn-light" href="{% url 'base:gestion' %}">Annuler</a>
+        </div>
+    </form>
+{% endblock %}
