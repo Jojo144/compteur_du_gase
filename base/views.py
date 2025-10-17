@@ -1135,7 +1135,7 @@ def share_amount(request):
             prorata_by_member = form.cleaned_data['prorata_by_member']
             households = Household.objects.all() # takes only activated households
             if prorata_by_member:
-                nb_members = len(Member.objects.all()) # takes only activated members
+                nb_members = Member.objects.count() # takes only activated members
             else:
                 nb_households = len(households)
             pt, _ = PaymentType.objects.get_or_create(name=label)
