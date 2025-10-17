@@ -1,11 +1,9 @@
 {% comment "Liste de produits ré-utilisable, en vueJS" %}
-
-    @param products : liste de produits, sous forme d'un Array JSON encodé dans une string
-    @param colums : Liste des titres de colonnes à afficher, sous forme d'un Array JSON encodé dans une string
+    @param productsList : liste de produits, sous forme d'un Array JSON encodé dans une string
+    @param columns : Liste des titres de colonnes à afficher, sous forme d'un Array JSON encodé dans une string
 {% endcomment %}
 
 <div id="vue-table">
-
     <div class="row">
         <div class="text-right filter">
             <input type="text" v-model="search" class="form-control" placeholder="Tapez pour filtrer ...">
@@ -14,7 +12,7 @@
             <button @click="changeVisible" class="btn btn-secondary">[[ only_visible ? "Montrer " : "Masquer "]] les non
                 visibles
             </button>
-            <button @click="changeAlerte" class="btn btn-secondary">[[ only_alerte ? "Ne pas filter les alertes" : "Montrer uniquement les alertes"]]
+            <button @click="changeAlerte" class="btn btn-secondary">[[ only_alerte ? "Ne pas filtrer les alertes" : "Montrer uniquement les alertes"]]
             </button>
         </div>
 	{% if use_exports %}
@@ -27,7 +25,7 @@
     <table class="table table-striped" id="produits-table">
         <thead>
         <tr>
-            <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
+            <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }" style="cursor: pointer;">
                 [[ _.capitalize(column) ]]
                 [[ sortKey == column ? (sortWay === 'asc' ? "⯅" : "⯆") : ""]]
             </th>
@@ -36,18 +34,24 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="x in filter()">
+        <tr v-for="product in getFilteredProducts()">
             <td v-for="column in columns">
-                [[ x[column] ]]
+                <template v-if="column === 'alerte stock'">
+                    <template v-if="product.is_alert_defined">
+                        <span v-if="product.is_in_alert" role="img" aria-label="alerte stock">🔴 (≤ [[ product.stock_alert]])</span>
+                        <span v-else role="img" aria-label="stock ok">⚪ (> [[ product.stock_alert]])</span>
+                    </template>
+                </template>
+                <template v-else>
+                    [[ product[column] ]]
+                </template>
             </td>
-            <td><a :href="x.details_url">⌬ Détails</a></td>
-            <td><a :href="x.stats_url">📈 Stats</a></td>
+            <td><a :href="product.details_url">⌬ Détails</a></td>
+            <td><a :href="product.stats_url">📈 Stats</a></td>
         </tr>
         </tbody>
     </table>
-
 </div>
-
 
 <script>
  new Vue({
@@ -98,13 +102,13 @@
              }
          },
 
-         filter: function () {
+         getFilteredProducts: function () {
              var search = this.search;
              var only_visible = this.only_visible;
              var only_alerte = this.only_alerte;
              return _.pickBy(this.orderedData, (function (row) {
                  var b = (!only_visible) || (row.visible == "✔");
-                 var c = !((only_alerte) && (!row["alerte stock"].includes("✔")));
+                 var c = !((only_alerte) && (!row["is_in_alert"]));
                  return b && c && (myContains(row.nom, search) || myContains(row.catégorie, search) || myContains(row.fournisseur, search))
              }))
          }
