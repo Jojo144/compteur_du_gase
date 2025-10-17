@@ -38,7 +38,7 @@
             <td v-for="column in columns">
                 <template v-if="column === 'alerte stock'">
                     <template v-if="product.is_alert_defined">
-                        <span v-if="product.is_in_alert" role="img" aria-label="alerte stock">🔴 (< [[ product.stock_alert]])</span>
+                        <span v-if="product.is_in_alert" role="img" aria-label="alerte stock">🔴 (≤ [[ product.stock_alert]])</span>
                         <span v-else role="img" aria-label="stock ok">⚪ (> [[ product.stock_alert]])</span>
                     </template>
                 </template>

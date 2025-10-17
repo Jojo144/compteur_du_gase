@@ -82,7 +82,7 @@ def gestion(request):
     value_stock = sum([p.value_stock() for p in Product.objects.all()])
     value_accounts = sum([p.account for p in Household.objects.all()])
     alert_pdts = [p for p in Product.objects.filter(stock_alert__isnull=False, visible=True) if
-                  p.stock < p.stock_alert]
+                  p.stock <= p.stock_alert]
     return render(request, 'base/gestion.html',
                   {'value_stock': value_stock,
                    'value_accounts': value_accounts,
@@ -369,7 +369,7 @@ class ProductsListView(ListView):
 
         for p in self.get_queryset():
             isAlertDefined = bool(p.stock_alert)
-            isInAlert = (p.stock < p.stock_alert) if isAlertDefined else False
+            isInAlert = (p.stock <= p.stock_alert) if isAlertDefined else False
             pdts.append(
                 {
                     "id": p.id,
