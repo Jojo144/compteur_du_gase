@@ -1127,3 +1127,32 @@ def activity_details(request, perm_id):
     else:
         form = ActivityForm(instance=activity)
     return render(request, 'base/details_activity.html', {'form': form})
+
+
+
+def share_amount(request):
+    if request.method == 'POST':
+        form = ShareAmountForm(request.POST)
+        if form.is_valid():
+            label = form.cleaned_data['label']
+            amount = form.cleaned_data['amount']
+            prorata_by_member = form.cleaned_data['prorata_by_member']
+            households = Household.objects.all() # takes only activated households
+            if prorata_by_member:
+                nb_members = Member.objects.count() # takes only activated members
+            else:
+                nb_households = len(households)
+            pt, _ = PaymentType.objects.get_or_create(name=label)
+            for household in households:
+                if prorata_by_member:
+                    prorata = amount * len(household.get_members()) / nb_members
+                else:
+                    prorata = amount / nb_households
+                ApproCompteOp.objects.create(household=household, amount=prorata, paymenttype=pt)
+                household.account += prorata
+                household.save()
+            messages.success(request, '✔ {} € partagés'.format(amount))
+            return HttpResponseRedirect(reverse('base:index'))
+    else:
+        form = ShareAmountForm()
+    return render(request, 'base/share_amount.html', {'form': form})

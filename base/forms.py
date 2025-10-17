@@ -166,3 +166,24 @@ class ActivityForm(forms.ModelForm):
             'volunteer1': Select2(select2attrs=settings.SELECT2_ATTRS),
             'volunteer2': Select2(select2attrs=settings.SELECT2_ATTRS),
         }
+
+
+class ShareAmountForm(forms.Form):
+    label = forms.CharField(
+        label="Nom de la somme à partager entre tous les foyers",
+        max_length=200,
+        required=True,
+    )
+    amount = forms.DecimalField(
+        label="Montant de la somme",
+        required=True,
+    )
+    prorata_by_member = forms.BooleanField(
+        label="Partager au prorata du nombre de membres de chaque foyer ?",
+
+        help_text="""Si la case est cochée, les foyers comptant plus de membres toucherons
+                     une plus grosse somme que ceux avec peu de membres.
+                     Sinon, chaque foyer touchera la même somme.""",
+
+        required=False,
+    )
