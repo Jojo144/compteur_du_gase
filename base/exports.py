@@ -105,7 +105,9 @@ def generate_ecarts_data():
         'calendar_date'
     ).annotate(
         total=Sum('price')
-    )[:10]  # 10 dernières dates
+    ).order_by(
+        '-calendar_date'
+    )[:10]
 
     ecarts_data = [{'date': stat['calendar_date'],
                     'details': ope.filter(date__date=stat['calendar_date']),
