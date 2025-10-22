@@ -102,7 +102,7 @@ def gestion(request):
 
 
 def otherstats(request):
-    value_appro = sum([p.amount for p in ApproCompteOp.objects.all()])
+    value_appro = sum([p.amount for p in CagnotteOp.objects.all()])
     if get_local_settings().use_cost_of_purchase:
         value_purchase = sum([p.cost_of_purchase() for p in ChangeStockOp.objects.appros_only()])
     else:
@@ -157,8 +157,7 @@ def achats(request, household_id):
                                  kind=Mail.ALERTE_STOCK)
         if household.on_the_flight:
             ontheflight, _ = PaymentType.objects.get_or_create(name="À la volée")
-            opa = ApproCompteOp(household=household, amount=s, paymenttype=ontheflight)
-            opa.save()
+            CagnotteOp.objects.create(household=household, amount=s, paymenttype=ontheflight)
             household.account += s
             household.save()
             messages.success(request, '✔ Approvisionnement de la cagnotte de {0:.2f} € effectué'.format(s))
@@ -225,15 +224,15 @@ def pre_compte(request):
 
 def compte(request, household_id):
     household = get_object_or_404(Household, pk=household_id)
-    history = ApproCompteOp.objects.filter(household_id=household_id).order_by('-date')[:5]
+    history = CagnotteOp.objects.filter(household_id=household_id).order_by('-date')[:5]
     local_settings = get_local_settings()
     use_paymenttype = local_settings.use_paymenttype
     if request.method == 'POST':
-        form = ApproCompteFormKind(request.POST) if use_paymenttype else ApproCompteForm(request.POST)
+        form = ApproCagnotteFormKind(request.POST) if use_paymenttype else ApproCagnotteForm(request.POST)
         if form.is_valid():
             q = form.cleaned_data['amount']
             pt = form.cleaned_data.get('paymenttype')  # None if paymenttypes are not used
-            op = ApproCompteOp(household=household, amount=q, paymenttype=pt)
+            op = CagnotteOp(household=household, amount=q, paymenttype=pt)
             op.save()
             household.account += q
             household.save()
@@ -243,7 +242,7 @@ def compte(request, household_id):
                          recipients=household.get_emails_receipt(), kind=Mail.APPRO_CAGNOTTE)
             return HttpResponseRedirect(reverse('base:index'))
     else:
-        form = ApproCompteFormKind() if use_paymenttype else ApproCompteForm()
+        form = ApproCagnotteFormKind() if use_paymenttype else ApproCagnotteForm()
     context = {'household': household,
                'form': form,
                'history': history,
@@ -260,7 +259,9 @@ def compteslist(request):
         columns.append("type")
     comptes = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "foyer": str(p.household),
                 "approvisionnement": '{} €'.format(p.amount), "type": str(p.paymenttype), "date": p.date.isoformat()}
-               for p in ApproCompteOp.objects.all()]
+               for p in CagnotteOp.objects.all()]
+    columns = json.dumps(columns)
+    comptes = json.dumps(comptes)
     comptes_stats = get_comptes_stats()
     context = {
         'columns': json.dumps(columns),
@@ -274,7 +275,7 @@ def compteslist(request):
 def get_comptes_stats():
     # dates
     dates = [date.today()]
-    for a in ApproCompteOp.objects.all():
+    for a in CagnotteOp.objects.all():
         if a.date.date() not in dates:
             dates.append(a.date.date())
 
@@ -283,7 +284,7 @@ def get_comptes_stats():
     # value
     values = [0] * len(dates)
     labels = [0] * len(dates)
-    for a in ApproCompteOp.objects.all():
+    for a in CagnotteOp.objects.all():
         for ii, i in enumerate(range(dates.index(a.date.date()), len(dates))):
             values[i] += a.amount
             if ii == 0:
@@ -1096,7 +1097,7 @@ def database_info(request):
             for pdt in Product.objects.all()]
 
     def f1(h):
-        x = ApproCompteOp.objects.filter(household=h).aggregate(Sum('amount'))['amount__sum']
+        x = CagnotteOp.objects.filter(household=h).aggregate(Sum('amount'))['amount__sum']
         return x if x else Decimal(0)
 
     def f2(h):

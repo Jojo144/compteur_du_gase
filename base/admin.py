@@ -82,7 +82,7 @@ class ChangeStockOpAdmin(admin.ModelAdmin):
     list_display_links = ('label',)
 
 
-class ApproCompteOpAdmin(admin.ModelAdmin):
+class CagnotteOpAdmin(admin.ModelAdmin):
     list_display = ('id', 'date', 'household', 'amount', 'paymenttype')
     list_filter = ('paymenttype','household')
     list_display_links = ('household',)
@@ -220,7 +220,7 @@ admin.site.register(Activity, ActivityAdmin)
 admin.site.register(PaymentType)
 
 admin.site.register(ChangeStockOp, ChangeStockOpAdmin)
-admin.site.register(ApproCompteOp, ApproCompteOpAdmin)
+admin.site.register(CagnotteOp, CagnotteOpAdmin)
 
 
 admin.site.site_url = reverse('base:index')

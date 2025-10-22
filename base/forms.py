@@ -20,12 +20,12 @@ class ProviderList(forms.Form):
                                       queryset=Provider.objects.all())
 
 
-class ApproCompteForm(forms.Form):
+class ApproCagnotteForm(forms.Form):
     amount = forms.DecimalField(label="De combien d'argent la cagnotte doit-elle être approvisionnée ?",
                                 help_text="♥ Merci de ne pas oublier d'encaisser l'argent !",
                                 decimal_places=2)
 
-class ApproCompteFormKind(ApproCompteForm):
+class ApproCagnotteFormKind(ApproCagnotteForm):
     paymenttype = forms.ModelChoiceField(label="Type de paiement",
                                          required=False,
                                          queryset=PaymentType.objects.all(),
