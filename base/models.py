@@ -383,6 +383,7 @@ class ChangeStockOp(Operation):
 
     class Meta:
         verbose_name = 'Opération sur le stock'
+        verbose_name_plural = "Opérations sur le stock"
 
 
 class Purchase(Operation):
@@ -409,7 +410,7 @@ class PaymentType(models.Model):
         ordering = ['name']
 
 
-class ApproCompteOp(Operation):
+class CagnotteOp(Operation):
     household = models.ForeignKey(Household, null=True,
                                   on_delete=models.SET_NULL, verbose_name="Foyer")  # null if the household was deleted and no longer exists
     amount = models.DecimalField(max_digits=15, decimal_places=2, verbose_name="Montant")  # positif for a regular appro
@@ -423,11 +424,11 @@ class ApproCompteOp(Operation):
             return "(non renseigné)"
 
     def __str__(self):
-        return 'ApproCompteOp {} - {} - {}'.format(self.household, self.amount, self.paymenttype)
+        return 'CagnotteOp {} - {} - {}'.format(self.household, self.amount, self.paymenttype)
 
     class Meta:
-        verbose_name = "Opération d'appro de cagnotte"
-        verbose_name_plural = "Opérations d'appro de cagnotte"
+        verbose_name = "Opération sur les cagnottes"
+        verbose_name_plural = "Opérations sur les cagnottes"
 
 
 # message
