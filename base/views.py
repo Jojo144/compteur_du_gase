@@ -102,7 +102,7 @@ def gestion(request):
 
 
 def otherstats(request):
-    value_appro = sum([p.amount for p in CagnotteOp.objects.all()])
+    value_appro = sum([p.amount for p in CagnotteOp.objects.appros_only()])
     if get_local_settings().use_cost_of_purchase:
         value_purchase = sum([p.cost_of_purchase() for p in ChangeStockOp.objects.appros_only()])
     else:
@@ -157,7 +157,7 @@ def achats(request, household_id):
                                  kind=Mail.ALERTE_STOCK)
         if household.on_the_flight:
             ontheflight, _ = PaymentType.objects.get_or_create(name="À la volée")
-            CagnotteOp.objects.create(household=household, amount=s, paymenttype=ontheflight)
+            CagnotteOp.create_appro_cagnotte(household=household, amount=s, paymenttype=ontheflight)
             household.account += s
             household.save()
             messages.success(request, '✔ Approvisionnement de la cagnotte de {0:.2f} € effectué'.format(s))
@@ -224,7 +224,7 @@ def pre_compte(request):
 
 def compte(request, household_id):
     household = get_object_or_404(Household, pk=household_id)
-    history = CagnotteOp.objects.filter(household_id=household_id).order_by('-date')[:5]
+    history = CagnotteOp.objects.appros_only().filter(household_id=household_id).order_by('-date')[:5]
     local_settings = get_local_settings()
     use_paymenttype = local_settings.use_paymenttype
     if request.method == 'POST':
@@ -232,8 +232,7 @@ def compte(request, household_id):
         if form.is_valid():
             q = form.cleaned_data['amount']
             pt = form.cleaned_data.get('paymenttype')  # None if paymenttypes are not used
-            op = CagnotteOp(household=household, amount=q, paymenttype=pt)
-            op.save()
+            CagnotteOp.create_appro_cagnotte(household=household, amount=q, paymenttype=pt)
             household.account += q
             household.save()
             messages.success(request, '✔ Approvisionnement de la cagnotte de {0:.2f} € effectué'.format(q))
@@ -259,7 +258,7 @@ def compteslist(request):
         columns.append("type")
     comptes = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "foyer": str(p.household),
                 "approvisionnement": '{} €'.format(p.amount), "type": str(p.paymenttype), "date": p.date.isoformat()}
-               for p in CagnotteOp.objects.all()]
+               for p in CagnotteOp.objects.appros_only()]
     columns = json.dumps(columns)
     comptes = json.dumps(comptes)
     comptes_stats = get_comptes_stats()
@@ -275,7 +274,7 @@ def compteslist(request):
 def get_comptes_stats():
     # dates
     dates = [date.today()]
-    for a in CagnotteOp.objects.all():
+    for a in CagnotteOp.objects.appros_only():
         if a.date.date() not in dates:
             dates.append(a.date.date())
 
@@ -284,7 +283,7 @@ def get_comptes_stats():
     # value
     values = [0] * len(dates)
     labels = [0] * len(dates)
-    for a in CagnotteOp.objects.all():
+    for a in CagnotteOp.objects.appros_only():
         for ii, i in enumerate(range(dates.index(a.date.date()), len(dates))):
             values[i] += a.amount
             if ii == 0:

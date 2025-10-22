@@ -410,12 +410,34 @@ class PaymentType(models.Model):
         ordering = ['name']
 
 
+class CagnotteOpQuerySet(models.QuerySet):
+    def appros_only(self):
+        return self.filter(label=CagnotteOp.TYPE_APPRO_CAGNOTTE)
+
+    def share_amount_only(self):
+        return self.filter(label=CagnotteOp.TYPE_SHARE_AMOUNT)
+
+
 class CagnotteOp(Operation):
+    TYPE_APPRO_CAGNOTTE = "ApproCagnotte"
+    TYPE_SHARE_AMOUNT = "PartageSomme"
+
     household = models.ForeignKey(Household, null=True,
                                   on_delete=models.SET_NULL, verbose_name="Foyer")  # null if the household was deleted and no longer exists
     amount = models.DecimalField(max_digits=15, decimal_places=2, verbose_name="Montant")  # positif for a regular appro
     paymenttype = models.ForeignKey(PaymentType, null=True,
                                     on_delete=models.SET_NULL, verbose_name="Type de paiement")
+    label = models.CharField(max_length=20)
+
+    objects = CagnotteOpQuerySet.as_manager()
+
+    @classmethod
+    def create_appro_cagnotte(cls, **kwargs):
+        return cls.objects.create(label=cls.TYPE_APPRO_CAGNOTTE, **kwargs)
+
+    @classmethod
+    def create_share_amount(cls, **kwargs):
+        return cls.objects.create(label=cls.TYPE_SHARE_AMOUNT, **kwargs)
 
     def get_paymenttype_display(self):
         if self.paymenttype:
