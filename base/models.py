@@ -428,6 +428,7 @@ class CagnotteOp(Operation):
     paymenttype = models.ForeignKey(PaymentType, null=True,
                                     on_delete=models.SET_NULL, verbose_name="Type de paiement")
     label = models.CharField(max_length=20)
+    comment = models.TextField(blank=True, verbose_name="commentaire")
 
     objects = CagnotteOpQuerySet.as_manager()
 
