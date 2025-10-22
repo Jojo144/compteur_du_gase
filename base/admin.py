@@ -78,14 +78,12 @@ class MemberAdmin(admin.ModelAdmin):
 
 class ChangeStockOpAdmin(admin.ModelAdmin):
     list_display = ('id', 'label', 'date', 'product', 'quantity', 'price', 'purchase_cost')
-    list_filter = ('label','product')
-    list_display_links = ('label',)
+    list_filter = ('label', 'product')
 
 
 class CagnotteOpAdmin(admin.ModelAdmin):
-    list_display = ('id', 'date', 'household', 'amount', 'paymenttype')
-    list_filter = ('paymenttype','household')
-    list_display_links = ('household',)
+    list_display = ('id', 'label', 'date', 'household', 'amount', 'paymenttype')
+    list_filter = ('label', 'paymenttype', 'household')
 
 
 # Formulaire pour ajouter une activité récurrente au tableau des permanences
