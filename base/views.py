@@ -17,7 +17,13 @@ from extra_views import FormSetView
 from .models import *
 from .forms import *
 from .templatetags.my_tags import *
+from .utils import cached_activity_years
 
+
+def _date_filter_context():
+    return {
+        "years": cached_activity_years,
+    }
 
 
 def my_send_mail(request, subject, message, recipients, kind):
@@ -243,11 +249,14 @@ def compteslist(request):
     comptes = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "foyer": str(p.household),
                 "approvisionnement": '{} €'.format(p.amount), "type": str(p.paymenttype), "date": p.date.isoformat()}
                for p in ApproCompteOp.objects.all()]
-    columns = json.dumps(columns)
-    comptes = json.dumps(comptes)
     comptes_stats = get_comptes_stats()
-    return render(request, 'base/compteslist.html',
-                  {'columns': columns, 'comptes': comptes, 'comptes_stats': comptes_stats})
+    context = {
+        'columns': json.dumps(columns),
+        'comptes': json.dumps(comptes),
+        'comptes_stats': comptes_stats,
+    }
+    context.update(**_date_filter_context())
+    return render(request, 'base/compteslist.html', context)
 
 
 def get_comptes_stats():
@@ -281,9 +290,12 @@ def subscriptionslist(request):
     subscriptions = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "foyer": str(p),
                       "adhesion": '{} €'.format(p.subscription)}
                      for p in Household.objects.all()]
-    columns = json.dumps(columns)
-    subscriptions = json.dumps(subscriptions)
-    return render(request, 'base/subscriptionslist.html', {'columns': columns, 'subscriptions': subscriptions})
+    context = {
+        'columns': json.dumps(columns),
+        'subscriptions': json.dumps(subscriptions),
+    }
+    context.update(**_date_filter_context())
+    return render(request, 'base/subscriptionslist.html', context)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -530,12 +542,14 @@ def approslist(request):
                "coût total (prix de vente)": '{0:.2f} €'.format(p.cost_of_price()),
                "date": p.date.isoformat()}
               for p in ChangeStockOp.objects.appros_only()]
-    columns = json.dumps(columns)
-    appros = json.dumps(appros)
-    appros_stats = get_appros_stats(use_cost_of_purchase)
-    return render(request, 'base/approslist.html',
-                  {'columns': columns, 'appros': appros, 'use_cost_of_purchase': use_cost_of_purchase,
-                   'appros_stats': appros_stats})
+    context = {
+        'columns': json.dumps(columns),
+        'appros': json.dumps(appros),
+        'use_cost_of_purchase': use_cost_of_purchase,
+        'appros_stats': get_appros_stats(use_cost_of_purchase)
+    }
+    context.update(**_date_filter_context())
+    return render(request, 'base/approslist.html', context)
 
 
 def get_appros_stats(use_cost_of_purchase):
@@ -648,11 +662,14 @@ def purchaseslist(request):
                           'prix moyen du panier': '{0:.2f} €'.format(mean_baskets), 'nombre de paniers': len(baskets),
                           'total': '{0:.2f} €'.format(total_baskets)})
 
-    columns = json.dumps(columns)
-    purchases = json.dumps(purchases)
     purchases_stats = get_purchases_stats()
-    return render(request, 'base/purchaseslist.html',
-                  {'columns': columns, 'purchases': purchases, 'purchases_stats': purchases_stats})
+    context = {
+        'columns': json.dumps(columns),
+        'purchases': json.dumps(purchases),
+        'purchases_stats': purchases_stats,
+    }
+    context.update(**_date_filter_context())
+    return render(request, 'base/purchaseslist.html', context)
 
 
 def get_purchases_stats():
