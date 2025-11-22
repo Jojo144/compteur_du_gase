@@ -14,6 +14,7 @@ from django.db import transaction
 from django.db.models import Q, Sum
 from extra_views import FormSetView
 
+from .consts import MONTHS_OPTIONS, DAYS_OF_MONTH_OPTIONS
 from .models import *
 from .forms import *
 from .templatetags.my_tags import *
@@ -22,7 +23,9 @@ from .utils import cached_activity_years
 
 def _date_filter_context():
     return {
-        "years": cached_activity_years,
+        "years_options": [(str(i), str(i)) for i in cached_activity_years()],
+        "months_options": MONTHS_OPTIONS,
+        "days_options": DAYS_OF_MONTH_OPTIONS,
     }
 
 
