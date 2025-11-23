@@ -166,9 +166,18 @@ def achats(request, household_id):
         history = [{'date': p.date, 'details': PurchaseDetailOp.objects.filter(purchase=p),
                     'total': '{0:.2f} €'.format(sum([-q.price for q in PurchaseDetailOp.objects.filter(purchase=p)]))}
                    for p in purchases_history]
-        pdts = {str(p.id): {"name": p.name, "category": p.category.name if p.category else None, "pwyw": p.pwyw,
-                            "price": str(p.price), "unit": p.unit.plural_name(), "vrac": p.unit.vrac}
-                for p in Product.objects.filter(visible=True)}
+        pdts = {
+            str(p.id): {
+                "name": p.name,
+                "category": p.category.name if p.category else None,
+                "pwyw": p.pwyw,
+                "price": str(p.price),
+                "unit": p.unit.plural_name(),
+                "vrac": p.unit.vrac,
+                "stock": '{} {}'.format(round_stock(p.stock), p.unit.name),
+            }
+            for p in Product.objects.filter(visible=True)
+        }
         pdts = json.dumps(pdts)
         balance = household.account
         alerte_balance_amount = local_settings.min_balance
