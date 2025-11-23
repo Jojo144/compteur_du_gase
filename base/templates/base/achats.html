@@ -64,7 +64,10 @@
           </thead>
           <tbody>
             <tr v-for="(pdt, id) in pdts" v-show="matchFilter(pdt)">
-              <td>[[ pdt.name ]]</td>
+              <td>
+                [[ pdt.name ]]<br>
+                <small class="text-secondary">stock : [[ pdt.stock ]]</small>
+              </td>
               <td>[[ pdt.pwyw ? "prix libre !" : pdt.price + " €" ]]</td>
               <td>
                 <div class="input-group">
