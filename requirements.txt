@@ -1,6 +1,7 @@
-django>=3.2,<3.4  # LTS version
-django-bootstrap4>=23.1,<24
-django-crispy-forms>=1.13.0,<1.14
-django-extra-views>=0.14.0,<0.15
+django~=5.2  # LTS version
+django-bootstrap4~=25.3
+crispy-bootstrap4~=2025.6
+django-crispy-forms~=2.5
+django-extra-views~=0.16
 django-easy-select2>=1.5.8,<1.5.9  # careful, compatibility drop happen on patch-level :-(
-openpyxl>=3.0.9,<3.1
+openpyxl~=3.1

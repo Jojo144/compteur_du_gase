@@ -53,6 +53,11 @@ Version de démo ici : https://demo-compteur.gase.eu.org
 
 L'interface d'administration n'est pour l'instant pas accessible sans compte sur le serveur gase.eu.org.
 
+## Pré-requis
+
+Les versions de Python supportées sont 3.11 à 3.13.
+Cela correspond aux versions de Debian 12 (Bookworm) à 13 (Trixie).
+
 
 ## Installation
 

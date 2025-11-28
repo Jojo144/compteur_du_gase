@@ -33,12 +33,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "bootstrap4",
+    'crispy_bootstrap4',
     'crispy_forms',
     'easy_select2',
     "extra_views",
     'base',
 ]
 
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 SELECT2_USE_BUNDLED_JQUERY = False
 SELECT2_ATTRS={
@@ -123,7 +125,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'badge-info',
