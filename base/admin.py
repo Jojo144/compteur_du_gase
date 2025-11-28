@@ -2,12 +2,11 @@ import datetime
 
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
-from django.conf.urls import url
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.admin.widgets import AdminDateWidget
 from django.contrib.auth.models import User, Group
-from django.urls import reverse
+from django.urls import reverse, re_path
 
 from datetime import timedelta
 
@@ -154,7 +153,7 @@ class ActivityAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super().get_urls()
         my_urls = [
-            url(r'^recurring/$', self.add_recurring_view, name='recurring'),
+            re_path(r'^recurring/$', self.add_recurring_view, name='recurring'),
         ]
         return my_urls + urls
 
