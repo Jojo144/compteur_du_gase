@@ -98,6 +98,7 @@ def gestion(request):
                    'diff_values': value_accounts - value_stock,
                    'alert_pdts': alert_pdts,
                    'use_subscriptions': local_settings.use_subscription,
+                   'version': getattr(settings, 'VERSION', "Not found"),
                    })
 
 
