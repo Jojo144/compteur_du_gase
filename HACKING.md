@@ -1,5 +1,12 @@
 # Coder sur le compteur du GASE
 
+## Versions
+
+Il n'y a pas de "release" majeures du compteur. La version est donc donnée par le
+dernier commit mergé dans master. À chaque fois que nous mergeons une Pull Request
+dans master nous mettons à jour le fichier `VERSION` avec la date du jour.
+
+
 ## Environnement de développement
 
 Il est recommandé d'utiliser des paramètres personalisés pour le dév :
