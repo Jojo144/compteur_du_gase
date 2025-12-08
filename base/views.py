@@ -98,6 +98,7 @@ def gestion(request):
                    'diff_values': value_accounts - value_stock,
                    'alert_pdts': alert_pdts,
                    'use_subscriptions': local_settings.use_subscription,
+                   'version': getattr(settings, 'VERSION', "Not found"),
                    })
 
 
@@ -1156,3 +1157,15 @@ def activity_details(request, perm_id):
     else:
         form = ActivityForm(instance=activity)
     return render(request, 'base/details_activity.html', {'form': form})
+
+
+def debug(request):
+    return render(request, 'base/debug.html',
+                  {'version': getattr(settings, 'VERSION', "Not found"),
+                   'settings_local_found': getattr(settings, 'SETTINGS_LOCAL_FOUND', "Not found"),
+                   'base_dir': getattr(settings, 'BASE_DIR', "Not found"),
+                   'path': getattr(settings, 'PATH', "Not found"),
+                   'static_url': getattr(settings, 'STATIC_URL', "Not found"),
+                   'yunohost_app_id': getattr(settings, 'YUNOHOST_APP_ID', "Not found"),
+                   'ynh_integration_enabled': getattr(settings, 'YNH_INTEGRATION_ENABLED', "Not found"),
+                   })

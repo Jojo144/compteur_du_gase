@@ -149,8 +149,15 @@ YNH_INTEGRATION_ENABLED = False
 
 try:
     from .settings_local import *
+    SETTINGS_LOCAL_FOUND = True
 except ModuleNotFoundError:
+    SETTINGS_LOCAL_FOUND = FALSE
     print('Warning: the file settings_local.py was not found, you are in debug mode.')
+
+
+with open("VERSION") as f:
+    VERSION = f.read()
+
 
 if YNH_INTEGRATION_ENABLED:
     AUTHENTICATION_BACKENDS = [
