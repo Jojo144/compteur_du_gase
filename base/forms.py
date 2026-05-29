@@ -2,7 +2,7 @@ from django import forms
 from django.conf import settings
 from django.forms import inlineformset_factory, Textarea, BaseFormSet
 from django.utils.safestring import mark_safe
-from easy_select2.widgets import Select2
+from easy_select2.widgets import Select2, Select2Multiple
 
 from .models import *
 from .templatetags.my_tags import *
@@ -139,6 +139,9 @@ class ProviderForm(forms.ModelForm):
     class Meta:
         model = Provider
         exclude = []
+        widgets = {
+            'referents': Select2Multiple(select2attrs=settings.SELECT2_ATTRS),
+        }
 
 
 # used for details AND creation
