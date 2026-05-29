@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 from django.db import transaction
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Count
 from extra_views import FormSetView
 
 from .consts import MONTHS_OPTIONS, DAYS_OF_MONTH_OPTIONS
@@ -655,24 +655,30 @@ def stockslist(request):
 def purchaseslist(request):
     columns = ['jour', 'mois', 'année', 'prix moyen du panier', 'nombre de paniers', 'total']
 
-    ops = Purchase.objects.all()
-    dates = sorted({d.date.date() for d in ops})
+    perm_income = Sum('purchasedetailop__price')
+    basket_count = Count('id', distinct=True)
+    basket_avg = perm_income / basket_count
 
-    purchases = []
+    perm_stats_qs = Purchase.objects.values(
+        'date__date',
+    ).annotate(
+        perm_income=perm_income,
+        basket_count=basket_count,
+        basket_avg=basket_avg,
+    )
 
-    for date in dates:
-        baskets = []
-        for p in ops:
-            if p.date.date() == date:
-                q = PurchaseDetailOp.objects.filter(purchase=p)
-                if q:
-                    price = q.aggregate(Sum('price'))['price__sum']
-                    baskets.append(-price)
-        total_baskets = sum(baskets)
-        mean_baskets = total_baskets / len(baskets)
-        purchases.append({"date": date.isoformat(), "jour": date.day, "mois": date.month, "année": date.year,
-                          'prix moyen du panier': '{0:.2f} €'.format(mean_baskets), 'nombre de paniers': len(baskets),
-                          'total': '{0:.2f} €'.format(total_baskets)})
+    purchases = [
+        {
+            "date": row['date__date'].isoformat(),
+            "jour": row['date__date'].day,
+            "mois": row['date__date'].month,
+            "année": row['date__date'].year,
+            "prix moyen du panier": f'{-row["basket_avg"]:.2f} €',
+            "nombre de paniers": f'{row["basket_count"]}',
+            "total": f'{-row["perm_income"]:.2f} €',
+        }
+        for row in perm_stats_qs
+    ]
 
     purchases_stats = get_purchases_stats()
     context = {
