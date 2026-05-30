@@ -13,6 +13,7 @@ from django.views.generic.list import ListView
 from django.db import transaction
 from django.db.models import Q, Sum
 from extra_views import FormSetView
+from django.contrib.admin.views.decorators import staff_member_required
 
 from .consts import MONTHS_OPTIONS, DAYS_OF_MONTH_OPTIONS
 from .models import *
@@ -1184,3 +1185,19 @@ def share_amount(request):
     else:
         form = ShareAmountForm()
     return render(request, 'base/share_amount.html', {'form': form})
+
+
+
+@staff_member_required
+def debug(request):
+    return render(request, 'base/debug.html',
+                  {'version': "TODO",
+                   'settings_local_found': getattr(settings, 'SETTINGS_LOCAL_FOUND', "Not found"),
+                   'base_dir': getattr(settings, 'BASE_DIR', "Not found"),
+                   'path': getattr(settings, 'PATH', "Not found"),
+                   'static_url': getattr(settings, 'STATIC_URL', "Not found"),
+                   'yunohost_app_id': getattr(settings, 'YUNOHOST_APP_ID', "Not found"),
+                   'ynh_integration_enabled': getattr(settings, 'YNH_INTEGRATION_ENABLED', "Not found"),
+                   'databases_default_engine': settings.DATABASES['default']['ENGINE'],
+                   'databases_default_name': settings.DATABASES['default']['NAME'],
+                   })

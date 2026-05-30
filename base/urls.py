@@ -54,5 +54,5 @@ urlpatterns = [
     path('valueslist', views.valueslist, name='valueslist'),
     path('activité/<int:perm_id>', views.activity_details, name='activity_details'),
     path('partage_somme', views.share_amount, name='share_amount'),
-
+    path('debug', views.debug, name='debug'),
 ]
