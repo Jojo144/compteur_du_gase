@@ -377,6 +377,13 @@ class ChangeStockOp(Operation):
         if self.label != self.TYPE_APPRO_STOCK:
             raise TypeError("Operation must be filter with label==ApproStock")
         return self.price
+    
+    def effective_price(self): # returns effective amount based on margin settings
+        if self.label != self.TYPE_APPRO_STOCK:
+            raise TypeError("Operation must be filter with label==ApproStock")
+        if get_local_settings().use_cost_of_purchase:
+            return self.purchase_cost
+        return self.price # purchase cost is at zero when cost of purchase (margin) setting is disabled
 
     def __str__(self):
         return '{} : {} - {}'.format(self.label, self.product, self.quantity)
