@@ -521,6 +521,7 @@ class ApproView(FormSetView):
         """
         msgs: dict[str, List[str]] = {}
         for product, quantity in appro_summary:
+            # TODO : Pourra probablement être simplifié si on vire les réf par produit
             for email in product.get_email_stock_alert():
                 if not email in msgs:
                     msgs[email] = []
@@ -936,10 +937,17 @@ def archive_household(request, household_id):
 # ----------------------------------------------------------------------------------------------------------------------
 
 def providers(request):
-    columns = ['nom', 'contact', 'commentaire']
-    providers_data = [{"id": p.id, "nom": p.name, "contact": str(p.contact),
-                       "commentaire": p.comment}
-                      for p in Provider.objects.all()]
+    columns = ['nom', 'référent·es', 'contact', 'commentaire']
+    providers_data = [
+        {
+            "id": p.id,
+            "référent·es": ', '.join(str(m) for m in p.referents.all()),
+            "nom": p.name,
+            "contact": str(p.contact),
+            "commentaire": p.comment,
+        }
+        for p in Provider.objects.all()
+    ]
     columns = json.dumps(columns)
     providers_data = json.dumps(providers_data)
     return render(request, 'base/providers.html', {'columns': columns, 'providers': providers_data})

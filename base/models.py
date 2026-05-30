@@ -142,6 +142,16 @@ class Unit(models.Model):
 
 class Provider(models.Model):
     name = models.CharField(max_length=200, verbose_name="nom")
+    referents = models.ManyToManyField(
+        "Member",
+        verbose_name="référent·es",
+        blank=True,
+        help_text=(
+            "Les référent·es reçoivent, si elles ont activé les alertes, un mail à chaque fois qu'un produit du fournisseur"
+            " est approvisionné ou que le stock devient plus bas"
+            " que le niveau \"Alerte stock\" paramétré sur chaque produit."
+        ),
+    )
     contact = models.TextField(blank=True, verbose_name="mail / téléphone / adresse du fournisseur")
     comment = models.TextField(blank=True,
                                verbose_name="commentaire (quel Gasier a été en contact, historique des échanges, ...)")
@@ -304,11 +314,16 @@ class Product(models.Model):
     def value_purchase(self):
         return self.cost_of_purchase * self.stock
 
-    def get_email_stock_alert(self):
-        if self.referent and self.referent.stock_alert and self.referent.email != '':
-            return [self.referent]
-        else:
-            return []
+    def get_email_stock_alert(self) -> list[Member]:
+        # Ref produits + ref forunisseurs
+        referents = [self.referent] + list(self.provider.referents.all())
+
+        referents_to_reach = [
+            ref for ref in set(referents)
+            if ref.stock_alert and ref.email
+       ]
+
+        return referents_to_reach
 
     class Meta:
         verbose_name = 'Produit'
