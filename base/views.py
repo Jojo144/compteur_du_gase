@@ -5,7 +5,7 @@ from decimal import Decimal
 from typing import List, Iterable, Tuple
 
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpRequest
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.views.generic.edit import CreateView, UpdateView
@@ -19,7 +19,7 @@ from .consts import MONTHS_OPTIONS, DAYS_OF_MONTH_OPTIONS
 from .models import *
 from .forms import *
 from .templatetags.my_tags import *
-from .utils import cached_activity_years
+from .utils import cached_activity_years, get_referent_produit_deprecation_msg
 
 
 def _date_filter_context():
@@ -152,8 +152,11 @@ def achats(request, household_id):
                 s -= op.price
                 msg += "{} ({} € / unité) : {} unité  -> {} €\n".format(pdt.name, pdt.price, q, op.price)
                 if pdt.stock_alert and pdt.stock <= pdt.stock_alert:
+                    alert_msg = 'Le stock de {} est bas : il reste {} unités'.format(pdt, pdt.stock)
+                    if pdt.referent:
+                        alert_msg += "\n\n" + get_referent_produit_deprecation_msg(pdt, request)
                     my_send_mail(request, subject='Alerte de stock : {}'.format(pdt),
-                                 message='Le stock de {} est bas : il reste {} unités'.format(pdt, pdt.stock),
+                                 message=alert_msg,
                                  recipients=pdt.get_email_stock_alert(),
                                  kind=Mail.ALERTE_STOCK)
         if household.on_the_flight:
@@ -499,7 +502,7 @@ class ApproView(FormSetView):
                     product.save()
 
         messages.success(self.request, '✔ Approvisionnement effectué')
-        self._email_about_appro(self.provider, appro_summary.items())
+        self._email_about_appro(self.provider, appro_summary.items(), self.request)
 
         return super().formset_valid(formset)
 
@@ -513,7 +516,12 @@ class ApproView(FormSetView):
             for product in products_qs.all()
         ]
 
-    def _email_about_appro(self, provider: Provider, appro_summary: Iterable[Tuple[Product, float]]):
+    def _email_about_appro(
+            self,
+            provider: Provider,
+            appro_summary: Iterable[Tuple[Product, float]],
+            request: HttpRequest,
+    ):
         """
         Notify referents by email
 
@@ -528,6 +536,10 @@ class ApproView(FormSetView):
                     msgs[email] = []
                 msg = f'{product} a été approvisionné de {quantity} {product.unit}'
                 msgs[email].append(msg)
+
+                if product.referent:
+                    deprecation_msg = get_referent_produit_deprecation_msg(product, request)
+                    msgs[email].append(deprecation_msg)
 
 
         for (email_addr, msgs) in msgs.items():

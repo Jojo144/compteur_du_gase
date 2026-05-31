@@ -292,8 +292,8 @@ class Product(models.Model):
     referent = models.ForeignKey(Member, blank=True, null=True,
                                  help_text="S'il le souhaite, le référent reçoit un mail à chaque fois qu'un produit"
                                            " est approvisionné ou que le stock devient plus bas"
-                                           " que le niveau \"Alerte stock\"",
-                                 verbose_name="référent", on_delete=models.SET_NULL)  # todo : many to many
+                                           " que le niveau \"Alerte stock\" ⚠️ Peut-être veux-tu plutôt paramétrer un·e référent·e fournisseur ?",
+                                 verbose_name="référent (déprécié)", on_delete=models.SET_NULL)  # todo : many to many
     stock_alert = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True,
                                       help_text="Laisser vide pour pas d'alerte",
                                       verbose_name="Seuil de l'alerte stock")

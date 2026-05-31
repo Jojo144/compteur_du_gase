@@ -2,8 +2,10 @@ import datetime
 
 from django.core.cache import cache
 from django.db.models.functions import ExtractYear
+from django.http import HttpRequest
+from django.urls import reverse
 
-from base.models import Operation, Household
+from base.models import Operation, Household, Product
 
 
 def cached_activity_years():
@@ -37,3 +39,9 @@ def activity_years() -> list[int]:
     unique_years.sort(reverse=True)
 
     return unique_years
+
+
+def get_referent_produit_deprecation_msg(product: Product, request: HttpRequest) -> str:
+    url = request.build_absolute_uri(reverse("base:detail_product", args=(product.id,)))
+    return f"""Attention ⚠️ ce produit a un référent produit paramétré. Les référent·es produit sont amenés à disparaître. Voir détails et conseils ici : <{url}>
+    """

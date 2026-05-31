@@ -3,6 +3,46 @@
 {% load my_tags %}
 
 {% block content %}
+    {% if pdt.referent %}
+<aside>
+    <div class="row alert alert-warning">
+        <details>
+            <summary>⚠️ Attention, les <strong>référent·es produit</strong> pourraient disparaître le 01/06/2027 ! (cliquer pour
+                détails)
+            </summary>
+
+            <p><br> Ce produit a un référent produit paramétré.</p>
+            <h2>Qu'est-ce qui se passe ?</h2>
+            <p>Le compteur du GASE possède une notion de <em>référent par produit</em>. Le référent reçoit par mail des
+                notifs quand le stock d'un produit passe sous le seuil d'alerte.</p>
+            <p>Il semble que cette notion recouvre assez mal les usages des GASEs, d'une part parce-que le bon endroit
+                pour gérer des référents est plutôt le fournisseur que le produit, et d'autre part car on souhaite
+                pouvoir avoir possiblement <em>plusieurs</em> référent·es.</p>
+            <p>C'est pourquoi une notion de <strong>référent·e par fournisseur</strong> a été introduite récement dans le
+                logiciel. Pour l'instant, elle co-habite avec celle de référent·e produit. Les référent·es produit ET
+                les référent·es fournisseur sont prévenues par mail d'un stock trop bas.</p>
+            <p>Puisque nous (équipe de développement du logiciel) n'avons pas a-priori d'exemple d'usage réel de la
+                notion de référent prouit, nous prévoyons de <strong>supprimer la notion de référent·es par produit au
+                    1/6/2027</strong>, sauf si…</p>
+            <p>Si la notion de référent·e produit conserve un usage dans ton GASE, contacte <a
+                    href="mailto:jojo144@girole.fr">jojo144@girole.fr</a> pour expliquer ton usage et défendre le
+                sauvetage des référent·es produit. Nous pourrons alors envisager de faire cohabiter les deux notions sur
+                le long terme :-).</p>
+            <h2>Comment paramétrer les nouveaux référents fournisseur ?</h2>
+            <p>Pour chaque fournisseur, l<strong>a personne qui avait le plus de produits en référence a été « élue »
+                référente fournisseur automatiquement</strong> à la mise à jour. Cette personne a également été retirée
+                de la référence des produits concernés pour éviter les notifications en double. Les personnes qui
+                étaient « référentes minoritaires » sont, elles, restées référentes de leur(s) produit(s).</p>
+            <h2>Comment se débarasser de cet avertissement ?</h2>
+            <p>Vu que la fonction est amenée à une probable disparition, l'existence de référent·es produits produit des
+                warnings a différents endroits du logiciel. Supprimer le référent produits supprimera les warnings. Il est possible de passer les personnes
+                co-référent·es fournisseur manuellement à la place (depuis la fiche fournisseur).</p>
+
+        </details>
+    </div>
+</aside>
+{% endif %}
+
 <div class="narrow-content">
 <form action="" method="post">
     {% csrf_token %}
@@ -15,8 +55,12 @@
 
 <!-- Stock et valeur du stock -->
 <br><br>
-<h5>État des stock et historique</h5>
+<h5>État du stock et historique</h5>
 <div>
+  <p class="col-form-label">Référent·es du fournisseur {{ pdt.provider }}</p>
+  <input class="form-control" type="text" readonly
+         placeholder="{% for member in pdt.provider.referents.all %}{{ member }}{% endfor %}"
+  />
   <p class="col-form-label">Stock :</p>
   <input class="form-control" type="text" placeholder="{{ pdt.stock | print_quantity:pdt.unit }}" readonly>
   <p class="col-form-label">Valeur du stock :</p>
