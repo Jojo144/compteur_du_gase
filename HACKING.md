@@ -2,10 +2,25 @@
 
 ## Environnement de développement
 
-Il est recommandé d'utiliser des paramètres personalisés pour le dév :
+Pour lancer rapidement l'application pour un développement local, voici le script sh à lancer :
 
-    cp compteur/settings_local.py.dev.example compteur/settings_local.py
 
+```sh
+sudo apt-get install python3-venv
+python3 -m venv ./.venv
+
+.venv/bin/pip install pip --upgrade
+.venv/bin/pip install -r requirements.txt
+
+cp compteur/settings_local.py.dev.example compteur/settings_local.py
+.venv/bin/python3 manage.py migrate
+echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@test.com', 'admin')" | .venv/bin/python3 manage.py shell
+.venv/bin/python3 manage.py loaddata initial_database.json
+.venv/bin/python3 manage.py collectstatic --noinput
+.venv/bin/python3 manage.py runserver 0.0.0.0:8000
+```
+
+L'application est ensuite disponible à l'adresse http://localhost:8000/
 
 ## Pour mettre à jour en testant une branche
 

@@ -13,3 +13,10 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db-dev.sqlite3'),
     }
 }
+
+# Configuration fichiers statiques
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
+
+# Mode debug
+DEBUG = True
