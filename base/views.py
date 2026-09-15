@@ -150,7 +150,7 @@ def achats(request, household_id):
                 pdt.stock -= q
                 pdt.save()
                 s -= op.price
-                msg += "{} ({} € / unité) : {} unité  -> {} €\n".format(pdt.name, pdt.price, q, op.price)
+                msg += "{} ({} € / unité) : {} unité  -> {} €\n".format(pdt.name, pdt.price_for(household), q, op.price)
                 if pdt.stock_alert and pdt.stock <= pdt.stock_alert:
                     alert_msg = 'Le stock de {} est bas : il reste {} unités'.format(pdt, pdt.stock)
                     if pdt.referent:
@@ -183,7 +183,8 @@ def achats(request, household_id):
                 "name": p.name,
                 "category": p.category.name if p.category else None,
                 "pwyw": p.pwyw,
-                "price": str(p.price),
+                "price": str(p.price_for(household)),
+                "base_price": str(p.price),
                 "unit": p.unit.plural_name(),
                 "vrac": p.unit.vrac,
                 "stock": '{} {}'.format(round_stock(p.stock), p.unit.name),
