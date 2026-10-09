@@ -488,18 +488,18 @@ class ApproView(FormSetView):
             if form.has_changed():
                 product = form.cleaned_data["product"]
 
+                # Object edit, done before the appro so that it uses the new prices:
                 for field_name in form.changed_data:
-                    field_value = form.cleaned_data[field_name]
+                    if field_name != "quantity":
+                        setattr(product, field_name, form.cleaned_data[field_name])
 
-                    # Appro itself:
-                    if (field_name == "quantity") and (field_value != 0):
-                        self._do_appro(product, field_value)
-                        appro_summary[product] = field_value
-                    # Object edit:
-                    else:
-                        setattr(product, field_name, field_value)
+                # Appro itself:
+                quantity = form.cleaned_data.get("quantity")
+                if "quantity" in form.changed_data and quantity != 0:
+                    self._do_appro(product, quantity)
+                    appro_summary[product] = quantity
 
-                    product.save()
+                product.save()
 
         messages.success(self.request, '✔ Approvisionnement effectué')
         self._email_about_appro(self.provider, appro_summary.items(), self.request)
