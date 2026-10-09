@@ -165,3 +165,19 @@ hr.gestion-hr {
 table ul {
   padding-left: 0.75rem; /* align with header padding */
 }
+
+.low-sales-form .form-group {
+    margin-right: 1.5em;
+}
+
+.low-sales-form label {
+    margin-right: 0.5em;
+}
+
+.low-sales-form .asteriskField {
+    display: none;
+}
+
+.low-sales-filter {
+    margin-bottom: 1em;
+}

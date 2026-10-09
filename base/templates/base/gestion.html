@@ -59,6 +59,14 @@
         {% endfor %}
     </ul>
 
+    <hr class="gestion-hr">
+
+    <h4>Produits dormants</h4>
+    Liste des produits classés par quantité vendue sur une période donnée.
+    <div class="gestion-btn">
+        <a class="btn btn-info" href="{% url 'base:low_sales' %}">Produits dormants</a>
+    </div>
+
     {% if use_subscriptions %}
     <hr class="gestion-hr">
 
