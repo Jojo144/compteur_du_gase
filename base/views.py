@@ -378,17 +378,13 @@ class ProductsListView(ListView):
         return  Product.objects.all()
 
     def get_columns(self, local_settings) -> List[str]:
-        local_settings = get_local_settings()
+        hidden = set()
+        if not local_settings.use_cost_of_purchase:
+            hidden.add("prix d'achat")
+        if not local_settings.use_categories:
+            hidden.add('catégorie')
         all_columns = ['nom', 'catégorie', 'fournisseur', "prix d'achat", 'prix de vente', 'vrac', 'visible', 'alerte stock', 'stock']
-        columns = []
-        for column in all_columns:
-            if not (
-                    (column == "prix d'achat" and not local_settings.use_cost_of_purchase)
-                    or
-                    (column == "catégorie" and not local_settings.use_cost_of_purchase)
-            ):
-                columns.append(column)
-        return columns
+        return [c for c in all_columns if c not in hidden]
 
     def get_context_data(self, **kwargs):
         local_settings = get_local_settings()
