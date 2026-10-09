@@ -51,6 +51,7 @@ urlpatterns = [
     path('mail_send/<int:mail_id>', views.mail_send, name='mail_send'),
     path('subscriptionslist', views.subscriptionslist, name='subscriptionslist'),
     path('purchaseslist', views.purchaseslist, name='purchaseslist'),
+    path('produits_dormants', views.low_sales, name='low_sales'),
     path('valueslist', views.valueslist, name='valueslist'),
     path('activité/<int:perm_id>', views.activity_details, name='activity_details'),
     path('partage_somme', views.share_amount, name='share_amount'),

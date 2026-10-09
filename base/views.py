@@ -1,6 +1,6 @@
 import json
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 from typing import List, Iterable, Tuple
 
@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 from django.db import transaction
-from django.db.models import Q, Sum, Count
+from django.db.models import Q, Sum, Count, Max
 from extra_views import FormSetView
 from django.contrib.admin.views.decorators import staff_member_required
 
@@ -728,6 +728,61 @@ def get_purchases_stats():
                        for i in range(len(dates))]
 
     return purchases_stats
+
+
+def low_sales(request):
+    today = date.today()
+    params = {'start': today - timedelta(days=90), 'end': today, 'visible_only': True}
+    if 'start' in request.GET:
+        form = LowSalesForm(request.GET)
+        if form.is_valid():
+            params = form.cleaned_data
+    else:
+        form = LowSalesForm(initial=params)
+    start, end, visible_only = params['start'], params['end'], params['visible_only']
+
+    is_purchase = Q(changestockop__label=ChangeStockOp.TYPE_PURCHASE)
+    in_period = is_purchase & Q(changestockop__date__date__gte=start, changestockop__date__date__lte=end)
+    products = Product.objects.select_related('provider', 'category', 'unit').annotate(
+        sold_quantity=Sum('changestockop__quantity', filter=in_period),
+        sold_income=Sum('changestockop__price', filter=in_period),
+        sales_count=Count('changestockop', filter=in_period),
+        last_sale=Max('changestockop__date', filter=is_purchase),
+    )
+    if visible_only:
+        products = products.filter(visible=True)
+
+    # les quantités et prix des achats sont négatifs
+    rows = [
+        {
+            "url": reverse('base:detail_product', args=[p.id]),
+            "fournisseur": str(p.provider),
+            "catégorie": str(p.category) if p.category else "",
+            "produit": str(p),
+            "unité": p.unit.name,
+            "quantité vendue": float(-(p.sold_quantity or 0)),
+            "chiffre d'affaires": float(-(p.sold_income or 0)),
+            "nombre de ventes": p.sales_count,
+            "dernière vente": p.last_sale.date().isoformat() if p.last_sale else "",
+        }
+        for p in products
+    ]
+
+    use_categories = get_local_settings().use_categories
+    columns = ['fournisseur', 'catégorie', 'produit', 'quantité vendue', "chiffre d'affaires",
+               'nombre de ventes', 'dernière vente']
+    if not use_categories:
+        columns.remove('catégorie')
+
+    context = {
+        'form': form,
+        'start': start,
+        'end': end,
+        'columns': json.dumps(columns),
+        'rows': json.dumps(rows),
+        'use_categories': use_categories,
+    }
+    return render(request, 'base/low_sales.html', context)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

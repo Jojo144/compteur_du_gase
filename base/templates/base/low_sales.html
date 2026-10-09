@@ -1,0 +1,105 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h4>Produits dormants</h4>
+
+<div class="description">
+    Liste des produits classés par quantité vendue sur une période donnée (les moins vendus en premier).
+    Les produits non vendus sur la période apparaissent avec une quantité de 0.
+    La colonne « dernière vente » ne tient pas compte de la période.
+</div>
+
+<form method="get" class="form-inline low-sales-form">
+    {{ form | crispy }}
+    &nbsp;
+    <input class="btn btn-info" type="submit" value="Afficher">
+</form>
+
+<div id="vue-table">
+
+    <form class="form-inline low-sales-filter" @submit.prevent>
+        <div class="text-right filter">
+            <input type="text" v-model="search" class="form-control" size="50"
+                   placeholder="Tapez pour filtrer par fournisseur{% if use_categories %}, par produit ou par catégorie{% else %} ou par produit{% endif %}...">
+        </div>
+    </form>
+
+    <div>[[ filtered.length ]] produit(s)</div>
+
+    <table id="table" class="table table-striped">
+        <thead>
+        <tr>
+            <th v-for="column in columns" @click="sortBy(column)" :class="{ active: sortKey == column }">
+                [[ _.capitalize(column) ]]
+                [[ sortKey == column ? (sortWay === 'asc' ? "⯅" : "⯆") : ""]]
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="x in filtered">
+            <td v-for="column in columns">
+                <a v-if="column === 'produit'" :href="x.url">[[ x[column] ]]</a>
+                <span v-else>[[ display(x, column) ]]</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+  new Vue({
+      delimiters: ['[[', ']]'],
+      el: '#vue-table',
+      data: {
+          sortKey: 'quantité vendue',
+          search: '',
+          sortWay: 'asc',
+          columns: {{ columns | safe }},
+          raw_data: {{ rows | safe }},
+      },
+
+      computed: {
+          filtered: function () {
+              var sortKey = this.sortKey;
+              var data = _.orderBy(this.raw_data, function (row) {
+                  var val = row[sortKey];
+                  return _.isString(val) ? val.toLowerCase() : val;
+              }, this.sortWay);
+              var filterKey = this.search.toLowerCase();
+              var searchKeys = _.intersection(['fournisseur', 'catégorie', 'produit'], this.columns);
+              return data.filter(function (row) {
+                  return searchKeys.some(function (key) {
+                      return String(row[key]).toLowerCase().indexOf(filterKey) > -1;
+                  });
+              });
+          }
+      },
+
+      methods: {
+          sortBy: function (sortKey) {
+              if (this.sortKey === sortKey) {
+                  this.sortWay = (this.sortWay === 'asc' ? 'desc' : 'asc');
+              } else {
+                  this.sortKey = sortKey;
+              }
+          },
+
+          display: function (row, column) {
+              var val = row[column];
+              switch (column) {
+                  case 'quantité vendue':
+                      return (+val.toFixed(3)) + ' ' + row['unité'];
+                  case "chiffre d'affaires":
+                      return val.toFixed(2) + ' €';
+                  case 'dernière vente':
+                      return val ? val.split('-').reverse().join('/') : 'jamais';
+                  default:
+                      return val;
+              }
+          }
+      }
+  })
+</script>
+{% endblock %}

@@ -189,3 +189,25 @@ class ShareAmountForm(forms.Form):
         label="Commentaire",
         required=False,
     )
+
+
+class LowSalesForm(forms.Form):
+    start = forms.DateField(
+        label="Du",
+        widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
+    )
+    end = forms.DateField(
+        label="au",
+        widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
+    )
+    visible_only = forms.BooleanField(
+        label="Produits visibles uniquement",
+        required=False,
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start, end = cleaned_data.get('start'), cleaned_data.get('end')
+        if start and end and start > end:
+            raise forms.ValidationError("La date de début doit être antérieure à la date de fin.")
+        return cleaned_data
