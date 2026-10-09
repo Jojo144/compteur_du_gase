@@ -263,8 +263,6 @@ def compteslist(request):
     comptes = [{"jour": p.date.day, "mois": p.date.month, "année": p.date.year, "foyer": str(p.household),
                 "approvisionnement": '{} €'.format(p.amount), "type": str(p.paymenttype), "date": p.date.isoformat()}
                for p in CagnotteOp.objects.appros_only()]
-    columns = json.dumps(columns)
-    comptes = json.dumps(comptes)
     comptes_stats = get_comptes_stats()
     context = {
         'columns': json.dumps(columns),
