@@ -78,6 +78,16 @@
   margin-bottom: 1rem;
 }
 
+.gestion-more > summary {
+  color: #007bff;
+  cursor: pointer;
+}
+
+.gestion-more > summary:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
 .gestion-more > ul {
   margin-left: -1.4rem;
 }
