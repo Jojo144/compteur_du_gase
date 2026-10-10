@@ -43,6 +43,7 @@ urlpatterns = [
     path('note', views.create_note, name='create_note'),
     path('note/<int:note_id>', views.detail_note, name='detail_note'),
     path('stockslist', views.stockslist, name='stockslist'),
+    path('alertes_stock', views.alertslist, name='alertslist'),
     path('mailslist', views.mailslist, name='mailslist'),
     path('mails_send_all', views.mails_send_all, name='mails_send_all'),
     path('mails_del_send', views.mails_del_send, name='mails_del_send'),

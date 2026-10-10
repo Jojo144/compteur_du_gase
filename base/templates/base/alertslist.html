@@ -1,0 +1,34 @@
+{% extends "base/base.html" %}
+{% load my_tags %}
+
+{% block content %}
+<div class="medium-content">
+    <h4>Liste des alertes stock</h4>
+    Produits en rupture ou proche de la rupture de stock (produits visibles seulements).
+
+    {% if alert_pdts %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Produit</th>
+            <th>Fournisseur</th>
+            <th>Stock</th>
+            <th>Seuil d'alerte</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for p in alert_pdts %}
+        <tr>
+            <td><a href="{% url 'base:detail_product' p.id %}">{{ p.name }}</a></td>
+            <td>{{ p.provider }}</td>
+            <td>{{ p.stock | print_quantity:p.unit }}</td>
+            <td>{{ p.stock_alert | print_quantity:p.unit }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Pas d'alerte stock !</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -47,17 +47,12 @@
 
     <hr class="gestion-hr">
 
-    <h4>Liste des alertes stock</h4>
-    Produits en rupture ou proche de la rupture de stock (produits visibles seulements).
-    <ul>
-        {% for p in alert_pdts %}
-        <li>
-            {{ p.name }} : {{ p.stock | round_stock }} {{ p.unit }} en stock
-        </li>
-        {% empty %}
-        <li>Pas d'alerte stock !</li>
-        {% endfor %}
-    </ul>
+    <h4>Alertes stock</h4>
+    Produits en rupture ou proche de la rupture de stock (produits visibles seulements) :
+    {% if alert_pdts %}{{ alert_pdts|length }} alerte(s).{% else %}pas d'alerte stock !{% endif %}
+    <div class="gestion-btn">
+        <a class="btn btn-info" href="{% url 'base:alertslist' %}">Liste des alertes stock</a>
+    </div>
 
     {% if use_subscriptions %}
     <hr class="gestion-hr">
