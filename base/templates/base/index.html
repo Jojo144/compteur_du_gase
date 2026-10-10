@@ -27,4 +27,13 @@
   {{ txt_home2 | linebreaksbr }}
 </p>
 
+{% if alert_pdts %}
+<br>
+<p class="index-part">
+    <b>Alertes stock :</b>
+    {% for p in alert_pdts|slice:":10" %}{{ p.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if alert_pdts|length > 10 %}, …{% endif %}
+    <a href="{% url 'base:gestion' %}#alertes-stock">Voir la liste complète des alertes stock ({{ alert_pdts|length }})</a>
+</p>
+{% endif %}
+
 {% endblock content %}
