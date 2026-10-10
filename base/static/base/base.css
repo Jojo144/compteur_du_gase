@@ -165,3 +165,195 @@ hr.gestion-hr {
 table ul {
   padding-left: 0.75rem; /* align with header padding */
 }
+
+/* statistiques de ventes */
+
+.sales-filters {
+  background-color: #f6f7f8;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.sales-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.sales-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem 1rem;
+}
+
+.sales-fields label {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.sales-fields select {
+  max-width: 14rem;
+}
+
+.sales-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.sales-summary span {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.sales-summary strong {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.sales-chart {
+  position: relative;
+  width: 100%;
+}
+
+.sales-chart-title {
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.sales-chart-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.sales-chart-header .sales-chart-title {
+  margin: 0;
+}
+
+.sales-grouping-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.sales-grouping {
+  display: inline-flex;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: hidden;
+  font-size: 0.85rem;
+}
+
+.sales-grouping label {
+  margin: 0;
+}
+
+.sales-grouping input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sales-grouping span {
+  display: block;
+  padding: 0.2rem 0.7rem;
+  cursor: pointer;
+  color: #555;
+}
+
+.sales-grouping label + label span {
+  border-left: 1px solid #ccc;
+}
+
+.sales-grouping input:checked + span {
+  background-color: #17a2b8;
+  color: #fff;
+}
+
+.sales-grouping input:focus-visible + span {
+  outline: 2px solid #0056b3;
+  outline-offset: -2px;
+}
+
+.sales-chart .point {
+  fill: #17a2b8;
+}
+
+.sales-chart svg {
+  display: block;
+  touch-action: pan-y;
+}
+
+.sales-chart .grid {
+  stroke: #e6e6e6;
+}
+
+.sales-chart .axis {
+  stroke: #999;
+}
+
+.sales-chart .tick {
+  font-size: 11px;
+  fill: #666;
+  font-variant-numeric: tabular-nums;
+}
+
+.sales-chart .line {
+  fill: none;
+  stroke: #17a2b8;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.sales-chart .area {
+  fill: #17a2b8;
+  fill-opacity: 0.12;
+}
+
+.sales-chart .cursor {
+  stroke: #888;
+  stroke-dasharray: 3 3;
+}
+
+.sales-chart .dot {
+  fill: #fff;
+  stroke: #17a2b8;
+  stroke-width: 2;
+}
+
+.sales-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  padding: 0.35rem 0.6rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.sales-tooltip .tt-date {
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.sales-empty {
+  padding: 3rem 0;
+  text-align: center;
+  color: #888;
+}

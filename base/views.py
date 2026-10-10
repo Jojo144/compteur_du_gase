@@ -12,6 +12,7 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 from django.db import transaction
 from django.db.models import Q, Sum, Count
+from django.db.models.functions import TruncDate
 from extra_views import FormSetView
 from django.contrib.admin.views.decorators import staff_member_required
 
@@ -115,6 +116,54 @@ def otherstats(request):
                   {'value_appro': value_appro,
                    'value_purchase': value_purchase,
                    'value_purchase_household': value_purchase_household
+                   })
+
+
+def sales_stats(request):
+    def parse_date(s):
+        try:
+            return date.fromisoformat(s) if s else None
+        except ValueError:
+            return None
+
+    def parse_id(s):
+        return int(s) if s and s.isdigit() else None
+
+    start = parse_date(request.GET.get('debut'))
+    end = parse_date(request.GET.get('fin'))
+    category_id = parse_id(request.GET.get('categorie'))
+    product_id = parse_id(request.GET.get('produit'))
+    groupings = [('jour', 'Jour'), ('semaine', 'Semaine'), ('mois', 'Mois'), ('annee', 'Année')]
+    grouping = request.GET.get('groupe')
+    if grouping not in dict(groupings):
+        grouping = 'jour'
+
+    sales = PurchaseDetailOp.objects.all()
+    if start:
+        sales = sales.filter(date__date__gte=start)
+    if end:
+        sales = sales.filter(date__date__lte=end)
+    if product_id:
+        sales = sales.filter(product_id=product_id)
+    elif category_id:
+        sales = sales.filter(product__category_id=category_id)
+
+    # les ventes ont un prix négatif (quantité négative)
+    per_day = (sales.annotate(day=TruncDate('date')).values('day')
+               .annotate(amount=-Sum('price')).order_by('day'))
+    data = [{'date': d['day'].isoformat(), 'amount': float(d['amount'])} for d in per_day]
+
+    return render(request, 'base/sales_stats.html',
+                  {'data': data,
+                   'start': start.isoformat() if start else '',
+                   'end': end.isoformat() if end else '',
+                   'category_id': category_id,
+                   'product_id': product_id,
+                   'categories': Category.objects.order_by('name'),
+                   'products': Product.objects.order_by('name'),
+                   'today': date.today().isoformat(),
+                   'groupings': groupings,
+                   'grouping': grouping,
                    })
 
 

@@ -1,0 +1,357 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="medium-content sales-stats">
+
+    <h4>Statistiques de ventes</h4>
+    <p>Ventes (achats des foyers) sur la période choisie, par jour, semaine, mois ou année, et en cumulé.</p>
+
+    <form method="get" id="sales-filters" class="sales-filters">
+        <div class="sales-presets" role="group" aria-label="Périodes prédéfinies">
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-preset="30d">30 jours</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-preset="12m">12 mois</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-preset="year">Cette année</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-preset="lastyear">Année dernière</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-preset="all">Tout</button>
+        </div>
+        <div class="sales-fields">
+            <label>Du
+                <input type="date" name="debut" value="{{ start }}" max="{{ today }}" class="form-control form-control-sm">
+            </label>
+            <label>au
+                <input type="date" name="fin" value="{{ end }}" max="{{ today }}" class="form-control form-control-sm">
+            </label>
+            <label>Catégorie
+                <select name="categorie" id="sales-category" class="form-control form-control-sm">
+                    <option value="">Toutes</option>
+                    {% for c in categories %}
+                    <option value="{{ c.pk }}" {% if c.pk == category_id %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>Produit
+                <select name="produit" id="sales-product" class="form-control form-control-sm">
+                    <option value="">Tous</option>
+                    {% for p in products %}
+                    <option value="{{ p.pk }}" data-category="{{ p.category_id|default_if_none:'' }}"
+                            {% if p.pk == product_id %}selected{% endif %}>{{ p.name }}{% if not p.visible %} (non visible){% endif %}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <button type="submit" class="btn btn-sm btn-info">Afficher</button>
+        </div>
+    </form>
+
+    <div class="sales-summary" id="sales-summary"></div>
+
+    <div class="sales-chart-header">
+        <h5 class="sales-chart-title" id="sales-period-title">Montant des ventes par jour</h5>
+        <div class="sales-grouping-wrap">
+            <span id="sales-grouping-label">Regrouper par</span>
+            <div class="sales-grouping" role="radiogroup" aria-labelledby="sales-grouping-label">
+                {% for value, label in groupings %}
+                <label><input type="radio" name="groupe" value="{{ value }}" form="sales-filters"
+                              {% if value == grouping %}checked{% endif %}><span>{{ label }}</span></label>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="sales-chart" id="sales-chart-daily">
+        <div class="sales-tooltip" hidden></div>
+    </div>
+
+    <h5 class="sales-chart-title">Montant cumulé des ventes</h5>
+    <div class="sales-chart" id="sales-chart-cumul">
+        <div class="sales-tooltip" hidden></div>
+    </div>
+
+    <br>
+    <a href="{% url 'base:otherstats' %}">← Retour aux statistiques</a>
+</div>
+
+{{ data|json_script:"sales-data" }}
+{{ start|json_script:"sales-start" }}
+{{ end|json_script:"sales-end" }}
+
+<script>
+(function () {
+    const DAY = 86400000;
+    const data = JSON.parse(document.getElementById('sales-data').textContent);
+    const startParam = JSON.parse(document.getElementById('sales-start').textContent);
+    const endParam = JSON.parse(document.getElementById('sales-end').textContent);
+
+    const euro = new Intl.NumberFormat('fr-FR', {style: 'currency', currency: 'EUR', maximumFractionDigits: 0});
+    const euroCents = new Intl.NumberFormat('fr-FR', {style: 'currency', currency: 'EUR'});
+    const fmtDay = new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC'});
+    const fmtMonth = new Intl.DateTimeFormat('fr-FR', {month: 'short', year: '2-digit', timeZone: 'UTC'});
+    const fmtShort = new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: 'short', timeZone: 'UTC'});
+
+    // dates manipulées en UTC (minuit) pour éviter les soucis de changement d'heure
+    const parse = s => Date.parse(s + 'T00:00:00Z');
+    const iso = t => new Date(t).toISOString().slice(0, 10);
+
+    // ---------------------------------------------------------------- filtres
+
+    const form = document.getElementById('sales-filters');
+    const categorySelect = document.getElementById('sales-category');
+    const productSelect = document.getElementById('sales-product');
+
+    function filterProducts() {
+        const cat = categorySelect.value;
+        for (const opt of productSelect.options) {
+            if (!opt.value) continue;
+            opt.hidden = !!cat && opt.dataset.category !== cat;
+        }
+        if (productSelect.selectedOptions[0] && productSelect.selectedOptions[0].hidden) {
+            productSelect.value = '';
+        }
+    }
+    categorySelect.addEventListener('change', filterProducts);
+    filterProducts();
+
+    form.querySelectorAll('[data-preset]').forEach(btn => btn.addEventListener('click', () => {
+        const now = new Date();
+        const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+        const y = now.getFullYear();
+        let start = '', end = '';
+        switch (btn.dataset.preset) {
+            case '30d': start = iso(today - 29 * DAY); end = iso(today); break;
+            case '12m': start = iso(Date.UTC(y - 1, now.getMonth(), now.getDate() + 1)); end = iso(today); break;
+            case 'year': start = y + '-01-01'; end = iso(today); break;
+            case 'lastyear': start = (y - 1) + '-01-01'; end = (y - 1) + '-12-31'; break;
+        }
+        form.debut.value = start;
+        form.fin.value = end;
+        form.submit();
+    }));
+
+    // ---------------------------------------------------------------- série cumulée (un point par jour)
+
+    const byDay = new Map(data.map(d => [d.date, d.amount]));
+    const first = startParam ? parse(startParam) : (data.length ? parse(data[0].date) : null);
+    const last = endParam ? parse(endParam) : (data.length ? parse(data[data.length - 1].date) : null);
+
+    const series = [];
+    if (first !== null && last !== null && first <= last) {
+        let cumul = 0;
+        for (let t = first; t <= last; t += DAY) {
+            const amount = byDay.get(iso(t)) || 0;
+            cumul += amount;
+            series.push({t, amount, cumul, label: fmtDay.format(t)});
+        }
+    }
+
+    const total = series.length ? series[series.length - 1].cumul : 0;
+    const salesDays = data.length;
+    document.getElementById('sales-summary').innerHTML = series.length
+        ? `<div><span>Total</span><strong>${euro.format(total)}</strong></div>
+           <div><span>Jours avec ventes</span><strong>${salesDays}</strong></div>
+           <div><span>Moyenne par jour de vente</span><strong>${euro.format(salesDays ? total / salesDays : 0)}</strong></div>`
+        : '';
+
+    // ---------------------------------------------------------------- regroupement par jour, semaine, mois ou année
+
+    const fmtMonthLong = new Intl.DateTimeFormat('fr-FR', {month: 'long', year: 'numeric', timeZone: 'UTC'});
+    const GROUPINGS = {
+        jour: {
+            title: 'Montant des ventes par jour', amountLabel: 'Ventes du jour',
+            start: t => t, label: t => fmtDay.format(t),
+        },
+        semaine: {
+            title: 'Montant des ventes par semaine', amountLabel: 'Ventes de la semaine',
+            start: t => t - ((new Date(t).getUTCDay() + 6) % 7) * DAY,  // lundi
+            label: t => 'Semaine du ' + fmtDay.format(t),
+        },
+        mois: {
+            title: 'Montant des ventes par mois', amountLabel: 'Ventes du mois',
+            start: t => { const d = new Date(t); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1); },
+            label: t => fmtMonthLong.format(t),
+        },
+        annee: {
+            title: 'Montant des ventes par année', amountLabel: "Ventes de l'année",
+            start: t => Date.UTC(new Date(t).getUTCFullYear(), 0, 1),
+            label: t => String(new Date(t).getUTCFullYear()),
+        },
+    };
+
+    function groupSeries(grouping) {
+        const g = GROUPINGS[grouping];
+        const points = [];
+        for (const p of series) {
+            const t = g.start(p.t);
+            const last = points[points.length - 1];
+            if (last && last.t === t) {
+                last.amount += p.amount;
+                last.cumul = p.cumul;
+            } else {
+                points.push({t, amount: p.amount, cumul: p.cumul, label: g.label(t)});
+            }
+        }
+        return points;
+    }
+
+    // ---------------------------------------------------------------- graphique
+
+    const SVG = 'http://www.w3.org/2000/svg';
+
+    function el(name, attrs, parent) {
+        const e = document.createElementNS(SVG, name);
+        for (const k in attrs) e.setAttribute(k, attrs[k]);
+        if (parent) parent.appendChild(e);
+        return e;
+    }
+
+    function niceStep(max, count) {
+        const raw = max / count;
+        const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+        const norm = raw / mag;
+        return (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10) * mag;
+    }
+
+    // graduations de l'axe X : jours, semaines, mois ou années selon la durée et la place disponible
+    function xTicks(t0, t1, maxTicks) {
+        const span = (t1 - t0) / DAY;
+        const ticks = [];
+        if (span <= 45) {
+            const step = [1, 2, 7, 14].find(st => span / st <= maxTicks) || 14;
+            for (let t = t0; t <= t1; t += step * DAY) ticks.push({t, label: fmtShort.format(t)});
+            return ticks;
+        }
+        const months = span / 30.4;
+        const monthStep = [1, 2, 3, 6, 12, 24, 60].find(st => months / st <= maxTicks) || 120;
+        const d0 = new Date(t0);
+        const y = d0.getUTCFullYear();
+        let m = Math.ceil((d0.getUTCMonth() + 1) / monthStep) * monthStep;
+        for (;;) {
+            const t = Date.UTC(y, m, 1);
+            if (t > t1) break;
+            if (t >= t0) {
+                const d = new Date(t);
+                ticks.push({t, label: monthStep % 12 === 0 ? String(d.getUTCFullYear()) : fmtMonth.format(t)});
+            }
+            m += monthStep;
+        }
+        return ticks;
+    }
+
+    // dessine dans `container` la courbe de `key` ('cumul' ou 'amount') de la série
+    function draw(container, series, key, ariaLabel, amountLabel) {
+        const tooltip = container.querySelector('.sales-tooltip');
+        container.querySelectorAll('svg, .sales-empty').forEach(e => e.remove());
+        if (!series.length || total === 0 && series.every(p => p.amount === 0)) {
+            const p = document.createElement('p');
+            p.className = 'sales-empty';
+            p.textContent = 'Aucune vente sur cette période.';
+            container.appendChild(p);
+            return;
+        }
+
+        const W = container.clientWidth;
+        if (W < 150) return;
+        const H = Math.max(260, Math.min(420, W * 0.55));
+        const m = {top: 16, right: 16, bottom: 32, left: 64};
+        const iw = W - m.left - m.right, ih = H - m.top - m.bottom;
+
+        const t0 = series[0].t, t1 = series[series.length - 1].t;
+        const minY = Math.min(0, ...series.map(p => p[key]));
+        const maxY = Math.max(...series.map(p => p[key]), 1);
+        const step = niceStep(maxY - minY, 5);
+        const y0 = Math.floor(minY / step) * step, y1 = Math.ceil(maxY / step) * step;
+
+        const x = t => m.left + (t1 === t0 ? iw / 2 : (t - t0) / (t1 - t0) * iw);
+        const y = v => m.top + ih - (v - y0) / (y1 - y0) * ih;
+
+        const svg = el('svg', {width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: 'img',
+            'aria-label': ariaLabel});
+        container.insertBefore(svg, tooltip);
+
+        // grille et axe Y
+        for (let v = y0; v <= y1 + step / 2; v += step) {
+            el('line', {x1: m.left, x2: W - m.right, y1: y(v), y2: y(v), class: v === 0 ? 'axis' : 'grid'}, svg);
+            el('text', {x: m.left - 8, y: y(v), class: 'tick', 'text-anchor': 'end', 'dominant-baseline': 'middle'}, svg)
+                .textContent = euro.format(v);
+        }
+        // axe X
+        for (const tk of xTicks(t0, t1, Math.max(2, Math.floor(iw / 70)))) {
+            el('line', {x1: x(tk.t), x2: x(tk.t), y1: m.top + ih, y2: m.top + ih + 4, class: 'axis'}, svg);
+            el('text', {x: x(tk.t), y: H - 8, class: 'tick', 'text-anchor': 'middle'}, svg).textContent = tk.label;
+        }
+
+        // aire + courbe
+        const pts = series.map(p => `${x(p.t).toFixed(1)},${y(p[key]).toFixed(1)}`);
+        el('path', {d: `M${x(t0)},${y(Math.max(0, y0))}L${pts.join('L')}L${x(t1)},${y(Math.max(0, y0))}Z`, class: 'area'}, svg);
+        el('path', {d: 'M' + pts.join('L'), class: 'line'}, svg);
+        if (series.length <= 60) {
+            for (const p of series) el('circle', {cx: x(p.t), cy: y(p[key]), r: 2.5, class: 'point'}, svg);
+        }
+
+        // survol
+        const cursor = el('line', {y1: m.top, y2: m.top + ih, class: 'cursor', visibility: 'hidden'}, svg);
+        const dot = el('circle', {r: 4, class: 'dot', visibility: 'hidden'}, svg);
+        const overlay = el('rect', {x: m.left, y: m.top, width: iw, height: ih, fill: 'transparent'}, svg);
+
+        function show(evt) {
+            const rect = svg.getBoundingClientRect();
+            const px = evt.clientX - rect.left;
+            const i = Math.max(0, Math.min(series.length - 1,
+                Math.round((px - m.left) / iw * (series.length - 1))));
+            const p = series[i];
+            const cx = x(p.t), cy = y(p[key]);
+            cursor.setAttribute('x1', cx); cursor.setAttribute('x2', cx);
+            dot.setAttribute('cx', cx); dot.setAttribute('cy', cy);
+            cursor.setAttribute('visibility', 'visible'); dot.setAttribute('visibility', 'visible');
+            tooltip.innerHTML = `<div class="tt-date">${p.label}</div>
+                <div>${amountLabel} : ${key === 'amount' ? `<strong>${euroCents.format(p.amount)}</strong>` : euroCents.format(p.amount)}</div>
+                <div>Cumul : ${key === 'cumul' ? `<strong>${euroCents.format(p.cumul)}</strong>` : euroCents.format(p.cumul)}</div>`;
+            tooltip.hidden = false;
+            const tw = tooltip.offsetWidth;
+            tooltip.style.left = Math.min(Math.max(cx - tw / 2, 0), W - tw) + 'px';
+            tooltip.style.top = Math.max(cy - tooltip.offsetHeight - 12, 0) + 'px';
+        }
+        function hide() {
+            cursor.setAttribute('visibility', 'hidden'); dot.setAttribute('visibility', 'hidden');
+            tooltip.hidden = true;
+        }
+        overlay.addEventListener('pointermove', show);
+        overlay.addEventListener('pointerdown', show);
+        overlay.addEventListener('pointerleave', hide);
+    }
+
+    const cumulChart = document.getElementById('sales-chart-cumul');
+    const periodChart = document.getElementById('sales-chart-daily');
+    const periodTitle = document.getElementById('sales-period-title');
+
+    function drawCumul() {
+        draw(cumulChart, series, 'cumul', `Montant cumulé des ventes : ${euro.format(total)}`, 'Ventes du jour');
+    }
+
+    function drawPeriod() {
+        const checked = document.querySelector('input[name="groupe"]:checked');
+        const grouping = checked && GROUPINGS[checked.value] ? checked.value : 'jour';
+        const g = GROUPINGS[grouping];
+        periodTitle.textContent = g.title;
+        draw(periodChart, grouping === 'jour' ? series : groupSeries(grouping), 'amount', g.title, g.amountLabel);
+    }
+
+    // changer de regroupement redessine sans recharger, et garde le choix dans l'URL
+    document.querySelectorAll('input[name="groupe"]').forEach(r => r.addEventListener('change', () => {
+        const url = new URL(location.href);
+        url.searchParams.set('groupe', r.value);
+        history.replaceState(null, '', url);
+        drawPeriod();
+    }));
+
+    // redessine quand la largeur disponible change (y compris au premier affichage)
+    for (const [container, redraw] of [[cumulChart, drawCumul], [periodChart, drawPeriod]]) {
+        let lastWidth = container.clientWidth;
+        redraw();
+        new ResizeObserver(() => {
+            if (container.clientWidth !== lastWidth) {
+                lastWidth = container.clientWidth;
+                redraw();
+            }
+        }).observe(container);
+    }
+})();
+</script>
+{% endblock content %}
