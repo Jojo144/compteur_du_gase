@@ -50,6 +50,11 @@ def my_send_mail(request, subject, message, recipients, kind):
 # index
 # ----------------------------------------------------------------------------------------------------------------------
 
+def get_alert_products():
+    return [p for p in Product.objects.filter(stock_alert__isnull=False, visible=True) if
+            p.stock <= p.stock_alert]
+
+
 def index(request):
     local_settings = get_local_settings()
 
@@ -84,6 +89,7 @@ def index(request):
                    'activity_list': activity_list,
                    'use_logo': local_settings.use_logo,
                    'protect_personal_data' : protect_personal_data,
+                   'alert_pdts': get_alert_products(),
                    })
 
 
@@ -92,13 +98,11 @@ def gestion(request):
     # todo : use aggregate ?
     value_stock = sum([p.value_stock() for p in Product.objects.all()])
     value_accounts = sum([p.account for p in Household.objects.all()])
-    alert_pdts = [p for p in Product.objects.filter(stock_alert__isnull=False, visible=True) if
-                  p.stock <= p.stock_alert]
     return render(request, 'base/gestion.html',
                   {'value_stock': value_stock,
                    'value_accounts': value_accounts,
                    'diff_values': value_accounts - value_stock,
-                   'alert_pdts': alert_pdts,
+                   'alert_pdts': get_alert_products(),
                    'use_subscriptions': local_settings.use_subscription,
                    })
 
@@ -655,6 +659,10 @@ def stockslist(request):
     columns = json.dumps(columns)
     stocks = json.dumps(stocks)
     return render(request, 'base/stockslist.html', {'columns': columns, 'stocks': stocks})
+
+
+def alertslist(request):
+    return render(request, 'base/alertslist.html', {'alert_pdts': get_alert_products()})
 
 
 # ----------------------------------------------------------------------------------------------------------------------
