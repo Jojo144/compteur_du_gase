@@ -73,6 +73,15 @@
   margin-bottom: 0rem;
 }
 
+.gestion-more {
+  margin-left: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+.gestion-more > ul {
+  margin-left: -1.4rem;
+}
+
 header nav {
     background-color: #c0fcdf;
     font-weight: bold;
