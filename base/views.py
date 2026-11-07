@@ -12,7 +12,6 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 from django.db import transaction
 from django.db.models import Q, Sum, Count
-from django.db.models.functions import Lower
 from extra_views import FormSetView
 from django.contrib.admin.views.decorators import staff_member_required
 
@@ -1093,7 +1092,7 @@ def mail_send(request, mail_id):
 # ----------------------------------------------------------------------------------------------------------------------
 
 def inventory(request):
-    pdts = Product.objects.filter(Q(visible__exact=True) | ~Q(stock__exact=0)).order_by(Lower('name'))
+    pdts = Product.objects.filter(Q(visible__exact=True) | ~Q(stock__exact=0))
     if request.method == 'POST':
         form = ProductList(pdts, request.POST)
         if form.is_valid():
