@@ -293,6 +293,27 @@ table ul {
   fill: #17a2b8;
 }
 
+.sales-chart .selection {
+  fill: #17a2b8;
+  fill-opacity: 0.2;
+  stroke: #17a2b8;
+  stroke-width: 1;
+}
+
+.sales-chart svg rect {
+  cursor: crosshair;
+}
+
+.sales-hint {
+  font-size: 0.8rem;
+  color: #777;
+  margin-top: 0.75rem;
+}
+
+.sales-stats {
+  padding-bottom: 4rem;
+}
+
 .sales-chart svg {
   display: block;
   touch-action: pan-y;

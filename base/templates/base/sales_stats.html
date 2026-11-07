@@ -65,7 +65,9 @@
         <div class="sales-tooltip" hidden></div>
     </div>
 
-    <br>
+    <p class="sales-hint">Astuce : cliquez-glissez sur un graphique pour zoomer sur une période
+        (le bouton « précédent » du navigateur permet de revenir en arrière).</p>
+
     <a href="{% url 'base:otherstats' %}">← Retour aux statistiques</a>
 </div>
 
@@ -155,21 +157,24 @@
     const GROUPINGS = {
         jour: {
             title: 'Montant des ventes par jour', amountLabel: 'Ventes du jour',
-            start: t => t, label: t => fmtDay.format(t),
+            start: t => t, end: t => t, label: t => fmtDay.format(t),
         },
         semaine: {
             title: 'Montant des ventes par semaine', amountLabel: 'Ventes de la semaine',
             start: t => t - ((new Date(t).getUTCDay() + 6) % 7) * DAY,  // lundi
+            end: t => GROUPINGS.semaine.start(t) + 6 * DAY,
             label: t => 'Semaine du ' + fmtDay.format(t),
         },
         mois: {
             title: 'Montant des ventes par mois', amountLabel: 'Ventes du mois',
             start: t => { const d = new Date(t); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1); },
+            end: t => { const d = new Date(t); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1) - DAY; },
             label: t => fmtMonthLong.format(t),
         },
         annee: {
             title: 'Montant des ventes par année', amountLabel: "Ventes de l'année",
             start: t => Date.UTC(new Date(t).getUTCFullYear(), 0, 1),
+            end: t => Date.UTC(new Date(t).getUTCFullYear() + 1, 0, 1) - DAY,
             label: t => String(new Date(t).getUTCFullYear()),
         },
     };
@@ -234,8 +239,16 @@
         return ticks;
     }
 
-    // dessine dans `container` la courbe de `key` ('cumul' ou 'amount') de la série
-    function draw(container, series, key, ariaLabel, amountLabel) {
+    // zoom : recharge la page sur la période [start, end] (dates en ms UTC), en gardant les autres filtres
+    function zoomTo(start, end) {
+        form.debut.value = iso(Math.max(start, first));
+        form.fin.value = iso(Math.min(end, last));
+        form.submit();
+    }
+
+    // dessine dans `container` la courbe de `key` ('cumul' ou 'amount') de la série ;
+    // `grouping` sert à caler une sélection de zoom sur des jours/semaines/mois/années entiers
+    function draw(container, series, key, ariaLabel, amountLabel, grouping) {
         const tooltip = container.querySelector('.sales-tooltip');
         container.querySelectorAll('svg, .sales-empty').forEach(e => e.remove());
         if (!series.length || total === 0 && series.every(p => p.amount === 0)) {
@@ -286,13 +299,16 @@
         }
 
         // survol
+        const selection = el('rect', {y: m.top, height: ih, class: 'selection', visibility: 'hidden'}, svg);
         const cursor = el('line', {y1: m.top, y2: m.top + ih, class: 'cursor', visibility: 'hidden'}, svg);
         const dot = el('circle', {r: 4, class: 'dot', visibility: 'hidden'}, svg);
         const overlay = el('rect', {x: m.left, y: m.top, width: iw, height: ih, fill: 'transparent'}, svg);
 
+        const toPx = evt => Math.max(m.left, Math.min(m.left + iw, evt.clientX - svg.getBoundingClientRect().left));
+        const toT = px => t1 === t0 ? t0 : t0 + (px - m.left) / iw * (t1 - t0);
+
         function show(evt) {
-            const rect = svg.getBoundingClientRect();
-            const px = evt.clientX - rect.left;
+            const px = toPx(evt);
             const i = Math.max(0, Math.min(series.length - 1,
                 Math.round((px - m.left) / iw * (series.length - 1))));
             const p = series[i];
@@ -312,9 +328,44 @@
             cursor.setAttribute('visibility', 'hidden'); dot.setAttribute('visibility', 'hidden');
             tooltip.hidden = true;
         }
-        overlay.addEventListener('pointermove', show);
-        overlay.addEventListener('pointerdown', show);
-        overlay.addEventListener('pointerleave', hide);
+
+        // cliquer-glisser pour sélectionner une période et zoomer dessus
+        let dragFrom = null;
+        const dragging = evt => dragFrom !== null && Math.abs(toPx(evt) - dragFrom) > 4;
+
+        overlay.addEventListener('pointerdown', evt => {
+            if (evt.button !== 0) return;
+            dragFrom = toPx(evt);
+            overlay.setPointerCapture(evt.pointerId);
+            show(evt);
+        });
+        overlay.addEventListener('pointermove', evt => {
+            if (!dragging(evt)) {
+                show(evt);
+                return;
+            }
+            hide();
+            const px = toPx(evt);
+            selection.setAttribute('x', Math.min(px, dragFrom));
+            selection.setAttribute('width', Math.abs(px - dragFrom));
+            selection.setAttribute('visibility', 'visible');
+        });
+        overlay.addEventListener('pointerup', evt => {
+            if (dragging(evt)) {
+                const [a, b] = [toT(dragFrom), toT(toPx(evt))].sort((u, v) => u - v);
+                // arrondi au jour près, puis calé sur le regroupement affiché
+                const day = t => Math.round(t / DAY) * DAY;
+                zoomTo(grouping.start(day(a)), grouping.end(day(b)));
+            }
+            dragFrom = null;
+            selection.setAttribute('visibility', 'hidden');
+        });
+        overlay.addEventListener('pointercancel', () => {
+            dragFrom = null;
+            selection.setAttribute('visibility', 'hidden');
+            hide();
+        });
+        overlay.addEventListener('pointerleave', () => { if (dragFrom === null) hide(); });
     }
 
     const cumulChart = document.getElementById('sales-chart-cumul');
@@ -322,7 +373,8 @@
     const periodTitle = document.getElementById('sales-period-title');
 
     function drawCumul() {
-        draw(cumulChart, series, 'cumul', `Montant cumulé des ventes : ${euro.format(total)}`, 'Ventes du jour');
+        draw(cumulChart, series, 'cumul', `Montant cumulé des ventes : ${euro.format(total)}`, 'Ventes du jour',
+             GROUPINGS.jour);
     }
 
     function drawPeriod() {
@@ -330,7 +382,7 @@
         const grouping = checked && GROUPINGS[checked.value] ? checked.value : 'jour';
         const g = GROUPINGS[grouping];
         periodTitle.textContent = g.title;
-        draw(periodChart, grouping === 'jour' ? series : groupSeries(grouping), 'amount', g.title, g.amountLabel);
+        draw(periodChart, grouping === 'jour' ? series : groupSeries(grouping), 'amount', g.title, g.amountLabel, g);
     }
 
     // changer de regroupement redessine sans recharger, et garde le choix dans l'URL
