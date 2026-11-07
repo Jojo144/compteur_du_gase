@@ -1,6 +1,7 @@
 import itertools
 
 from django.db import models
+from django.db.models.functions import Lower
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail, get_connection
 from django import forms
@@ -330,7 +331,7 @@ class Product(models.Model):
 
     class Meta:
         verbose_name = 'Produit'
-        ordering = ['name']
+        ordering = [Lower('name')]
 
 
 class Operation(models.Model):
