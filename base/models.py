@@ -1,4 +1,5 @@
 import itertools
+from decimal import Decimal, ROUND_HALF_UP
 
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -221,6 +222,8 @@ class Household(models.Model):
     objects = ActivatedManager()
     all_objects = models.Manager()
 
+    discount = models.DecimalField(default=0, max_digits=5, decimal_places=2, verbose_name="remise (%)")
+
     def __str__(self):
         return self.name
 
@@ -328,6 +331,12 @@ class Product(models.Model):
 
         return referents_to_reach
 
+    def price_for(self, household: Household) -> Decimal:
+        if self.pwyw:
+            return self.price
+        ratio = 1 - household.discount / 100
+        return (self.price * ratio).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
     class Meta:
         verbose_name = 'Produit'
         ordering = ['name']
@@ -420,8 +429,11 @@ class PurchaseDetailOp(ChangeStockOp):
     purchase = models.ForeignKey(Purchase, null=False, on_delete=models.CASCADE)
 
     @classmethod
-    def create(cls, **kwargs):
-        return super().create(label=cls.TYPE_PURCHASE, **kwargs)
+    def create(cls, product: Product, purchase: Purchase, quantity: Decimal, pwyw: Decimal | None, **kwargs):
+        if purchase.household.discount is not None and pwyw is None:
+            # for households that have a discount, override the product price using the pay what you want field
+            pwyw = product.price_for(purchase.household) * quantity
+        return super().create(label=cls.TYPE_PURCHASE, product=product, purchase=purchase, quantity=quantity, pwyw=pwyw, **kwargs)
 
 
 class PaymentType(models.Model):
