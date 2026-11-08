@@ -1062,12 +1062,12 @@ def mails_action(request, mails, action):
     return redirect('base:mailslist')
 
 
-def mails_send_all(request):
+def mails_send_waiting(request):
     mails = Mail.objects.filter(sent=False)
     return mails_action(request, mails, action="send")
 
 
-def mails_del_send(request):
+def mails_del_sent(request):
     mails = Mail.objects.filter(sent=True)
     return mails_action(request, mails, action="del")
 
