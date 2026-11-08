@@ -8,9 +8,9 @@
     <div id="print-total"></div>
     </br>
 
-    <a class="btn btn-info" href="{% url 'base:mails_send_all' %}">Envoyer les mails en attente</a>
+    <a class="btn btn-info" href="{% url 'base:mails_send_waiting' %}">Envoyer les mails en attente</a>
 
-    <a class="btn btn-secondary" href="{% url 'base:mails_del_send' %}">Supprimer les mails envoyés</a>
+    <a class="btn btn-secondary" href="{% url 'base:mails_del_sent' %}">Supprimer les mails envoyés</a>
 
     <a class="btn btn-secondary" href="{% url 'base:mails_del_all' %}">Supprimer tous les mails</a>
 
