@@ -155,7 +155,7 @@ def achats(request, household_id):
                 pdt.save()
                 s -= op.price
                 msg += "{} ({} € / unité) : {} unité  -> {} €\n".format(pdt.name, pdt.price, q, op.price)
-                if pdt.stock_alert and pdt.stock <= pdt.stock_alert:
+                if pdt.stock_alert is not None and pdt.stock <= pdt.stock_alert:
                     alert_msg = 'Le stock de {} est bas : il reste {} unités'.format(pdt, pdt.stock)
                     if pdt.referent:
                         alert_msg += "\n\n" + get_referent_produit_deprecation_msg(pdt, request)
@@ -394,7 +394,7 @@ class ProductsListView(ListView):
         pdts = []
 
         for p in self.get_queryset():
-            isAlertDefined = bool(p.stock_alert)
+            isAlertDefined = p.stock_alert is not None
             isInAlert = (p.stock <= p.stock_alert) if isAlertDefined else False
             pdts.append(
                 {
