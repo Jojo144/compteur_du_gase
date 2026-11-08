@@ -1063,7 +1063,7 @@ def mails_action(request, mails, action):
 
 
 def mails_send_all(request):
-    mails = Mail.objects.all()
+    mails = Mail.objects.filter(sent=False)
     return mails_action(request, mails, action="send")
 
 
