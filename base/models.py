@@ -229,7 +229,7 @@ class Household(models.Model):
         return Member.objects.filter(household=self.pk)
 
     def get_emails_receipt(self):
-        return self.get_members().filter(receipt=True)
+        return self.get_members().filter(receipt=True).exclude(email__isnull=True).exclude(email='')
 
     class Meta:
         verbose_name = 'Foyer'
@@ -534,7 +534,7 @@ class Mail(models.Model):
             return "La notification n'a pas été envoyée"
 
     def recipient_list(self):
-        return [m.email for m in self.recipients.all()]
+        return [m.email for m in self.recipients.all() if m.email]
 
     def send(self, local_settings):
         debug_mail = local_settings.debug_mail
