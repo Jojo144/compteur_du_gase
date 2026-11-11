@@ -51,9 +51,12 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'base:gestion' %}">☭ Gestion</a></li>
                     {% if request.user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin:logout' %}">
-                                🚪 Se déconnecter
-                            </a>
+                            <form method="post" action="{% url 'admin:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="nav-link btn btn-link">
+                                    🚪 Se déconnecter
+                                </button>
+                            </form>
                         </li>
                     {% endif %}
                 </ul>
