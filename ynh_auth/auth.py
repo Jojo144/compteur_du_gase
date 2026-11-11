@@ -62,6 +62,10 @@ class SSOWatRemoteUserBackend(RemoteUserBackend):
         for django_k, ynh_ldap_perm in PERMISSIONS_MAP.items():
             attrs[django_k] = ynh_ldap_perm.encode() in user_permissions
 
+        # SSOwat already lets admins into /admin, even if they lack the main
+        # permission: don't lock them out of the Django admin.
+        attrs['is_active'] = attrs['is_active'] or attrs['is_staff']
+
         return attrs
 
 
