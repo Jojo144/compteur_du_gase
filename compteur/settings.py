@@ -169,4 +169,4 @@ if YNH_INTEGRATION_ENABLED:
     )
 
     LOGIN_URL = os.path.join('/', PATH, 'ynh_auth/login_router')
-    LOGOUT_REDIRECT_URL='/yunohost/sso/?action=logout'
+    LOGOUT_REDIRECT_URL = 'portal_logout'
