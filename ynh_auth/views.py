@@ -59,4 +59,8 @@ def portal_logout(request):
     back in on the next request.
     The portal API then redirects back to the Referer.
     """
-    return redirect(f'https://{get_portal_domain(request)}/yunohost/portalapi/logout?referer_redirect')
+    response = redirect(f'https://{get_portal_domain(request)}/yunohost/portalapi/logout?referer_redirect')
+    # Django's default policy (same-origin) would strip the Referer sent to the
+    # portal, which is on another domain.
+    response['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    return response
