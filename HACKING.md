@@ -72,8 +72,6 @@ d'utilisateur courant loggué.
 
 La définition du `login_router` (voir plus haut).
 
-### `scripts/_common.sh`
+### `manifeste.toml`
 
 On y définit les trois permissions.
-
-Remarque : la permission admin est "protected", c'est-à-dire qu'on ne peut pas la donner aux visiteurs, car sinon le visiteur essaie d'accéder à l'interface d'amdin en tant que anonyme et ça c'est pas possible.
