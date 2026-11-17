@@ -1,4 +1,5 @@
 import itertools
+from decimal import Decimal, ROUND_HALF_UP
 
 from django.db import models
 from django.db.models.functions import Lower
@@ -218,6 +219,12 @@ class Household(models.Model):
     activated = models.BooleanField(default=True,
                                     help_text="Un foyer non activé n'apparaît pas dans le logiciel. Utilisé pour archiver les foyers et ses membres",
                                     verbose_name="activé")
+    
+    margin = models.DecimalField(default=1, 
+                                 max_digits=5, 
+                                 decimal_places=2, 
+                                 help_text="Coefficient appliqué aux prix de vente.", 
+                                 verbose_name="marge")
 
     objects = ActivatedManager()
     all_objects = models.Manager()
@@ -329,6 +336,11 @@ class Product(models.Model):
 
         return referents_to_reach
 
+    def price_for(self, household: Household | None) -> Decimal:
+        if household is None:
+            return self.price
+        return (self.price * household.margin).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
     class Meta:
         verbose_name = 'Produit'
         ordering = [Lower('name')]
@@ -373,8 +385,8 @@ class ChangeStockOp(Operation):
     objects = ChangeStockOpQuerySet.as_manager()
 
     @classmethod  # constructor computing price and cost_of_purchase
-    def create(cls, product=product, quantity=quantity, pwyw=None, **kwargs):
-        price = pwyw if (pwyw is not None) else (product.price * quantity)
+    def create(cls, product=product, quantity=quantity, household=None, pwyw=None, **kwargs):
+        price = pwyw if (pwyw is not None) else (product.price_for(household) * quantity)
         purchase_cost = product.cost_of_purchase * quantity
         newstock = product.stock + quantity
         return cls.objects.create(product=product, quantity=quantity, price=price, purchase_cost=purchase_cost, stock=newstock, **kwargs)
@@ -421,8 +433,8 @@ class PurchaseDetailOp(ChangeStockOp):
     purchase = models.ForeignKey(Purchase, null=False, on_delete=models.CASCADE)
 
     @classmethod
-    def create(cls, **kwargs):
-        return super().create(label=cls.TYPE_PURCHASE, **kwargs)
+    def create(cls, purchase=purchase, **kwargs):
+        return super().create(label=cls.TYPE_PURCHASE, purchase=purchase, household=purchase.household, **kwargs)
 
 
 class PaymentType(models.Model):
